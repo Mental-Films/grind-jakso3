@@ -46,6 +46,29 @@
     }
   },
 
+  // Kartta. Yönavigaattorin paletti — maa tummin, tiet vaaleampia, reitti
+  // punainen. Tiet piirretään kahdessa kerroksessa (kuori + täyttö), mikä
+  // saa tiestön lukemaan karttana eikä viivapiirroksena.
+  //
+  // Nämä eivät ole CSS-muuttujia vaan menevät suoraan canvakselle, joten
+  // rgba() käy mutta var() ei.
+  "kartta": {
+    "maa":           "#12161C",   // pohja, kaupungin ulkopuoli
+    "kortteli":      "#171C24",   // rakennuskorttelit
+    "metsa":         "#131A18",
+    "vesi":          "#16202B",
+    "tie-kuori":     "#0D1116",   // tumma reunus tien alla
+    "tie-paa":       "#39424F",   // valtaväylä ja pääkatu
+    "tie":           "#2A323D",   // katu ja maantie
+    "tie-pieni":     "#222932",   // metsätie
+    "kadunnimi":     "#7A8694",
+    "reitti":        "#C4402F",
+    "reitti-kuori":  "#7A1E14",
+    "reitti-ajettu": "#4A241D",   // jo ajettu osuus, himmeä
+    "auto":          "#3E9E92",
+    "auto-hehku":    "rgba(62,158,146,.45)"
+  },
+
   // Kirjasimet. IBM Plex on SIL OFL -lisensoitu, joten sen saa upottaa
   // levitykseen menevään tuotantoon. Pudota woff2-tiedostot kansioon
   // assets/fontit/ — ilman niitä käytetään laitteen omaa kirjasinta, mikä

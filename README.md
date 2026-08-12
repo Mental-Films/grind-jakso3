@@ -58,6 +58,15 @@ U                           puhdas hohto — pelkkä valo, ei käyttöliittymä�
 T                           kameratestikortti
 ```
 
+Puhelinpropissa lisäksi karttatyökalu (näkyy kun ohjauspalkki on esillä):
+
+```
+W A S D   siirrä karttaa      C  keskitä autoon
+Q E       zoom                K  kartan kääntyminen
+N         uusi kaupunki       M  tallenna näkymä
+G         laitteen paikannin (toimii lentotilassa)
+```
+
 Yksikään toiminto ei ole Shift-yhdistelmän takana: klikkeri ei lähetä Shiftiä,
 ja operaattori säätää näitä pimeässä yhdellä sormella.
 
@@ -149,7 +158,9 @@ hakukoneista.
 proppi_tabletti.html    Ajolista ja cue-määrittelyt — iPad
 proppi_puhelin.html     Ajolista ja cue-määrittelyt — iPhone
 moottori.js             Cue-moottori, hohto, kirkkaus, kulmat, laitetiedot, esikatselu
+kartta.js               Karttamoottori — tiestö, reitti, kamera, paikannin
 runko.css               Rakenteen tyylit
+hopp.css                HOPP Partnerin ulkoasu
 teema.json              Värit ja kirjasimet
 sisalto.json            Teksti, numerot ja nimet
 assets/                 Grafiikka

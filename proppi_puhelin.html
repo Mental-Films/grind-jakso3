@@ -11,88 +11,418 @@
 <link rel="apple-touch-icon" href="assets/ikoni_puhelin.png">
 <link rel="manifest" href="manifest_puhelin.json">
 <link rel="stylesheet" href="runko.css">
+<link rel="stylesheet" href="hopp.css">
 <title>GRIND 3 — puhelin</title>
 </head>
 <body>
+<script src="kartta.js"></script>
 <script src="moottori.js"></script>
 <script>
-/* Alvinan iPhone autotelineessä — HOPP Partner.
+/* Alvinan iPhone autotelineessä — HOPP Partner, kuljettajanäkymä.
  *
- * Vaihe 1: cue-rakenne ja paikkamerkit. Kartta, ajastinrengas ja
- * navigaattori tehdään vaiheessa 6. Cue-numerot eivät muutu.
+ * Rakenne noudattaa kyytisovellusten genrekonventiota: kartta täyttää ruudun,
+ * tieto kelluu päällä. Ilme on oma — ei kenenkään tunnusväriä, kirjainmerkkiä
+ * eikä painikemuotoa. Ks. BRIEF_GRAAFIKKO.md kohta 8.
  *
- * Puhelin on telineessä liikkuvassa autossa, joten piilotettuihin kulmiin
- * ei voi luottaa — ajolista ajetaan Bluetooth-klikkerillä.
+ * Kartta on kartta.js. Sitä ei piirretä uudelleen cue-vaihdossa vaan sama
+ * canvas siirretään cuesta toiseen — muuten tiestö välkähtäisi joka kerta.
  */
-GRIND.kaynnista({
-  laite: 'puhelin',
+(function () {
+  var kartta = null, kangas = null, S = null;
 
-  cuet: function (M) { return [
+  /* ── Kartta cueen ────────────────────────────────────────────────────── */
+  function karttaan(juuri, ctx, asetukset) {
+    S = ctx.S;
+    if (!kangas) {
+      kangas = document.createElement('canvas');
+      kangas.className = 'hopp-kartta';
+    }
+    if (!kartta) {
+      var K = ctx.S.hopp.kartta || {};
+      kartta = new GRIND.Kartta(kangas, {
+        siemen: K.siemen || 3310,
+        zoom: K.zoom,
+        nopeusKmh: K.nopeusKmh,
+        kadut: ctx.S.hopp.kadut,
+        varit: ctx.T.kartta || {},
+        fontti: 'system-ui, sans-serif'
+      });
+      kartta.kaanny = K.kaanny !== false;
+    }
+    juuri.appendChild(kangas);
 
-    { id: 0, nimi: 'Vuoroloki', sovellus: 'hopp',
-      hohto: { vari: null, voima: 0 },
-      piirra: M.paikkamerkki({
-        sovellus: 'hopp',
-        otsikko: function (c) { return c.S.hopp.vuoroOtsikko; },
-        kuvaus: 'Ansiot, kyydit ja hyväksymisaste. Tauko on ylitetty.',
-        luku: function (c) { return c.S.luvut.vuoroTunnit + ' h'; },
-        lukuvari: 'var(--varoitus)'
-      }) },
+    var osuudet = (ctx.S.hopp.kartta && ctx.S.hopp.kartta.osuudet) || {};
+    if (asetukset.osuus != null) {
+      kartta.keskitaAutoon();
+      kartta.asetaOsuus(osuudet[asetukset.osuus] != null ? osuudet[asetukset.osuus] : 0.4);
+    }
+    kartta.liikkuu = !!asetukset.liikkuu;
+    kartta.piirra();
 
-    { id: 1, nimi: 'Räpsy + ajastin', sovellus: 'hopp',
-      hohto: { vari: null, voima: 0 },
-      piirra: M.paikkamerkki({
-        sovellus: 'hopp',
-        otsikko: 'Ruutu räpsyy',
-        kuvaus: 'Häiriö. Hyväksymisajastin sykkii ja laskee sekunteja.',
-        luku: function (c) { return c.S.luvut.ajastinSekunnit + ' s'; },
-        lukuvari: 'var(--virhe)'
-      }) },
+    var h = document.createElement('div');
+    h.className = 'hopp-himmennys';
+    juuri.appendChild(h);
+    return kartta;
+  }
 
-    { id: 2, nimi: 'START RIDE', sovellus: 'hopp',
-      kosketus: true,                       // Alvina painaa itse
-      hohto: { vari: null, voima: 0 },
-      piirra: M.paikkamerkki({
-        sovellus: 'hopp',
-        otsikko: function (c) { return c.S.hopp.aloitaNappi; },
-        kuvaus: function (c) { return c.S.hopp.matkustaja + '. Navigaattori aukeaa. Määränpää ' + c.S.hopp.maaranpaa + '.'; }
-      }) },
+  function kuori(juuri) {
+    var d = document.createElement('div');
+    d.className = 'hopp';
+    juuri.appendChild(d);
+    return d;
+  }
 
-    { id: 3, nimi: 'Ajossa', sovellus: 'hopp',
-      hohto: { vari: null, voima: 0 },
-      piirra: M.paikkamerkki({
-        sovellus: 'hopp',
-        otsikko: 'Reitti etenee',
-        kuvaus: 'GPS-näkymä. Punainen reittiviiva piirtyy auki kartalle.',
-        luku: function (c) { return c.S.hopp.ohjeet[0].matka; }
-      }) },
+  function el(luokka, sisus) {
+    var d = document.createElement('div');
+    d.className = luokka;
+    if (sisus != null) d.innerHTML = sisus;
+    return d;
+  }
 
-    { id: 4, nimi: 'KÄÄNNY YMPÄRI', sovellus: 'hopp',
-      hohto: { vari: 'punainen', voima: 4 },
-      piirra: M.paikkamerkki({
-        sovellus: 'hopp',
-        otsikko: function (c) { return c.S.hopp.kaannyNappi; },
-        kuvaus: 'Auto on päätynyt metsätielle. Reitti ei ole enää käytettävissä.',
-        lukuvari: 'var(--virhe)'
-      }) },
+  var NUOLI_OIKEA = '<svg class="hopp-nuoli" viewBox="0 0 24 24"><path d="M9 21V12.5c0-1.9 1.6-3.5 3.5-3.5H17l-3.3-3.3 1.4-1.4L21.4 10l-6.3 6.3-1.4-1.4L17 11.5h-4.5c-.8 0-1.5.7-1.5 1.5V21H9z"/></svg>';
+  var NUOLI_SUORA = '<svg class="hopp-nuoli" viewBox="0 0 24 24"><path d="M11 21V7.8l-3.6 3.6L6 10l6-6 6 6-1.4 1.4L13 7.8V21h-2z"/></svg>';
+  var NUOLI_YMPARI = '<svg class="hopp-nuoli" viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7c3.3 0 6 2.7 6 6s-2.7 6-6 6-6-2.7-6-6H4c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8z"/></svg>';
 
-    { id: 5, nimi: 'Uusi kyyti', sovellus: 'hopp',
-      kosketus: true,                       // Alvina painaa HYVÄKSY
-      hohto: { vari: null, voima: 0 },
-      piirra: M.paikkamerkki({
-        sovellus: 'hopp',
-        otsikko: function (c) { return c.S.hopp.pyyntoOtsikko; },
-        kuvaus: function (c) { return 'Nouto ' + c.S.hopp.noutopaikka + '. Ajastin ' +
-                                      c.S.luvut.ajastinSekunnit + ' s. Alvina painaa ' + c.S.hopp.hyvaksyNappi + '.'; },
-        luku: function (c) { return c.e2(c.S.luvut.provikka) + ' €'; },
-        lukuvari: 'var(--ok)'
-      }) },
+  /* ── Tilapalkki ──────────────────────────────────────────────────────── */
+  function tilapalkki(ctx) {
+    var y = el('hopp-yla');
+    y.appendChild(el('hopp-tila',
+      '<div class="hopp-piste"></div>' +
+      '<b>' + ctx.nimi('hopp') + '</b>' +
+      '<span style="color:var(--himmea);font-size:13px">' + ctx.S.hopp.otsikko + '</span>' +
+      '<span class="hopp-ansiot">' + ctx.e2(ctx.S.luvut.ansiot) + ' €</span>'));
+    return y;
+  }
 
-    /* Viimeinen cue on aina kameratestikortti. Näppäin T hyppää siihen. */
-    { id: 6, nimi: 'Kameratesti', piirra: M.testikortti() }
+  /* ── Ajastinrengas ───────────────────────────────────────────────────── */
+  var KEHA = 2 * Math.PI * 29;
+  function rengas(sekunnit) {
+    var r = el('hopp-rengas',
+      '<svg viewBox="0 0 66 66">' +
+      '<circle class="hopp-rengas-tausta" cx="33" cy="33" r="29"></circle>' +
+      '<circle class="hopp-rengas-kaari" cx="33" cy="33" r="29" ' +
+      'stroke-dasharray="' + KEHA.toFixed(1) + '" stroke-dashoffset="0"></circle>' +
+      '</svg><div class="hopp-rengas-luku">' + sekunnit + '</div>');
+    return r;
+  }
 
-  ]; }
-});
+  /* Ajastin laskee cue-suhteellisesta ajasta, joten se on joka otossa sama. */
+  function paivitaRengas(juuri, alku, kulunut) {
+    var r = juuri.querySelector('.hopp-rengas');
+    if (!r) return;
+    var jaljella = Math.max(0, alku - Math.floor(kulunut));
+    r.querySelector('.hopp-rengas-luku').textContent = jaljella;
+    r.querySelector('.hopp-rengas-kaari').style.strokeDashoffset =
+      (KEHA * (1 - jaljella / alku)).toFixed(1);
+    r.classList.toggle('hopp-kiire', jaljella <= 10);
+  }
+
+  /* ── Kyytipyyntökortti ───────────────────────────────────────────────── */
+  function pyyntoKortti(ctx, painike) {
+    var H = ctx.S.hopp, L = ctx.S.luvut;
+    var p = el('hopp-pyynto');
+    var k = el('hopp-pyynto-kortti');
+
+    var ylin = el('hopp-pyynto-ylin',
+      '<div><div class="hopp-tuotto">' + ctx.e2(L.provikka) + ' €</div>' +
+      '<div class="hopp-tuotto-selite">' + H.ennusteOtsikko + '</div></div>');
+    ylin.appendChild(rengas(L.ajastinSekunnit));
+    k.appendChild(ylin);
+
+    k.appendChild(el('hopp-pyynto-tiedot',
+      '<div class="hopp-pyynto-tieto"><span>' + H.etaisyysOtsikko + '</span><b>2,1 km</b></div>' +
+      '<div class="hopp-pyynto-tieto"><span>Matka</span><b>' + H.matkanPituus + '</b></div>' +
+      '<div class="hopp-pyynto-tieto"><span>Arvio</span><b>' + H.matkustajaArvio + ' ★</b></div>'));
+
+    k.appendChild(el('hopp-osoite',
+      '<div class="hopp-osoite-merkit"><div class="hopp-piste-nouto"></div>' +
+      '<div class="hopp-viiva-pysty"></div><div class="hopp-piste-maara"></div></div>' +
+      '<div class="hopp-osoite-rivit">' +
+      '<div class="hopp-osoite-rivi">' + H.noutopaikka + '</div>' +
+      '<div class="hopp-osoite-rivi hopp-himmea">' + H.maaranpaa + '</div></div>'));
+
+    var nappi = document.createElement('button');
+    nappi.className = 'hopp-nappi';
+    nappi.textContent = H.hyvaksyNappi;
+    /* Alvina painaa itse. Painallus jää päälle, jottei ruutu palaudu
+       kesken oton — cue vaihdetaan klikkerillä. */
+    nappi.addEventListener('click', function () { nappi.classList.add('hopp-painettu'); });
+    k.appendChild(nappi);
+
+    var hylkaa = document.createElement('button');
+    hylkaa.className = 'hopp-nappi hopp-toissijainen';
+    hylkaa.textContent = H.hylkaaNappi;
+    k.appendChild(hylkaa);
+
+    p.appendChild(k);
+    return p;
+  }
+
+  /* ── Operaattorin karttatyökalu ──────────────────────────────────────── */
+  function karttatyokalu(juuri) {
+    var t = el('hopp-karttatyokalu');
+    t.innerHTML =
+      '<div class="hopp-tt-rivi"><span>KARTTA</span><b id="hopp-tt-tila">–</b></div>' +
+      '<div class="hopp-tt-rivi"><span>siemen</span><b id="hopp-tt-siemen">–</b></div>' +
+      '<div class="hopp-tt-rivi"><span>zoom</span><b id="hopp-tt-zoom">–</b></div>' +
+      '<div style="color:var(--himmea-2);line-height:1.6;margin-top:3px">' +
+      'W A S D siirrä · Q E zoom<br>C keskitä · K käännä<br>' +
+      'N uusi kaupunki · M tallenna<br>G paikannin</div>';
+    juuri.appendChild(t);
+    paivitaTyokalu();
+    return t;
+  }
+
+  function paivitaTyokalu() {
+    if (!kartta) return;
+    var a = document.getElementById('hopp-tt-tila');
+    if (!a) return;
+    a.textContent = kartta.gps ? 'GPS' : (kartta.vapaa ? 'siirretty' : 'auto');
+    document.getElementById('hopp-tt-siemen').textContent = kartta.asetukset.siemen;
+    document.getElementById('hopp-tt-zoom').textContent = kartta.zoom.toFixed(2);
+  }
+
+  /* ══ Cuet ═══════════════════════════════════════════════════════════════ */
+  GRIND.kaynnista({
+    laite: 'puhelin',
+    cuet: function (M) { return [
+
+      /* 0 — Vuoroloki. 18 tuntia ajossa, tauko ylitetty. */
+      { id: 0, nimi: 'Vuoroloki', sovellus: 'hopp',
+        piirra: function (juuri, ctx) {
+          var d = kuori(juuri);
+          karttaan(d, ctx, { osuus: 'nouto' });
+          d.appendChild(tilapalkki(ctx));
+          karttatyokalu(d);
+
+          var H = ctx.S.hopp, L = ctx.S.luvut;
+          var a = el('hopp-ala');
+          var p = el('hopp-paneeli');
+          p.appendChild(el('hopp-kahva'));
+          p.appendChild(el('hopp-otsikko', H.vuoroOtsikko));
+          p.appendChild(el('hopp-vuoro',
+            '<div class="hopp-vuoro-luku">' + L.vuoroTunnit + '</div>' +
+            '<div class="hopp-vuoro-min">h ' + L.vuoroMinuutit + ' min</div>'));
+          p.appendChild(el('hopp-luvut',
+            '<div class="hopp-luku"><span>' + H.ansiotOtsikko + '</span><b>' +
+              ctx.e2(L.ansiot) + ' €</b></div>' +
+            '<div class="hopp-luku"><span>' + H.kyyditOtsikko + '</span><b>' + L.kyydit + '</b></div>' +
+            '<div class="hopp-luku"><span>' + H.hyvaksyntaOtsikko + '</span><b>' +
+              ctx.e1(L.hyvaksymisprosentti) + ' %</b></div>'));
+          p.appendChild(el('hopp-varoitus', '<span>⚠</span><span>' + H.taukoVaroitus + '</span>'));
+          a.appendChild(p);
+          d.appendChild(a);
+        } },
+
+      /* 1 — Ruutu räpsyy, hyväksymisajastin sykkii. */
+      { id: 1, nimi: 'Räpsy + ajastin', sovellus: 'hopp',
+        piirra: function (juuri, ctx) {
+          var d = kuori(juuri);
+          karttaan(d, ctx, { osuus: 'nouto' });
+          d.appendChild(tilapalkki(ctx));
+          karttatyokalu(d);
+          d.appendChild(pyyntoKortti(ctx));
+        },
+        tick: function (juuri, ctx) { paivitaRengas(juuri, ctx.S.luvut.ajastinSekunnit, ctx.t); } },
+
+      /* 2 — Matkustaja kyydissä, navigaattori aukeaa. Alvina painaa START RIDE. */
+      { id: 2, nimi: 'START RIDE', sovellus: 'hopp',
+        kosketus: true,
+        piirra: function (juuri, ctx) {
+          var d = kuori(juuri);
+          karttaan(d, ctx, { osuus: 'nouto' });
+          d.appendChild(tilapalkki(ctx));
+          karttatyokalu(d);
+
+          var H = ctx.S.hopp;
+          var a = el('hopp-ala');
+          var p = el('hopp-paneeli');
+          p.appendChild(el('hopp-kahva'));
+          p.appendChild(el('hopp-otsikko', H.matkustaja));
+          var nimi = H.matkustajaNimi || 'Matkustaja';
+          p.appendChild(el('hopp-matkustaja',
+            '<div class="hopp-kuva">' + nimi.charAt(0) + '</div>' +
+            '<div><div class="hopp-matkustaja-nimi">' + nimi + '</div>' +
+            '<div class="hopp-matkustaja-tieto">' + H.matkanPituus + ' · perillä ' + H.saapumisaika + '</div></div>' +
+            '<div class="hopp-arvio">' + H.matkustajaArvio + ' ★</div>'));
+          p.appendChild(el('hopp-osoite',
+            '<div class="hopp-osoite-merkit"><div class="hopp-piste-nouto"></div>' +
+            '<div class="hopp-viiva-pysty"></div><div class="hopp-piste-maara"></div></div>' +
+            '<div class="hopp-osoite-rivit">' +
+            '<div class="hopp-osoite-rivi hopp-himmea">' + H.noutopaikka + '</div>' +
+            '<div class="hopp-osoite-rivi">' + H.maaranpaa + '</div></div>'));
+
+          var nappi = document.createElement('button');
+          nappi.className = 'hopp-nappi';
+          nappi.textContent = H.aloitaNappi;
+          nappi.addEventListener('click', function () { nappi.classList.add('hopp-painettu'); });
+          p.appendChild(nappi);
+          a.appendChild(p);
+          d.appendChild(a);
+        } },
+
+      /* 3 — Ajossa. Kartta liikkuu ja reittiviiva etenee. */
+      { id: 3, nimi: 'Ajossa', sovellus: 'hopp',
+        piirra: function (juuri, ctx) {
+          var d = kuori(juuri);
+          karttaan(d, ctx, { osuus: 'ajossa', liikkuu: true });
+          karttatyokalu(d);
+
+          var H = ctx.S.hopp, ohje = H.ohjeet[0];
+          var y = el('hopp-yla');
+          y.appendChild(el('hopp-ohje',
+            NUOLI_OIKEA +
+            '<div><div class="hopp-ohje-matka" id="hopp-matka">' + ohje.matka + '</div>' +
+            '<div class="hopp-ohje-teksti">' + ohje.teksti + '</div></div>'));
+          d.appendChild(y);
+
+          var a = el('hopp-ala');
+          var p = el('hopp-paneeli');
+          p.appendChild(el('hopp-luvut',
+            '<div class="hopp-luku"><span>Perillä</span><b>' + H.saapumisaika + '</b></div>' +
+            '<div class="hopp-luku"><span>Jäljellä</span><b id="hopp-jaljella">' + H.matkanPituus + '</b></div>' +
+            '<div class="hopp-luku"><span>Nopeus</span><b id="hopp-nopeus">–</b></div>'));
+          a.appendChild(p);
+          d.appendChild(a);
+        },
+        tick: function (juuri, ctx) {
+          if (!kartta) return;
+          var dt = Math.min(0.1, (ctx.t - (this._edellinen || 0)));
+          this._edellinen = ctx.t;
+          kartta.etene(dt);
+          kartta.piirra();
+
+          var jaljella = Math.max(0, kartta.reitinPituus - kartta.matka);
+          var m = juuri.querySelector('#hopp-jaljella');
+          if (m) m.textContent = jaljella > 950
+            ? ctx.e1(jaljella / 1000) + ' km' : Math.round(jaljella / 10) * 10 + ' m';
+          var n = juuri.querySelector('#hopp-nopeus');
+          if (n) n.textContent = Math.round(kartta.nopeus * 3.6) + ' km/h';
+
+          /* Käännösohje lasketaan reitin kaarevuudesta, jotta se vastaa sitä
+             mitä kartalla oikeasti tapahtuu. */
+          var e = juuri.querySelector('#hopp-matka');
+          if (e) {
+            var seuraava = Math.max(0, 400 - (kartta.matka % 400));
+            e.textContent = seuraava > 950
+              ? ctx.e1(seuraava / 1000) + ' km' : Math.round(seuraava / 10) * 10 + ' m';
+          }
+        } },
+
+      /* 4 — Metsätie. Reitti ei ole enää käytettävissä. */
+      { id: 4, nimi: 'KÄÄNNY YMPÄRI', sovellus: 'hopp',
+        hohto: { vari: 'punainen', voima: 3 },
+        piirra: function (juuri, ctx) {
+          var d = kuori(juuri);
+          karttaan(d, ctx, { osuus: 'metsatie' });
+          karttatyokalu(d);
+
+          var H = ctx.S.hopp, viimeinen = H.ohjeet[H.ohjeet.length - 1];
+          var y = el('hopp-yla');
+          var ohje = el('hopp-ohje hopp-hatatila',
+            NUOLI_YMPARI +
+            '<div><div class="hopp-ohje-matka">' + H.kaannyNappi + '</div>' +
+            '<div class="hopp-ohje-teksti">' + viimeinen.teksti + '</div></div>');
+          y.appendChild(ohje);
+          d.appendChild(y);
+        } },
+
+      /* 5 — Uusi kyyti lähellä. Alvina painaa HYVÄKSY. */
+      { id: 5, nimi: 'Uusi kyyti', sovellus: 'hopp',
+        kosketus: true,
+        piirra: function (juuri, ctx) {
+          var d = kuori(juuri);
+          karttaan(d, ctx, { osuus: 'metsatie' });
+          d.appendChild(tilapalkki(ctx));
+          karttatyokalu(d);
+          d.appendChild(pyyntoKortti(ctx));
+        },
+        tick: function (juuri, ctx) { paivitaRengas(juuri, ctx.S.luvut.ajastinSekunnit, ctx.t); } },
+
+      { id: 6, nimi: 'Kameratesti', piirra: M.testikortti() }
+
+    ]; }
+  }).then(function () {
+    /* ── Operaattorin karttanäppäimet ──────────────────────────────────────
+       Moottori jättää tuntemattomat näppäimet käsittelemättä, joten nämä
+       tulevat sen päälle. Ei päällekkäisyyksiä moottorin näppäinten kanssa. */
+    window.addEventListener('keydown', function (t) {
+      if (!kartta || t.metaKey || t.ctrlKey || t.altKey) return;
+      var n = t.key.toLowerCase(), askel = 70, kasitelty = true;
+      switch (n) {
+        case 'w': kartta.siirra(0, -askel); break;
+        case 's': kartta.siirra(0, askel); break;
+        case 'a': kartta.siirra(-askel, 0); break;
+        case 'd': kartta.siirra(askel, 0); break;
+        case 'q': kartta.zoom = Math.max(0.04, kartta.zoom / 1.3); break;
+        case 'e': kartta.zoom = Math.min(4, kartta.zoom * 1.3); break;
+        case 'c': kartta.keskitaAutoon(); break;
+        case 'k': kartta.kaanny = !kartta.kaanny; break;
+        case 'n': uusiKaupunki(); break;
+        case 'm': tallennaNakyma(); break;
+        case 'g': paikannin(); break;
+        default: kasitelty = false;
+      }
+      if (!kasitelty) return;
+      t.preventDefault();
+      kartta.piirra();
+      paivitaTyokalu();
+    });
+  });
+
+  /* Uusi siemen = uusi kaupunki samalla tyylillä. Jatkuvuuden takia siemen
+     pitää kirjata sisalto.json:iin, kun oikea löytyy. */
+  function uusiKaupunki() {
+    var uusi = Math.floor(Math.random() * 99999);
+    var vanha = kartta.asetukset;
+    kartta = new GRIND.Kartta(kangas, {
+      siemen: uusi, zoom: kartta.zoom, nopeusKmh: vanha.nopeusKmh,
+      kadut: vanha.kadut, varit: vanha.varit, fontti: vanha.fontti
+    });
+    GRIND.ilmoita ? GRIND.ilmoita('siemen ' + uusi) : null;
+  }
+
+  /* Tallentaa nykyisen näkymän laitteeseen ja tulostaa sen konsoliin
+     muodossa, jonka voi kopioida suoraan sisalto.json:iin. */
+  function tallennaNakyma() {
+    var n = {
+      siemen: kartta.asetukset.siemen,
+      zoom: Number(kartta.zoom.toFixed(3)),
+      keskus: [Math.round(kartta.keskus.x), Math.round(kartta.keskus.y)],
+      osuus: Number((kartta.matka / kartta.reitinPituus).toFixed(3)),
+      tallennettu: new Date().toISOString().slice(0, 16)
+    };
+    var lista = [];
+    try { lista = JSON.parse(localStorage.getItem('grind3-kartat') || '[]'); } catch (e) {}
+    lista.push(n);
+    try { localStorage.setItem('grind3-kartat', JSON.stringify(lista)); } catch (e) {}
+    console.log('Kopioi tämä sisalto.json → hopp.kartta.nakymat:\n' + JSON.stringify(lista, null, 2));
+    naytaViesti('näkymä tallennettu · siemen ' + n.siemen + ' · ' + lista.length + ' kpl');
+  }
+
+  function paikannin() {
+    if (kartta.gpsVahti) {
+      kartta.seuraaGps(false);
+      naytaViesti('paikannin pois');
+      return;
+    }
+    naytaViesti('paikannin päälle — odota paikannusta');
+    kartta.seuraaGps(true, function (viesti) {
+      naytaViesti(viesti);
+      kartta.piirra();
+      paivitaTyokalu();
+    });
+  }
+
+  function naytaViesti(teksti) {
+    var el2 = document.getElementById('ko-ilmoitus');
+    if (!el2) return;
+    el2.textContent = teksti;
+    el2.classList.add('ko-nakyy');
+    clearTimeout(naytaViesti._a);
+    naytaViesti._a = setTimeout(function () { el2.classList.remove('ko-nakyy'); }, 2200);
+  }
+})();
 </script>
 </body>
 </html>

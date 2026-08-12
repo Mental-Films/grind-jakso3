@@ -1,0 +1,272 @@
+/* HOPP Partner — kuljettajanäkymä.
+ *
+ * Rakenne on kyytisovellusten genrekonventio: kartta täyttää ruudun, tieto
+ * kelluu sen päällä ylä- ja alalaidassa. Ilme on oma — ks. BRIEF_GRAAFIKKO.md
+ * kohta 8. Ei kenenkään tunnusväriä, kirjainmerkkiä eikä painikemuotoa.
+ *
+ * Värit tulevat teema.json:ista. Mitat ovat pisteitä (pt = CSS-px iOS:ssä).
+ */
+
+.hopp {
+  position: absolute; inset: 0;
+  overflow: hidden;
+  color: var(--teksti);
+  font-family: var(--fontti);
+  --hopp: var(--tunnus, #3E9E92);
+}
+
+.hopp-kartta { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* Kartan päälle ylä- ja alareunaan tummennus, jotta valkoinen teksti
+   erottuu kartasta riippumatta siitä, mitä kartalla sattuu olemaan. */
+.hopp-himmennys {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(8,10,14,.85) 0%, rgba(8,10,14,0) 26%),
+    linear-gradient(to top,    rgba(8,10,14,.9)  0%, rgba(8,10,14,0) 34%);
+}
+
+.hopp-yla {
+  position: absolute; left: 0; right: 0;
+  top: calc(var(--turva-yla) + var(--palkki-tila, 0px));
+  padding: 10px 14px 0;
+}
+.hopp-ala {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--turva-ala) + 10px);
+  padding: 0 14px;
+}
+
+/* ── Tilapalkki: verkossa / vuoro käynnissä ─────────────────────────────── */
+.hopp-tila {
+  display: flex; align-items: center; gap: 9px;
+  background: rgba(21,26,33,.94);
+  border: 1px solid var(--viiva-2);
+  border-radius: 999px;
+  padding: 8px 15px 8px 12px;
+  backdrop-filter: blur(8px);
+}
+.hopp-piste {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--hopp);
+  box-shadow: 0 0 0 4px rgba(62,158,146,.2);
+}
+.hopp-tila b { font-size: 14px; font-weight: 600; letter-spacing: .02em; }
+.hopp-tila .hopp-ansiot {
+  margin-left: auto;
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600; font-size: 15px;
+}
+
+/* ── Käännösohje ajon aikana ────────────────────────────────────────────── */
+.hopp-ohje {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--paneeli-3);
+  border: 1px solid var(--viiva-2);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 26px rgba(0,0,0,.5);
+}
+.hopp-ohje.hopp-hatatila {
+  background: #3A1610;
+  border-color: var(--virhe);
+}
+.hopp-nuoli { width: 34px; height: 34px; flex: none; fill: var(--hopp); }
+.hopp-hatatila .hopp-nuoli { fill: var(--virhe); }
+.hopp-ohje-matka {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 26px; font-weight: 600; line-height: 1.05;
+  letter-spacing: -.01em;
+}
+.hopp-ohje-teksti { font-size: 15px; color: var(--himmea); margin-top: 2px; }
+.hopp-hatatila .hopp-ohje-matka { font-size: 23px; color: var(--virhe); letter-spacing: .04em; }
+.hopp-hatatila .hopp-ohje-teksti { color: #D9A79C; }
+
+/* ── Alapaneeli ─────────────────────────────────────────────────────────── */
+.hopp-paneeli {
+  background: var(--paneeli);
+  border: 1px solid var(--viiva-2);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 -6px 30px rgba(0,0,0,.55);
+}
+.hopp-kahva {
+  width: 38px; height: 4px; border-radius: 2px;
+  background: var(--viiva-2);
+  margin: -4px auto 13px;
+}
+.hopp-otsikko {
+  font-family: var(--fontti-mono);
+  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--himmea-2);
+  margin-bottom: 7px;
+}
+
+/* Vuoron tunnusluvut */
+.hopp-luvut { display: flex; gap: 8px; margin-top: 13px; }
+.hopp-luku {
+  flex: 1;
+  background: var(--paneeli-2);
+  border-radius: 11px;
+  padding: 11px 10px;
+}
+.hopp-luku span {
+  display: block;
+  font-size: 11px; color: var(--himmea-2);
+  margin-bottom: 4px;
+}
+.hopp-luku b {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(14px, 4.6vw, 19px); font-weight: 600;
+  white-space: nowrap;          /* "133,10 €" ei saa katketa kahdelle riville */
+}
+.hopp-luku { min-width: 0; }
+.hopp-vuoro {
+  display: flex; align-items: baseline; gap: 10px;
+}
+.hopp-vuoro-luku {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 46px; font-weight: 600; line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--varoitus);
+}
+.hopp-vuoro-min { font-family: var(--fontti-mono); font-size: 19px; color: var(--himmea); }
+
+.hopp-varoitus {
+  display: flex; align-items: center; gap: 9px;
+  margin-top: 13px; padding: 11px 13px;
+  background: rgba(199,154,58,.1);
+  border: 1px solid rgba(199,154,58,.42);
+  border-radius: 11px;
+  font-size: 13.5px; color: var(--varoitus);
+}
+
+/* ── Matkustajarivi ─────────────────────────────────────────────────────── */
+.hopp-matkustaja { display: flex; align-items: center; gap: 12px; }
+.hopp-kuva {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--paneeli-3);
+  display: grid; place-items: center;
+  font-size: 17px; font-weight: 600; color: var(--himmea);
+  flex: none;
+}
+.hopp-matkustaja-nimi { font-size: 17px; font-weight: 600; }
+.hopp-matkustaja-tieto { font-size: 13px; color: var(--himmea); margin-top: 2px; }
+.hopp-arvio {
+  margin-left: auto; text-align: right;
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 15px; font-weight: 600;
+}
+
+.hopp-osoite { display: flex; gap: 11px; margin-top: 14px; }
+.hopp-osoite-merkit { display: flex; flex-direction: column; align-items: center; padding-top: 5px; }
+.hopp-piste-nouto { width: 8px; height: 8px; border-radius: 50%; background: var(--hopp); }
+.hopp-viiva-pysty { width: 2px; flex: 1; min-height: 20px; background: var(--viiva-2); margin: 3px 0; }
+.hopp-piste-maara { width: 8px; height: 8px; background: var(--virhe); }
+.hopp-osoite-rivit { flex: 1; }
+.hopp-osoite-rivi { font-size: 14.5px; padding: 2px 0; }
+.hopp-osoite-rivi.hopp-himmea { color: var(--himmea); }
+.hopp-osoite-rivi + .hopp-osoite-rivi { margin-top: 14px; }
+
+/* ── Painikkeet ─────────────────────────────────────────────────────────── */
+.hopp-nappi {
+  display: block; width: 100%;
+  margin-top: 15px; padding: 17px;
+  min-height: 44px;
+  background: var(--hopp);
+  border: none; border-radius: 13px;
+  color: #0B0F13;
+  font-family: var(--fontti);
+  font-size: 17px; font-weight: 600; letter-spacing: .06em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.hopp-nappi:active { filter: brightness(.82); transform: translateY(1px); }
+.hopp-nappi.hopp-toissijainen {
+  background: transparent;
+  border: 1px solid var(--viiva-2);
+  color: var(--himmea);
+  font-size: 15px; letter-spacing: 0;
+  padding: 13px;
+  margin-top: 9px;
+}
+.hopp-nappi.hopp-painettu { filter: brightness(.7); }
+
+/* ── Kyytipyyntö ────────────────────────────────────────────────────────── */
+.hopp-pyynto {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  background: rgba(6,8,11,.62);
+  padding: 0 14px calc(var(--turva-ala) + 14px);
+}
+.hopp-pyynto-kortti {
+  background: var(--paneeli);
+  border: 1px solid var(--viiva-2);
+  border-radius: 20px;
+  padding: 18px 16px 16px;
+  box-shadow: 0 -10px 40px rgba(0,0,0,.7);
+}
+.hopp-pyynto-ylin { display: flex; align-items: center; gap: 14px; }
+.hopp-tuotto {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 40px; font-weight: 600; line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--ok);
+}
+.hopp-tuotto-selite { font-size: 12px; color: var(--himmea-2); margin-top: 5px; }
+
+/* Ajastinrengas. Sykkii ja laskee sekunteja — se on kohtauksen paine. */
+.hopp-rengas { position: relative; width: 66px; height: 66px; margin-left: auto; flex: none; }
+.hopp-rengas svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.hopp-rengas-tausta { fill: none; stroke: var(--viiva-2); stroke-width: 5; }
+.hopp-rengas-kaari {
+  fill: none; stroke: var(--hopp); stroke-width: 5; stroke-linecap: round;
+  transition: stroke-dashoffset .95s linear, stroke .3s linear;
+}
+.hopp-rengas.hopp-kiire .hopp-rengas-kaari { stroke: var(--virhe); }
+.hopp-rengas-luku {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px; font-weight: 600;
+}
+.hopp-rengas.hopp-kiire .hopp-rengas-luku { color: var(--virhe); }
+@keyframes hopp-syke { 0%,100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+.hopp-rengas.hopp-kiire { animation: hopp-syke 1s ease-in-out infinite; }
+
+.hopp-pyynto-tiedot {
+  display: flex; gap: 8px; margin-top: 15px;
+  padding-top: 14px; border-top: 1px solid var(--viiva);
+}
+.hopp-pyynto-tieto { flex: 1; }
+.hopp-pyynto-tieto span { display: block; font-size: 11px; color: var(--himmea-2); margin-bottom: 3px; }
+.hopp-pyynto-tieto b {
+  font-family: var(--fontti-mono); font-variant-numeric: tabular-nums;
+  font-size: 15px; font-weight: 600;
+}
+
+/* ── Operaattorin karttapaneeli ─────────────────────────────────────────
+   Näkyy vain kun ohjauspalkki on esillä. Piiloutuu H:lla oton ajaksi. */
+.hopp-karttatyokalu {
+  position: absolute; right: 10px;
+  top: calc(var(--turva-yla) + var(--palkki-tila, 0px) + 62px);
+  display: none;
+  flex-direction: column; gap: 6px;
+  background: rgba(8,10,14,.92);
+  border: 1px solid var(--viiva-2);
+  border-radius: 10px;
+  padding: 9px;
+  font-family: var(--fontti-mono); font-size: 10.5px; color: var(--himmea);
+  z-index: 5;
+  max-width: 172px;
+}
+body.ko-palkki-esilla .hopp-karttatyokalu { display: flex; }
+.hopp-karttatyokalu b { color: var(--teksti); }
+.hopp-karttatyokalu .hopp-tt-rivi { display: flex; justify-content: space-between; gap: 8px; }

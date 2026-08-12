@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  var VERSIO = '0.1.1';
+  var VERSIO = '0.2.0';
 
   /* ══ Siemennetty satunnaisluku ══════════════════════════════════════════
      Jatkuvuus vaatii, että sama cue piirtää saman kuvan joka otossa.
@@ -469,14 +469,32 @@
        tavallisella avauksella — muista siis avata proppi kerran ilman
        tuore-lisäystä ennen kuvauspäivää. */
     if (new URLSearchParams(location.search).has('tuore')) {
-      navigator.serviceWorker.getRegistrations().then(function (rekisterit) {
-        rekisterit.forEach(function (r) { r.unregister(); });
-      });
-      if (global.caches) caches.keys().then(function (avaimet) { avaimet.forEach(function (a) { caches.delete(a); }); });
       M.offlineTila = 'purettu';
       paivitaPalkki();
+
+      /* Purku ei riitä: tämän latauksen on jo ehtinyt tarjoilla vanha
+         service worker, joten ruudulla olisi yhä vanha versio. Puretaan
+         ensin ja ladataan sitten kerran uudelleen. sessionStorage estää
+         silmukan. */
+      Promise.all([
+        navigator.serviceWorker.getRegistrations().then(function (rekisterit) {
+          return Promise.all(rekisterit.map(function (r) { return r.unregister(); }));
+        }),
+        global.caches
+          ? caches.keys().then(function (avaimet) {
+              return Promise.all(avaimet.map(function (a) { return caches.delete(a); }));
+            })
+          : Promise.resolve()
+      ]).then(function () {
+        var jo = false;
+        try { jo = sessionStorage.getItem('grind3-tuore') === '1'; } catch (e) {}
+        if (jo || !navigator.serviceWorker.controller) return;
+        try { sessionStorage.setItem('grind3-tuore', '1'); } catch (e) {}
+        location.reload();
+      });
       return;
     }
+    try { sessionStorage.removeItem('grind3-tuore'); } catch (e) {}
 
     M.offlineTila = navigator.serviceWorker.controller ? 'valmis' : 'asentuu';
     paivitaPalkki();
@@ -857,5 +875,14 @@
     luvut: { kello: '03:31', kate: 3.31, vuoroTunnit: 18 }
   };
 
+  /* kartta.js voi olla ladattu ensin ja rekisteröinyt oman osansa
+     GRIND-nimiavaruuteen. Yhdistetään sen sijaan että korvattaisiin —
+     muuten latausjärjestys ratkaisisi, kumpi katoaa. */
+  var aiempi = global.GRIND;
+  if (aiempi) {
+    Object.keys(aiempi).forEach(function (avain) {
+      if (!(avain in M)) M[avain] = aiempi[avain];
+    });
+  }
   global.GRIND = M;
 })(window);

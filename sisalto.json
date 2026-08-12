@@ -152,10 +152,41 @@
       { "matka": "—",      "teksti": "Reitti ei ole käytettävissä" }
     ],
 
-    // Kadunnimet piirretään kartan päälle. Kartta itse on assets/hopp_kartta.svg.
-    // Nimet ovat keksittyjä eivätkä viittaa oikeaan paikkaan.
+    // Kadunnimet piirretään kartan päälle. Keksittyjä, eivät viittaa
+    // oikeaan paikkaan.
     "kadut": ["Ruovaarantie", "Kivihaanväylä", "Louhoskaari", "Pyörretie", "Sammalpolku"],
     "maaranpaa": "Sammalpolku 31",
-    "noutopaikka": "Louhoskaari 12"
+    "noutopaikka": "Louhoskaari 12",
+    "matkustajaNimi": "Riikka",
+    "matkustajaArvio": "4,9",
+    "matkanPituus": "12,4 km",
+    "saapumisaika": "03:48",
+
+    // ── KARTTA ───────────────────────────────────────────────────────────
+    // Tiestö generoidaan siemenluvusta, ei kuvatiedostosta. Siemenen
+    // vaihtaminen antaa uuden kaupungin samalla tyylillä — sama luku antaa
+    // aina saman kartan, joten jatkuvuus säilyy ottojen välillä.
+    //
+    // Operaattori voi siirtää ja zoomata karttaa propissa (näppäimet W A S D,
+    // + ja −) ja tallentaa löytämänsä näkymän painamalla M. Tallennettu
+    // näkymä ilmestyy alle listaan "nakymat" — kopioi se tähän tiedostoon,
+    // niin se on mukana seuraavallakin kerralla.
+    "kartta": {
+      "siemen": 3310,
+      "zoom": 0.7,            // px/m. 0,7 → ruudulla ~560 m (ajozoom)
+      "nopeusKmh": 42,
+      "kaanny": true,         // kartta kääntyy ajosuuntaan, kuten navigaattorissa
+
+      // Missä kohtaa reittiä ollaan kussakin cuessa, 0–1.
+      // 0 = kaupunki, 0,5 = maantie, 0,9+ = metsätie
+      "osuudet": {
+        "nouto": 0.06,
+        "ajossa": 0.42,
+        "metsatie": 0.93
+      },
+
+      // Tallennetut näkymät. Tyhjä lista = käytetään yllä olevia oletuksia.
+      "nakymat": []
+    }
   }
 }

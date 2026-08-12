@@ -2,7 +2,8 @@
 
 ## Kuvausproppi: Alvinan iPad ja iPhone
 
-Suunnitelma. Ei vielä toteutettu.
+Runko ja HOPP Partner toteutettu — ks. kohta 11 "Tila".
+Julkaistu: <https://antsub.github.io/grind-jakso3/>
 
 Alvinan kohtaus tarvitsee neljä keksittyä sovellusta kahdella laitteella:
 tabletilla kryptopörssi, keskustelupalsta ja osamaksupalvelu, puhelimessa
@@ -160,9 +161,9 @@ Cue 4 on tila, ei siirtymä: Alvina *herää* vihreään ruutuun. Siirtymäversi
 | **4** | **Metsätie.** Näytölle: **KÄÄNNY YMPÄRI** |
 | **5** | **Uusi kyytipyyntö.** Lähellä oleva asiakas, hyvä provikkaennuste, laskeva ajastin. Alvina painaa **HYVÄKSY** |
 
-Kartta on graafikon piirtämä vektorikartta, ei karttapalvelu — se toimii
-offline, näyttää siltä miltä halutaan eikä vaadi lisenssiä. Punainen reitti on
-polku, jota piirretään auki cuen edetessä. Metsätieosuus on osa piirrosta.
+Kartta ei ole karttapalvelu eikä piirretty kuva, vaan generoitu siemenluvusta.
+Se toimii lentotilassa, ei vaadi lisenssiä, on siirrettävissä mihin tahansa ja
+piirtyy joka otossa samanlaisena. Ks. kohta 13.
 
 > Jakson nimi kannattaa pitää mielessä telineen paikkaa valittaessa. Jos puhelin
 > on kiinnitetty kojelaudan oikeaan laitaan, sovellus istuu kirjaimellisesti
@@ -293,7 +294,9 @@ hermostuneisuutena.
 proppi_tabletti.html    iPad — CANDLR, GRUMBL, TABB. Ajolista ja cue-määrittelyt
 proppi_puhelin.html     iPhone — HOPP Partner. Ajolista ja cue-määrittelyt
 moottori.js             Cue-moottori, hohto, kirkkaus, kulmat, laitetiedot, esikatselu
+kartta.js               Karttamoottori — tiestö, reitti, kamera, paikannin
 runko.css               Rakenteen tyylit (värit tulevat teema.json:ista)
+hopp.css                HOPP Partnerin ulkoasu
 teema.json              Värit ja kirjasimet          ← graafikko muokkaa
 sisalto.json            Kaikki teksti ja numerot     ← graafikko ja ohjaaja muokkaavat
 assets/                 Grafiikka — pudota tänne     ← graafikko täyttää
@@ -313,15 +316,85 @@ Sovelluskohtainen sisältö pysyy omissa `proppi_*.html`-tiedostoissaan.
 
 Repo pidetään indeksoimattomana (`robots.txt`, `noindex`) kuten aiemmassa.
 
+## 13. Kartta
+
+Käsikirjoitus vaatii navigaattorin, joka liikkuu, kääntyy ja päätyy metsätielle.
+Kolme reunaehtoa ratkaisivat toteutustavan:
+
+1. **Lentotila.** Karttapalvelu ei ole käytettävissä otossa
+2. **Sijainti voi vaihtua** vielä kuvausten lähellä
+3. **Sama kuva joka otossa**, muuten leikkaus ei mene kasaan
+
+Piirretty SVG-kartta täyttäisi ehdot 1 ja 3 mutta ei ehtoa 2 — se lukitsisi
+yhden maantieteen viikkoja etukäteen. Siksi tiestö, korttelit, metsät, vesistö
+ja reitti **generoidaan siemenluvusta** (`kartta.js`). Uusi luku antaa uuden
+kaupungin samalla tyylillä, sama luku antaa aina saman kartan.
+
+Reitti syntyy ensin ja tiestö sen ympärille, joten auto on aina tiellä. Reitti
+kulkee kaupungista maantielle ja päättyy metsätiehen, joka ohenee kartalla —
+käännekohta on luettavissa kuvasta ennen kuin teksti kertoo sen.
+
+### Operaattorin karttatyökalu
+
+Näkyy aina kun ohjauspalkki on esillä, piiloutuu `H`:lla oton ajaksi.
+
+| Näppäin | Toiminto |
+|---|---|
+| `W` `A` `S` `D` | Siirrä karttaa |
+| `Q` `E` | Zoom ulos / sisään |
+| `C` | Keskitä autoon |
+| `K` | Kartan kääntyminen ajosuuntaan päälle/pois |
+| `N` | Uusi kaupunki (uusi siemen) |
+| `M` | Tallenna näkymä |
+| `G` | Laitteen paikannin päälle/pois |
+
+`M` tallentaa siemenen, zoomin ja kohdan reitillä laitteeseen ja tulostaa ne
+muodossa, jonka voi liittää `sisalto.json`:iin kohtaan `hopp.kartta`. Näin
+etsitty näkymä ei katoa, kun laite tyhjennetään.
+
+### Laitteen paikannin
+
+`G` kytkee iPhonen oman paikantimen. **GPS toimii lentotilassa** — se on
+vastaanotin eikä tarvitse verkkoa, ensimmäinen paikannus vain kestää kauemmin
+ilman verkkoapua. Tässä tilassa auto liikkuu oikean liikkeen mukaan ja reitti
+piirtyy ajetusta jäljestä, mutta tiestö ympärillä pysyy fiktiivisenä.
+
+Käyttö on tilannekohtainen:
+
+| Tila | Milloin |
+|---|---|
+| **Simuloitu ajo** (oletus) | Kaikki otot, joissa toistettavuus ratkaisee. Nopeus `sisalto.json`:ista, eteneminen cue-suhteellisesta ajasta |
+| **Paikannin** | Jos ohjaaja haluaa kartan reagoivan auton oikeaan liikkeeseen. Ei toistu identtisenä otosta toiseen — käytä harkiten |
+
+### Jos halutaan oikea maantiede
+
+Generoitu kartta ei ole Helsinki. Jos kuvauspaikan oikea tiestö halutaan
+ruudulle, se on mahdollista vaihtamalla maastokerros vektorikarttaan
+(PMTiles-arkisto + MapLibre): kuvausalue irrotetaan yhdeksi tiedostoksi,
+tyylitellään samaan yöpalettiin ja tallennetaan laitteeseen.
+
+Kamera, reitti, ajologiikka ja koko HOPP-käyttöliittymä pysyvät ennallaan —
+vain maaston piirto vaihtuu. Se on noin päivän työ, tuo mukaan noin 200 kt
+kirjastoa ja karttatiedoston, ja edellyttää OpenStreetMap-attribuutiota
+(ODbL). Kannattaa harkita vasta jos kuvassa näkyy tunnistettava paikka johon
+kartan pitää täsmätä.
+
+---
+
 ### Tila 12.8.2026
 
-Vaihe 1 on tehty ja testattu selaimessa: cue-moottori, hohtokerros, kirkkaus,
-piilotetut kulmat, näyttelijän kosketustila, offline-asennus, `laitetiedot.html`,
-`?esikatselu` ja kameratestikortti. Molemmat ajolistat ovat ajettavissa
-paikkamerkeillä — ohjaaja voi harjoitella cue-rytmin jo tällä versiolla.
+Vaihe 1 tehty ja testattu: cue-moottori, hohtokerros, kirkkaus, piilotetut
+kulmat, näyttelijän kosketustila, offline-asennus, `laitetiedot.html`,
+`?esikatselu` ja kameratestikortti.
 
-Seuraavaksi vaihe 2: asennus oikeille laitteille ja kameratesti. Vasta sen
-jälkeen kannattaa viimeistellä yhtäkään sovellusta.
+**Vaihe 6 (HOPP Partner) tehty ennen muita sovelluksia**, koska karttamoottori
+oli koko propin suurin tekninen riski. Kuljettajanäkymä, kyytipyyntö
+ajastinrenkaineen, navigaattori, liikkuva kartta ja KÄÄNNY YMPÄRI ovat valmiit.
+
+Jäljellä: CANDLR (vaihe 3), GRUMBL haamunäppäimistöineen (vaihe 4), TABB
+(vaihe 5) ja räpsy-efekti. Tabletin cuet ovat yhä paikkamerkeillä.
+
+Seuraavaksi vaihe 2: asennus oikeille laitteille ja kameratesti.
 
 ---
 

@@ -182,7 +182,6 @@ sRGB, 8-bit.
 
 | Tiedosto | Muoto / koko | Sisältö | Prio |
 |---|---|---|---|
-| `hopp_kartta.svg` | SVG, ~2000 × 3000 | **Yökartta.** Ainoa iso työ. Ks. kohta 5 | **1** |
 | `logo_candlr.svg` | SVG | Sanamerkki ja pikkumerkki | 2 |
 | `logo_grumbl.svg` | SVG | " | 2 |
 | `logo_tabb.svg` | SVG | " | 2 |
@@ -204,36 +203,57 @@ joten mikään näistä ei ole pullonkaula muulle työlle.
 
 ---
 
-## 5. Kartta — iso työ
+## 5. Kartta — ei enää sinun työtäsi
 
-Puhelimen navigaattori ei käytä karttapalvelua. Syitä on kolme: se ei toimisi
-lentotilassa, karttadatan käyttö kuvatussa tuotannossa vaatisi lisenssin, ja
-piirretty kartta näyttää siltä miltä halutaan.
+**Muutos aiempaan briefiin.** Kartta oli tässä aiemmin merkitty suurimmaksi
+yksittäiseksi urakaksi. Se on nyt tehty koodilla, eikä `hopp_kartta.svg`-tiedostoa
+tarvita. Älä piirrä sitä.
 
-**Piirrät kartan vektorina.** Se on yksi SVG.
+Syy on käytännöllinen: kartan sijaintia pitää pystyä vaihtamaan vielä kuvausten
+lähellä, ja piirretty kartta olisi lukinnut yhden maantieteen. Nyt tiestö,
+korttelit, metsät, vesistö ja reitti syntyvät siemenluvusta — uusi luku antaa
+uuden kaupungin samalla tyylillä, ja sama luku antaa aina saman kartan, joten
+jatkuvuus säilyy ottojen välillä.
 
-Sisältö:
+### Mitä sinä ratkaiset kartasta
 
-- **Kaupungin laita** ylhäällä — katuverkko, muutama nimetty katu, kortteleita
-- **Tie ulos** keskellä — harvenevaa, valaisematonta
-- **Metsätie** alhaalla — kapea, mutkitteleva, umpeen menevä. Tänne auto päätyy
-- Vettä, metsää ja peltoa niin että alue lukee maantieteenä eikä kuviona
+Värit. Ne ovat `teema.json`:in `kartta`-lohkossa ja menevät suoraan
+piirtoon:
 
-Tekniset vaatimukset:
-
-| | |
+| Avain | Mikä |
 |---|---|
-| **Reitti erillisenä polkuna** | Nimeä se `id="reitti"`. Yksi yhtenäinen `<path>`, ei katkoja. Koodi piirtää sen auki punaisena cuen edetessä ja kuljettaa auton merkkiä sitä pitkin |
-| **Väripaletti** | Pohja `#0E1116`, kadut `#232B36`, isot väylät `#2E3846`, vesi `#16202B`, metsä `#131A18`. Reitti `#C4402F` — mutta älä väritä reittiä valmiiksi, koodi tekee sen |
-| **Kadunnimet** | Ovat tekstiä ja tulevat `sisalto.json`-tiedostosta. Jätä niille tilaa, älä piirrä niitä sisään |
-| **Riittävästi kangasta** | Kartta liikkuu ruudulla. Piirrä ruutua selvästi leveämpi ja korkeampi alue |
-| **Kelvollinen SVG** | `viewBox` mukana, ei kiinteää `width`/`height`. Ei upotettuja bittikarttoja |
+| `maa` | pohja, kaupungin ulkopuoli |
+| `kortteli` | rakennuskorttelit |
+| `metsa` · `vesi` | maastoalueet |
+| `tie-kuori` | tumma reunus tien alla |
+| `tie-paa` · `tie` · `tie-pieni` | tiehierarkia: valtaväylä, katu, metsätie |
+| `kadunnimi` | tekstin väri |
+| `reitti` · `reitti-kuori` · `reitti-ajettu` | punainen reittiviiva, ajettu osuus himmeänä |
+| `auto` · `auto-hehku` | ajoneuvon merkki |
 
-Metsätie on kohtauksen käännekohta (**"KÄÄNNY YMPÄRI"**). Sen pitää näyttää
-kartalla siltä, että sinne ei olisi pitänyt ajaa: tie ohenee, nimi katoaa,
-ympärillä ei ole mitään.
+Tiet piirretään kahdessa kerroksessa — tumma kuori ensin, vaaleampi täyttö
+päälle. Se on se yksi asia, joka saa tiestön lukemaan karttana eikä
+viivapiirroksena. Jos säädät `tie-kuori`-arvoa liian lähelle `tie`-arvoa,
+kartta latistuu.
 
----
+Nämä eivät ole CSS-muuttujia vaan menevät canvakselle, joten `rgba()` käy
+mutta `var()` ei.
+
+### Miten katsot muutoksesi
+
+Avaa puhelinproppi ja mene cueen 3. Operaattorin karttapaneeli näkyy oikeassa
+laidassa aina kun ohjauspalkki on esillä:
+
+```
+W A S D  siirrä karttaa      C  keskitä autoon
+Q E      zoom                K  kartan kääntyminen päälle/pois
+N        uusi kaupunki       M  tallenna näkymä
+G        laitteen paikannin
+```
+
+`M` tallentaa nykyisen näkymän — siemenen, zoomin ja kohdan reitillä — ja
+tulostaa sen konsoliin muodossa, jonka voi liittää suoraan `sisalto.json`:iin
+kohtaan `hopp.kartta`.
 
 ## 6. Mitä kussakin sovelluksessa on
 
@@ -380,7 +400,7 @@ Jos aikaa on vähän, tässä järjestyksessä.
 |:--:|---|---|
 | 1 | Peruspaletti ja typografia | Kaikki neljä sovellusta ratkeavat kerralla |
 | 2 | CANDLR:n kaavio ja **3,31 €** | Eniten ruutuaikaa, kuvattu lähimpää |
-| 3 | HOPP:n kartta ja ajastinrengas | Pisin yksittäinen työ |
+| 3 | HOPP:n karttapaletti ja ajastinrengas | Kartta on koodissa — sinä ratkaiset värit |
 | 4 | TABB:n rivi ja erääntymismerkintä | Yksi elementti, joka toistuu |
 | 5 | GRUMBL ja näppäimistö | Näkyy lyhyimmän ajan |
 | 6 | Sanamerkit ja avatarit | Toimivat paikkamerkkeinä loppuun asti — ja sanamerkit vasta kun nimet on klaarattu |

@@ -18,29 +18,30 @@ laitteessa, ja **`EI OFFLINE — avattu ilman HTTPS:ää`** jos ei ole.
 
 ---
 
-## 1. Julkaise proppi (kerran, kotona)
+## 1. Osoite
 
-Repo on jo olemassa ja commitoitu. Julkaisu vaatii **julkisen** repon, koska
-GitHub Pages ei ole ilmaisella tilillä käytettävissä yksityisille repoille.
-Sisältö on suojattu hakukoneilta `robots.txt`- ja `noindex`-määrityksillä, ja
-sovellukset ovat keksittyjä — sama ratkaisu kuin tuotannon aiemmassa propissa.
+**Proppi on julkaistu. Tämä on osoite, joka avataan jokaisella laitteella:**
+
+```
+https://antsub.github.io/grind-jakso3/
+```
+
+Repo: <https://github.com/antsub/grind-jakso3> — julkinen, koska GitHub Pages ei
+ole ilmaisella tilillä käytettävissä yksityisille repoille. `robots.txt` ja
+`noindex` pitävät sivun poissa hakukoneista, ja sovellukset ovat keksittyjä.
+Sama ratkaisu kuin tuotannon aiemmassa propissa.
+
+### Päivitykset
 
 ```bash
 cd ~/Documents/grind-jakso3
-gh repo create grind-jakso3 --public --source=. --remote=origin --push
+git add -A && git commit -m "…" && git push
 ```
 
-Sitten GitHubissa: **Settings → Pages → Deploy from a branch → main → / (root)**.
-
-Osoite on parin minuutin päästä:
-
-```
-https://<käyttäjätunnus>.github.io/grind-jakso3/
-```
-
-Kirjoita osoite muistiin — sitä tarvitaan jokaisella laitteella.
-
-> Jos tuotanto ei halua proppia julkiseen repoon lainkaan, ks. kohta 6.
+Pages rakentaa uuden version noin minuutissa. **Nosta `sw.js`:n `VERSIO`
+jokaisella muutoksella** — muuten laitteissa pyörii vanha välimuisti. Laitteet
+saavat päivityksen, kun proppi avataan kerran verkkoyhteydellä; ohjauspalkin
+versionumerosta näkee, mikä build on koneessa.
 
 ---
 
@@ -48,8 +49,9 @@ Kirjoita osoite muistiin — sitä tarvitaan jokaisella laitteella.
 
 Tee tämä **kotona tai toimistossa, missä on wifi.** Ei kuvauspaikalla.
 
-1. Avaa osoite **Safarissa** (ei Chromessa — Koti-valikkoon lisääminen ja
-   offline-tuki toimivat iOS:ssä vain Safarissa)
+1. Avaa **`antsub.github.io/grind-jakso3`** laitteen **Safarissa** (ei
+   Chromessa — Koti-valikkoon lisääminen ja offline-tuki toimivat iOS:ssä
+   vain Safarissa)
 2. Valitse proppi:
    - iPad → **Tabletti**
    - iPhone → **Puhelin**

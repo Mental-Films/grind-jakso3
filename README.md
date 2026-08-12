@@ -6,6 +6,8 @@ ajolistaa, yksi cue-moottori.
 Ei App Storea, ei Xcodea, ei Apple Developer -tiliä. Sivu lisätään laitteen
 Koti-valikkoon ja ajetaan lentotilassa.
 
+**→ <https://antsub.github.io/grind-jakso3/>**
+
 **Vaihe 1 on tehty:** cue-moottori, hohtokerros, kirkkaussäätö, offline-asennus,
 laitetiedot ja esikatselu toimivat. Sovellusten ulkoasu on vielä paikkamerkeillä
 — ajolistan voi silti ajaa läpi sellaisenaan.
@@ -137,8 +139,9 @@ python3 -m http.server 8731
 
 Sitten `http://localhost:8731/`.
 
-Julkaisu: GitHub Pages, repo public, Settings → Pages → Deploy from a branch →
-main → / (root). `robots.txt` ja `noindex` pitävät sen poissa hakukoneista.
+Julkaisu: GitHub Pages on jo päällä. `git push` riittää — Pages rakentaa uuden
+version noin minuutissa. `robots.txt` ja `noindex` pitävät sivun poissa
+hakukoneista.
 
 ### Rakenne
 

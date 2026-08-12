@@ -1,0 +1,161 @@
+// GRIND jakso 3 "Pelkääjän paikka" — sisältö
+//
+// Kaikki ruudulla näkyvä teksti ja jokainen numero. Muokkaa tekstieditorissa
+// ja päivitä sivu. Kommentit ovat sallittuja, samoin perässä roikkuvat pilkut.
+//
+// KIELI: kryptopörssi, palsta ja osamaksu ovat englanniksi, kyytisovellus
+// suomeksi. Näin on käsikirjoituksessa ja näin se on uskottava — kotimainen
+// kyytipalvelu ei ole englanniksi, kansainvälinen kryptopörssi ei ole suomeksi.
+
+{
+  // ══ NIMET JA TAVARAMERKIT ═════════════════════════════════════════════
+  // Nimen vaihtaminen tästä vaihtaa sen KAIKKIALLA propissa — otsikoissa,
+  // sanamerkeissä, ilmoituksissa ja ostosriveillä. Koodiin ei kosketa.
+  //
+  // Jos graafikko toimittaa tiedoston assets/logo_<avain>.svg, sitä käytetään
+  // sanamerkkinä. Muuten alla oleva nimi ladotaan tekstinä. Kumpikin seuraa
+  // tätä tiedostoa.
+  //
+  // Nämä ovat keksittyjä nimiä. Tuotanto ajaa niille tavaramerkkihaun ennen
+  // lukitsemista — vaihtoehtoja on merkitty kommenttiin.
+  "nimet": {
+    "candlr":     { "nimi": "CANDLR",     "tunnusvari": "#C9A227" },  // vaihtoehdot: Spindl, Wickr, Bullpen
+    "grumbl":     { "nimi": "GRUMBL",     "tunnusvari": "#C25A7A" },  // Warren, Threadle
+    "tabb":       { "nimi": "TABB",       "tunnusvari": "#A8746A" },  // Laterr, Owed
+    "hopp":       { "nimi": "HOPP",       "tunnusvari": "#3E9E92" },  // Vectr, Haul
+    "reapercoin": { "nimi": "Reapercoin", "tunnusvari": "#C4402F" },  // käsikirjoituksesta
+    "novex":      { "nimi": "NOVEX",      "tunnusvari": "#6C7885" },  // puhelinvalmistaja
+    "nibbl":      { "nimi": "NIBBL",      "tunnusvari": "#C79A3A" },  // ruokalähetti
+    "nordkap":    { "nimi": "NORDKAP",    "tunnusvari": "#8C93A0" }   // vaatemerkki
+  },
+
+  // ══ LUVUT ══════════════════════════════════════════════════════════════
+  // Kohtauksen numerot ovat sarjaa. 3,31 on käsikirjoituksesta ja
+  // tarkoituksellinen, joten muutkin luvut on vedetty samaan sarjaan: 331,
+  // 33,1 · 3 310 · 83,1. Jos vaihdat yhden, katso ettei sarja hajoa.
+  "luvut": {
+    "kello":            "03:31",   // jäädytetty kellonaika, vain sekunnit elävät
+    "kate":             3.31,      // CANDLR, tilin kate — lähikuva, cue 5
+    "vuoroTunnit":      18,        // HOPP, työvuoron pituus — käsikirjoituksesta
+    "vuoroMinuutit":    31,
+
+    "rprKurssi":        0.0331,    // Reapercoinin kurssi euroina
+    "rprMuutos":        -33.1,     // % — romahdus
+    "rprMuutosNousu":   331.0,     // % — raketti
+    "salkkuHuippu":     3310,      // € — mistä tultiin
+    "salkkuNyt":        331,       // € — missä ollaan
+
+    "eraantyneet":      1331.00,   // TABB, erääntynyt yhteensä
+    "myohastymismaksu": 33.00,     // TABB
+    "tabbErat":         4,         // montako erää per ostos
+
+    "hyvaksymisprosentti": 83.1,   // HOPP, kuljettajan hyväksymisaste
+    "ajastinSekunnit":  31,        // HOPP, aika hyväksyä kyyti
+    "provikka":         33.10,     // € — uuden kyydin ennuste, cue 5
+    "tilausnumero":     "3310",
+    "kyydit":           31,        // tämän vuoron kyydit
+    "ajettuKm":         331,
+    "ansiot":           133.10     // € — vuoron ansiot
+  },
+
+  // ══ CANDLR — kryptopörssi (englanti) ═══════════════════════════════════
+  "candlr": {
+    "otsikko":        "Portfolio",
+    "tunnus":         "RPR",
+    "parivaluutta":   "EUR",
+    "ostaNappi":      "BUY",
+    "myyNappi":       "SELL",
+    "kateOtsikko":    "Available balance",
+    "salkkuOtsikko":  "Total value",
+    "romahdusMerkki": "−",
+    "rakettiBanneri": "Your portfolio is rocketing! Buy in before it's too late!",
+    "rakettiNappi":   "BUY NOW",
+    "aikavalit":      ["1H", "24H", "7D", "1M", "1Y", "ALL"],
+    "aikavaliValittu": "24H"
+  },
+
+  // ══ GRUMBL — keskustelupalsta (englanti) ═══════════════════════════════
+  "grumbl": {
+    "alue":            "c/cryptolosses",
+    "alueJasenet":     "331k members",
+    "kirjoitaOtsikko": "Create post",
+    "otsikkoVihje":    "An interesting title",
+    "julkaisuNappi":   "Post",
+
+    // Otsikko, jonka Alvina kirjoittaa. Tulee ruudulle merkki kerrallaan
+    // näyttelijän näppäilyn tahdissa — mihin tahansa hän osuukin.
+    "postausOtsikko":  "My crypto portfolio is tanking!! WTF DO I DO???",
+
+    // Valinnainen kirjoitusvirhe, joka korjataan matkalla. Lukee kameralle
+    // hermostuneisuutena. Tyhjennä, jos ei haluta.
+    "kirjoitusvirhe":  { "kohta": 31, "vaarin": "tankinh", "oikein": "tanking" },
+
+    // Taustalla näkyvä lista. Käyttäjänimet ovat keksittyjä ja tarkistettuja.
+    "postaukset": [
+      { "kayttaja": "u/liquidated_again", "aika": "4h",  "otsikko": "Lost 3 years of savings in 40 minutes", "aanet": 1331, "kommentit": 208 },
+      { "kayttaja": "u/nightshiftnancy",  "aika": "7h",  "otsikko": "Anyone else can't sleep because of this?", "aanet": 892, "kommentit": 331 },
+      { "kayttaja": "u/theexitliquidity", "aika": "11h", "otsikko": "It's not a loss until you sell (cope thread)", "aanet": 447, "kommentit": 96 },
+      { "kayttaja": "u/margin_call_mike", "aika": "14h", "otsikko": "My wife doesn't know yet", "aanet": 3310, "kommentit": 512 }
+    ]
+  },
+
+  // ══ TABB — osta nyt, maksa myöhemmin (englanti) ════════════════════════
+  "tabb": {
+    "otsikko":         "Your plan",
+    "eraantynytMerkki": "OVERDUE",
+    "avoinMerkki":     "DUE",
+    "maksettuMerkki":  "PAID",
+    "yhteensaOtsikko": "Total overdue",
+    "maksuOtsikko":    "Late fees",
+    "maksaNappi":      "Pay now",
+
+    // Ostosrivit. Lisää, poista ja järjestä vapaasti — ruutu sopeutuu.
+    // "kauppias" viittaa nimet-lohkoon, joten nimen vaihto menee läpi tästäkin.
+    "rivit": [
+      { "kauppias": "novex",   "tuote": "NOVEX 14 Pro 256 GB",     "summa": 1099.00, "erapaiva": "12 Mar", "tila": "eraantynyt" },
+      { "kauppias": "nordkap", "tuote": "Wool parka, black",       "summa": 449.00,  "erapaiva": "28 Mar", "tila": "eraantynyt" },
+      { "kauppias": "nibbl",   "tuote": "Order #8841 · late night", "summa": 43.10,  "erapaiva": "02 Apr", "tila": "eraantynyt" },
+      { "kauppias": "nibbl",   "tuote": "Order #8903 · late night", "summa": 38.50,  "erapaiva": "04 Apr", "tila": "eraantynyt" },
+      { "kauppias": "nibbl",   "tuote": "Order #9014 · late night", "summa": 51.20,  "erapaiva": "09 Apr", "tila": "eraantynyt" },
+      { "kauppias": "nibbl",   "tuote": "Order #9122 · late night", "summa": 29.90,  "erapaiva": "16 Apr", "tila": "avoin" },
+      { "kauppias": "novex",   "tuote": "Screen protector",         "summa": 19.90,  "erapaiva": "16 Apr", "tila": "maksettu" }
+    ]
+  },
+
+  // ══ HOPP Partner — kyytipalvelu (suomi) ════════════════════════════════
+  "hopp": {
+    "otsikko":         "Kuljettaja",
+    "vuoroOtsikko":    "Työvuoro käynnissä",
+    "ansiotOtsikko":   "Vuoron ansiot",
+    "kyyditOtsikko":   "Kyytejä",
+    "hyvaksyntaOtsikko": "Hyväksymisaste",
+    "taukoVaroitus":   "Suositeltu tauko ylitetty",
+
+    "pyyntoOtsikko":   "Uusi kyyti",
+    "hyvaksyNappi":    "HYVÄKSY",
+    "hylkaaNappi":     "HYLKÄÄ",
+    "ennusteOtsikko":  "Arvioitu tuotto",
+    "etaisyysOtsikko": "Nouto",
+
+    "aloitaNappi":     "START RIDE",
+    "lopetaNappi":     "PÄÄTÄ KYYTI",
+    "matkustaja":      "Matkustaja kyydissä",
+    "saapuminen":      "Perillä",
+    "kaannyNappi":     "KÄÄNNY YMPÄRI",
+
+    // Navigaattorin ohjeet ajon aikana, järjestyksessä.
+    "ohjeet": [
+      { "matka": "400 m",  "teksti": "Käänny oikealle" },
+      { "matka": "1,2 km", "teksti": "Jatka suoraan" },
+      { "matka": "3,1 km", "teksti": "Käänny vasemmalle" },
+      { "matka": "800 m",  "teksti": "Jatka suoraan" },
+      { "matka": "—",      "teksti": "Reitti ei ole käytettävissä" }
+    ],
+
+    // Kadunnimet piirretään kartan päälle. Kartta itse on assets/hopp_kartta.svg.
+    // Nimet ovat keksittyjä eivätkä viittaa oikeaan paikkaan.
+    "kadut": ["Ruovaarantie", "Kivihaanväylä", "Louhoskaari", "Pyörretie", "Sammalpolku"],
+    "maaranpaa": "Sammalpolku 31",
+    "noutopaikka": "Louhoskaari 12"
+  }
+}

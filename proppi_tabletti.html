@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Alvina · tabletti">
+<meta name="theme-color" content="#0E1116">
+<link rel="apple-touch-icon" href="assets/ikoni_tabletti.png">
+<link rel="manifest" href="manifest_tabletti.json">
+<link rel="stylesheet" href="runko.css">
+<title>GRIND 3 — tabletti</title>
+</head>
+<body>
+<script src="moottori.js"></script>
+<script>
+/* Alvinan iPad — CANDLR, GRUMBL, TABB.
+ *
+ * Vaihe 1: cue-rakenne ja paikkamerkit. Sovellusten ulkoasu tehdään
+ * vaiheissa 3–5, jolloin vain piirra-funktiot vaihtuvat — cue-numerot,
+ * hohdon värit ja ajolista pysyvät. Ohjaaja voi siis harjoitella
+ * ajolistan jo tällä versiolla.
+ */
+GRIND.kaynnista({
+  laite: 'tabletti',
+
+  cuet: function (M) { return [
+
+    { id: 0, nimi: 'Romahdus', sovellus: 'candlr',
+      hohto: { vari: 'punainen', voima: 6 },
+      piirra: M.paikkamerkki({
+        sovellus: 'candlr',
+        otsikko: 'Reapercoin romahtaa',
+        kuvaus: 'Verenpunainen sahalaitakäyrä lävistää asteikon diagonaalisesti. ' +
+                'Miinusmerkit ja tappioluvut vilkkuvat. Punainen hohto kasvoilla.',
+        luku: function (c) { return c.e1(c.S.luvut.rprMuutos) + ' %'; },
+        lukuvari: 'var(--virhe)'
+      }) },
+
+    { id: 1, nimi: 'Postaus', sovellus: 'grumbl',
+      kosketus: true,                       // Alvina kirjoittaa → kulmat pois
+      hohto: { vari: 'punainen', voima: 3 },
+      piirra: M.paikkamerkki({
+        sovellus: 'grumbl',
+        otsikko: 'Alvina kirjoittaa postauksen',
+        kuvaus: function (c) { return c.S.grumbl.postausOtsikko; }
+      }) },
+
+    { id: 2, nimi: 'Ostosrivit', sovellus: 'tabb',
+      hohto: { vari: 'punainen', voima: 3 },
+      piirra: M.paikkamerkki({
+        sovellus: 'tabb',
+        otsikko: 'Erääntyneet maksut',
+        kuvaus: 'Puhelin, takki ja neljä ruokatilausta. Valtaosa erääntynyt.',
+        luku: function (c) { return c.e2(c.S.luvut.eraantyneet) + ' €'; },
+        lukuvari: 'var(--virhe)'
+      }) },
+
+    { id: 3, nimi: 'Lepotila',
+      hohto: null,
+      piirra: M.paikkamerkki({
+        otsikko: 'Lepotila',
+        kuvaus: 'Musta ruutu. Ottojen väliin ja kohtiin, joissa Alvina nukkuu.'
+      }) },
+
+    { id: 4, nimi: 'Raketti', sovellus: 'candlr',
+      hohto: { vari: 'vihrea', voima: 6 },
+      piirra: M.paikkamerkki({
+        sovellus: 'candlr',
+        otsikko: 'Käyrä kääntyy vihreäksi',
+        kuvaus: function (c) { return c.S.candlr.rakettiBanneri; },
+        luku: function (c) { return '+' + c.e1(c.S.luvut.rprMuutosNousu) + ' %'; },
+        lukuvari: 'var(--ok)'
+      }) },
+
+    { id: 5, nimi: 'Saldo 3,31 €', sovellus: 'candlr',
+      hohto: { vari: 'vihrea', voima: 4 },
+      piirra: M.paikkamerkki({
+        sovellus: 'candlr',
+        otsikko: function (c) { return c.S.candlr.kateOtsikko; },
+        kuvaus: 'Lähikuva. Tämä on kohtauksen pointti — ostettavaa ei ole.',
+        luku: function (c) { return c.e2(c.S.luvut.kate) + ' €'; }
+      }) },
+
+    { id: 6, nimi: 'Loppukuva', sovellus: 'candlr',
+      hohto: { vari: 'punainen', voima: 7 },
+      piirra: M.paikkamerkki({
+        sovellus: 'candlr',
+        otsikko: 'Punainen palaa',
+        kuvaus: 'Ruutu heijastaa vihreän sijaan taas punaista hohdetta Alvinan kasvoille.'
+      }) },
+
+    /* Viimeinen cue on aina kameratestikortti. Näppäin T hyppää siihen. */
+    { id: 7, nimi: 'Kameratesti', piirra: M.testikortti() }
+
+  ]; }
+});
+</script>
+</body>
+</html>

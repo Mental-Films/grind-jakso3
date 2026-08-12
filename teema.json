@@ -1,0 +1,57 @@
+// GRIND jakso 3 "Pelkääjän paikka" — teema
+//
+// Kaikki propin värit ja kirjasimet. Muokkaa tätä tekstieditorissa ja päivitä
+// sivu — mitään ei tarvitse kääntää. Kommentit ovat sallittuja.
+//
+// Kamerasäännöt, jotka eivät ole makuasioita:
+//   · kirkkain sallittu #C8D0D8 — #FFFFFF palaa puhki
+//   · tummin sallittu #0E1116 — täysmusta ei valaise kasvoja
+//   · vältä täyskylläisiä värejä, ne clippaavat ennen kirkkausrajaa
+//
+// Testaa muutokset avaamalla proppi lisäyksellä ?esikatselu — ja
+// kameratestikortti näkyy viimeisessä cuessa (näppäin T).
+
+{
+  "varit": {
+    "pohja":     "#0E1116",   // taustan pohja
+    "paneeli":   "#151A21",
+    "paneeli-2": "#1A2029",   // korostettu
+    "paneeli-3": "#202834",   // kohotettu
+    "viiva":     "#232B36",
+    "viiva-2":   "#2E3846",
+    "teksti":    "#C8D0D8",   // kirkkain sallittu
+    "himmea":    "#6C7885",
+    "himmea-2":  "#4E5866",
+    "virhe":     "#C4402F",   // erääntynyt, lasku, reittiviiva
+    "varoitus":  "#C79A3A",
+    "ok":        "#5E9E6B"    // nousu
+  },
+
+  // Hohtokerros — kohtauksen käytännön valo Alvinan kasvoille.
+  //   keskus/reuna  = säteittäinen liuku, kun käyttöliittymä näkyy
+  //   taysi         = puhdas hohto (⇧P / ⇧V), pelkkä valo ilman käyttöliittymää
+  //   katto         = suurin peittävyys, jottei kuva pala puhki
+  "hohto": {
+    "punainen": {
+      "keskus": "rgba(196,64,47,.95)",
+      "reuna":  "rgba(120,26,20,.55)",
+      "taysi":  "#B8382A",
+      "katto":  0.85
+    },
+    "vihrea": {
+      "keskus": "rgba(94,158,107,.95)",
+      "reuna":  "rgba(30,84,46,.55)",
+      "taysi":  "#4E9463",
+      "katto":  0.85
+    }
+  },
+
+  // Kirjasimet. IBM Plex on SIL OFL -lisensoitu, joten sen saa upottaa
+  // levitykseen menevään tuotantoon. Pudota woff2-tiedostot kansioon
+  // assets/fontit/ — ilman niitä käytetään laitteen omaa kirjasinta, mikä
+  // kelpaa kameratestiin mutta ei lopulliseen proppiin.
+  "fontit": {
+    "teksti": "\"Plex\", -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    "numero": "\"PlexMono\", ui-monospace, \"SF Mono\", Menlo, monospace"
+  }
+}

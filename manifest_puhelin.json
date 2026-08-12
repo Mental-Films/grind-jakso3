@@ -1,0 +1,13 @@
+{
+  "name": "Alvina · puhelin",
+  "short_name": "Alvina · puhelin",
+  "start_url": "proppi_puhelin.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E1116",
+  "theme_color": "#0E1116",
+  "icons": [
+    { "src": "assets/ikoni_puhelin.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}

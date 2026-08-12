@@ -1,0 +1,357 @@
+/* GRIND jakso 3 "Pelkääjän paikka" — propin runko.
+   Nämä ovat rakenteen tyylejä. Värit ja kirjasimet tulevat teema.json:ista
+   CSS-muuttujina, joten tätä tiedostoa ei tarvitse muokata ulkoasun takia. */
+
+/* ── Kirjasimet ───────────────────────────────────────────────────────────
+   Pudota IBM Plex -tiedostot kansioon assets/fontit/, niin ne otetaan
+   käyttöön. Ilman niitä käytetään järjestelmän kirjasinta — se kelpaa
+   kameratestiin mutta ei lopulliseen proppiin. Ks. BRIEF_GRAAFIKKO.md 3. */
+@font-face {
+  font-family: "Plex";
+  src: url("assets/fontit/IBMPlexSans-Regular.woff2") format("woff2");
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "Plex";
+  src: url("assets/fontit/IBMPlexSans-SemiBold.woff2") format("woff2");
+  font-weight: 600; font-display: swap;
+}
+@font-face {
+  font-family: "PlexMono";
+  src: url("assets/fontit/IBMPlexMono-Regular.woff2") format("woff2");
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "PlexMono";
+  src: url("assets/fontit/IBMPlexMono-SemiBold.woff2") format("woff2");
+  font-weight: 600; font-display: swap;
+}
+
+/* ── Oletusmuuttujat ──────────────────────────────────────────────────────
+   teema.json ylikirjoittaa nämä ajossa. Tässä ovat varapuun arvot. */
+:root {
+  --pohja:        #0E1116;
+  --paneeli:      #151A21;
+  --paneeli-2:    #1A2029;
+  --paneeli-3:    #202834;
+  --viiva:        #232B36;
+  --viiva-2:      #2E3846;
+  --teksti:       #C8D0D8;
+  --himmea:       #6C7885;
+  --himmea-2:     #4E5866;
+  --virhe:        #C4402F;
+  --varoitus:     #C79A3A;
+  --ok:           #5E9E6B;
+  --fontti:       "Plex", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --fontti-mono:  "PlexMono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Runko täyttää nämä: turva-alueet ja säädöt */
+  --turva-yla:    env(safe-area-inset-top, 0px);
+  --turva-ala:    env(safe-area-inset-bottom, 0px);
+  --turva-vasen:  env(safe-area-inset-left, 0px);
+  --turva-oikea:  env(safe-area-inset-right, 0px);
+  --kirkkaus:     1;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--pohja);
+  color: var(--teksti);
+  font-family: var(--fontti);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  overflow: hidden;
+}
+
+/* Kuvausproppi: mikään ei saa valita, zoomata, korostua tai avata valikkoa
+   näyttelijän sormen alla. */
+body.ko-proppi {
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ── Kerrosjärjestys ──────────────────────────────────────────────────────
+   sovellus 0 · hohto 20 · musta 30 · kulmat 40 · palkki 50 · ilmoitus 60 */
+
+#ko-sovellus {
+  position: fixed; inset: 0;
+  filter: brightness(var(--kirkkaus));
+  will-change: filter;
+  z-index: 0;
+}
+
+/* Sovelluksen sisältö turva-alueiden sisällä. Hohto ja tausta ulottuvat
+   reunaan asti, sisältö ei.
+   --palkki-tila työntää sisältöä alas sen verran kuin ohjauspalkki vie.
+   Otossa palkki on piilossa (H) ja tila on 0, joten sommittelu on silloin
+   se, jonka graafikko on suunnitellut. */
+.ko-turva {
+  position: absolute; inset: 0;
+  padding:
+    calc(var(--turva-yla) + var(--palkki-tila, 0px))
+    var(--turva-oikea) var(--turva-ala) var(--turva-vasen);
+}
+body.ko-palkki-esilla { --palkki-tila: 36px; }
+
+/* ── Hohtokerros ─────────────────────────────────────────────────────────
+   Tämä on kohtauksen käytännön valo. screen-sekoitus lisää valoa sen sijaan
+   että peittäisi sisällön. */
+#ko-hohto {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity .5s linear, background .5s linear;
+}
+#ko-hohto.ko-puhdas {
+  mix-blend-mode: normal;
+  transition: opacity .25s linear, background .25s linear;
+}
+
+#ko-musta {
+  position: fixed; inset: 0;
+  background: #000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .18s linear;
+  z-index: 30;
+}
+#ko-musta.ko-paalla { opacity: 1; }
+
+/* ── Operaattorin piilotetut kulmat ──────────────────────────────────────
+   Näkymättömiä. Menevät pois päältä cuessa, jossa näyttelijä koskee ruutua. */
+.ko-kulma {
+  position: fixed;
+  width: 84px; height: 84px;
+  z-index: 40;
+  background: transparent;
+}
+body.ko-kulmat-pois .ko-kulma { display: none; }
+.ko-kulma-vy { top: 0; left: 0; }
+.ko-kulma-oy { top: 0; right: 0; }
+.ko-kulma-va { bottom: 0; left: 0; }
+.ko-kulma-oa { bottom: 0; right: 0; }
+/* Näytetään vain kun ohjauspalkki on esillä, jotta operaattori näkee ne. */
+body.ko-palkki-esilla .ko-kulma {
+  background: rgba(199, 154, 58, .10);
+  outline: 1px dashed rgba(199, 154, 58, .35);
+}
+
+/* ── Ohjauspalkki ────────────────────────────────────────────────────────
+   Piilotetaan H:lla ennen ottoa. */
+#ko-palkki {
+  position: fixed;
+  top: var(--turva-yla); left: 0; right: 0;
+  z-index: 50;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  background: rgba(8, 10, 14, .93);
+  border-bottom: 1px solid var(--viiva);
+  font-family: var(--fontti-mono);
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--himmea);
+  flex-wrap: wrap;
+}
+body.ko-palkki-esilla #ko-palkki { display: flex; }
+#ko-palkki b { color: var(--teksti); font-weight: 600; }
+#ko-palkki .ko-erotin { color: var(--himmea-2); }
+#ko-palkki .ko-varoitus {
+  color: var(--varoitus);
+  border: 1px solid var(--varoitus);
+  border-radius: 3px;
+  padding: 1px 6px;
+}
+#ko-palkki .ko-versio { margin-left: auto; color: var(--himmea-2); }
+
+/* Lyhyt ilmoitus operaattorille: cue vaihtui, hohto muuttui, kirkkaus. */
+#ko-ilmoitus {
+  position: fixed;
+  left: 50%; transform: translateX(-50%);
+  top: calc(var(--turva-yla) + 14px);
+  z-index: 60;
+  padding: 7px 15px;
+  border-radius: 4px;
+  background: rgba(8, 10, 14, .9);
+  border: 1px solid var(--viiva-2);
+  color: var(--teksti);
+  font-family: var(--fontti-mono);
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .16s linear;
+}
+#ko-ilmoitus.ko-nakyy { opacity: 1; }
+
+/* Väärä asento. Molemmat propit ovat pystyssä. */
+#ko-asento {
+  position: fixed; inset: 0;
+  z-index: 70;
+  display: none;
+  place-items: center;
+  text-align: center;
+  padding: 40px;
+  background: var(--pohja);
+  color: var(--himmea);
+  font-size: 17px;
+  line-height: 1.5;
+}
+body.ko-vaara-asento #ko-asento { display: grid; }
+
+/* ── Paikkamerkki ja kameratestikortti ───────────────────────────────────
+   Vaiheen 1 sisältö. Korvautuu sovelluksilla vaiheissa 3–6, mutta
+   testikortti jää: se on kameratestin työkalu. */
+.ko-paikka {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: calc(var(--turva-yla) + var(--palkki-tila, 0px) + 16px) 18px calc(var(--turva-ala) + 16px);
+  gap: 14px;
+}
+.ko-paikka-yla {
+  display: flex; align-items: baseline; gap: 10px;
+  color: var(--himmea);
+  font-family: var(--fontti-mono);
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+.ko-paikka-yla .ko-sovellusnimi {
+  color: var(--tunnus, var(--teksti));
+  font-weight: 600;
+  letter-spacing: .1em;
+}
+.ko-paikka-nimi {
+  font-size: 30px; font-weight: 600; line-height: 1.15;
+  letter-spacing: -.01em;
+}
+.ko-paikka-kuvaus {
+  color: var(--himmea);
+  font-size: 15px; line-height: 1.5;
+  max-width: 46ch;
+}
+.ko-paikka-luku {
+  font-family: var(--fontti-mono);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(52px, 17vw, 128px);
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+.ko-paikka-tayte { flex: 1; }
+
+.ko-testi { display: grid; gap: 10px; }
+.ko-testi h3 {
+  font-family: var(--fontti-mono);
+  font-size: 11px; font-weight: 400;
+  letter-spacing: .12em;
+  color: var(--himmea-2);
+  text-transform: uppercase;
+}
+.ko-ruudut { display: flex; flex-wrap: wrap; gap: 6px; }
+.ko-ruutu {
+  width: 52px; height: 34px;
+  border-radius: 3px;
+  display: grid; place-items: end center;
+  font-family: var(--fontti-mono); font-size: 8.5px;
+  color: rgba(0, 0, 0, .55);
+  padding-bottom: 2px;
+}
+.ko-viivat { display: grid; gap: 7px; }
+.ko-viivat div { background: var(--teksti); }
+.ko-portaat { display: grid; gap: 5px; }
+.ko-rampi { display: flex; height: 26px; border-radius: 3px; overflow: hidden; }
+.ko-rampi span { flex: 1; }
+
+/* ── Laitetiedot ─────────────────────────────────────────────────────────
+   Oma sivunsa. Tämä saa vierittyä. */
+body.ko-tiedot {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 22px)
+    calc(env(safe-area-inset-right, 0px) + 18px)
+    calc(env(safe-area-inset-bottom, 0px) + 40px)
+    calc(env(safe-area-inset-left, 0px) + 18px);
+  height: auto; min-height: 100%;
+}
+.ko-tiedot-otsikko { font-size: 23px; font-weight: 600; margin-bottom: 4px; }
+.ko-tiedot-alaotsikko { color: var(--himmea); font-size: 14px; line-height: 1.5; margin-bottom: 22px; }
+.ko-arvaus {
+  background: var(--paneeli-2);
+  border: 1px solid var(--viiva-2);
+  border-left: 3px solid var(--varoitus);
+  border-radius: 5px;
+  padding: 13px 15px;
+  margin-bottom: 22px;
+  font-size: 15px; line-height: 1.5;
+}
+.ko-arvaus b { font-weight: 600; }
+.ko-ryhma { margin-bottom: 22px; }
+.ko-ryhma > h2 {
+  font-family: var(--fontti-mono);
+  font-size: 11px; font-weight: 400;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--himmea-2);
+  padding-bottom: 7px; margin-bottom: 0;
+  border-bottom: 1px solid var(--viiva);
+}
+.ko-rivi {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--viiva);
+  font-size: 14.5px;
+}
+.ko-rivi > span:first-child { flex: 1; color: var(--himmea); }
+.ko-rivi > span:last-child {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+}
+.ko-rivi.ko-iso > span:last-child { font-size: 17px; }
+.ko-nappi {
+  display: block; width: 100%;
+  margin-top: 16px; padding: 15px;
+  background: var(--paneeli-3);
+  border: 1px solid var(--viiva-2);
+  border-radius: 6px;
+  color: var(--teksti);
+  font-family: var(--fontti); font-size: 16px; font-weight: 600;
+  cursor: pointer;
+}
+.ko-nappi:active { background: var(--viiva-2); }
+#ko-kopio-tulos { color: var(--ok); font-size: 14px; text-align: center; margin-top: 10px; min-height: 20px; }
+
+/* ── Esikatselu graafikolle ──────────────────────────────────────────────
+   ?esikatselu — kaikki cuet allekkain laitteen oikeassa koossa. */
+body.ko-esikatselu {
+  overflow: auto; height: auto; min-height: 100%;
+  padding: 26px 18px 60px;
+  display: flex; flex-wrap: wrap; align-items: flex-start;
+  justify-content: center; gap: 30px 22px;
+}
+.ko-esikatselu-otsikko { width: 100%; margin-bottom: 4px; }
+.ko-esikatselu-otsikko h1 { font-size: 21px; font-weight: 600; margin-bottom: 5px; }
+.ko-esikatselu-otsikko p { color: var(--himmea); font-size: 14px; line-height: 1.55; }
+.ko-kehys-nimi {
+  font-family: var(--fontti-mono); font-size: 12px;
+  color: var(--himmea); margin-bottom: 7px; letter-spacing: .05em;
+}
+.ko-kehys {
+  position: relative;
+  border: 1px solid var(--viiva-2);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--pohja);
+  flex: none;
+}
+.ko-kehys > .ko-sisus {
+  position: absolute; top: 0; left: 0;
+  transform-origin: top left;
+}

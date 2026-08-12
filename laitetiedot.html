@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0E1116">
+<link rel="stylesheet" href="runko.css">
+<title>GRIND 3 — laitetiedot</title>
+</head>
+<body>
+<script src="moottori.js"></script>
+<script>
+/* Avaa tämä sivu sillä laitteella, jolla kuvataan. Se lukee ruutukoon,
+ * kuvatiheyden, turva-alueet ja virkistystaajuuden laitteesta itsestään,
+ * jotta graafikon ei tarvitse arvata artboardia.
+ *
+ * HUOM: mittaa turva-alueet ja kotivalikkotila oikein vasta, kun sivu on
+ * lisätty Koti-valikkoon ja avattu sieltä. Selaimessa luvut ovat lähellä
+ * mutta eivät samat. */
+GRIND.kaynnista({ laite: 'laitetiedot', laitetiedot: true, cuet: function () { return []; } });
+</script>
+</body>
+</html>

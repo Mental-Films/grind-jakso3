@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Alvina · puhelin">
+<meta name="theme-color" content="#0E1116">
+<link rel="apple-touch-icon" href="assets/ikoni_puhelin.png">
+<link rel="manifest" href="manifest_puhelin.json">
+<link rel="stylesheet" href="runko.css">
+<title>GRIND 3 — puhelin</title>
+</head>
+<body>
+<script src="moottori.js"></script>
+<script>
+/* Alvinan iPhone autotelineessä — HOPP Partner.
+ *
+ * Vaihe 1: cue-rakenne ja paikkamerkit. Kartta, ajastinrengas ja
+ * navigaattori tehdään vaiheessa 6. Cue-numerot eivät muutu.
+ *
+ * Puhelin on telineessä liikkuvassa autossa, joten piilotettuihin kulmiin
+ * ei voi luottaa — ajolista ajetaan Bluetooth-klikkerillä.
+ */
+GRIND.kaynnista({
+  laite: 'puhelin',
+
+  cuet: function (M) { return [
+
+    { id: 0, nimi: 'Vuoroloki', sovellus: 'hopp',
+      hohto: { vari: null, voima: 0 },
+      piirra: M.paikkamerkki({
+        sovellus: 'hopp',
+        otsikko: function (c) { return c.S.hopp.vuoroOtsikko; },
+        kuvaus: 'Ansiot, kyydit ja hyväksymisaste. Tauko on ylitetty.',
+        luku: function (c) { return c.S.luvut.vuoroTunnit + ' h'; },
+        lukuvari: 'var(--varoitus)'
+      }) },
+
+    { id: 1, nimi: 'Räpsy + ajastin', sovellus: 'hopp',
+      hohto: { vari: null, voima: 0 },
+      piirra: M.paikkamerkki({
+        sovellus: 'hopp',
+        otsikko: 'Ruutu räpsyy',
+        kuvaus: 'Häiriö. Hyväksymisajastin sykkii ja laskee sekunteja.',
+        luku: function (c) { return c.S.luvut.ajastinSekunnit + ' s'; },
+        lukuvari: 'var(--virhe)'
+      }) },
+
+    { id: 2, nimi: 'START RIDE', sovellus: 'hopp',
+      kosketus: true,                       // Alvina painaa itse
+      hohto: { vari: null, voima: 0 },
+      piirra: M.paikkamerkki({
+        sovellus: 'hopp',
+        otsikko: function (c) { return c.S.hopp.aloitaNappi; },
+        kuvaus: function (c) { return c.S.hopp.matkustaja + '. Navigaattori aukeaa. Määränpää ' + c.S.hopp.maaranpaa + '.'; }
+      }) },
+
+    { id: 3, nimi: 'Ajossa', sovellus: 'hopp',
+      hohto: { vari: null, voima: 0 },
+      piirra: M.paikkamerkki({
+        sovellus: 'hopp',
+        otsikko: 'Reitti etenee',
+        kuvaus: 'GPS-näkymä. Punainen reittiviiva piirtyy auki kartalle.',
+        luku: function (c) { return c.S.hopp.ohjeet[0].matka; }
+      }) },
+
+    { id: 4, nimi: 'KÄÄNNY YMPÄRI', sovellus: 'hopp',
+      hohto: { vari: 'punainen', voima: 4 },
+      piirra: M.paikkamerkki({
+        sovellus: 'hopp',
+        otsikko: function (c) { return c.S.hopp.kaannyNappi; },
+        kuvaus: 'Auto on päätynyt metsätielle. Reitti ei ole enää käytettävissä.',
+        lukuvari: 'var(--virhe)'
+      }) },
+
+    { id: 5, nimi: 'Uusi kyyti', sovellus: 'hopp',
+      kosketus: true,                       // Alvina painaa HYVÄKSY
+      hohto: { vari: null, voima: 0 },
+      piirra: M.paikkamerkki({
+        sovellus: 'hopp',
+        otsikko: function (c) { return c.S.hopp.pyyntoOtsikko; },
+        kuvaus: function (c) { return 'Nouto ' + c.S.hopp.noutopaikka + '. Ajastin ' +
+                                      c.S.luvut.ajastinSekunnit + ' s. Alvina painaa ' + c.S.hopp.hyvaksyNappi + '.'; },
+        luku: function (c) { return c.e2(c.S.luvut.provikka) + ' €'; },
+        lukuvari: 'var(--ok)'
+      }) },
+
+    /* Viimeinen cue on aina kameratestikortti. Näppäin T hyppää siihen. */
+    { id: 6, nimi: 'Kameratesti', piirra: M.testikortti() }
+
+  ]; }
+});
+</script>
+</body>
+</html>

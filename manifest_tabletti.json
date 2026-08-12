@@ -1,0 +1,13 @@
+{
+  "name": "Alvina · tabletti",
+  "short_name": "Alvina · tabletti",
+  "start_url": "proppi_tabletti.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E1116",
+  "theme_color": "#0E1116",
+  "icons": [
+    { "src": "assets/ikoni_tabletti.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}

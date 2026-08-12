@@ -261,10 +261,29 @@ kohtaan `hopp.kartta`.
 Nämä ovat rakenteita, joita koodi piirtää. Sinä ratkaiset värin, tilan,
 typografian ja rytmin — et tee niistä kuvatiedostoja.
 
+> **Rakenteet on tarkistettu oikeista sovelluksista** — ks.
+> **[REFERENSSIT.md](REFERENSSIT.md)**. Sieltä löytyy myös se, miksi
+> pystyasennossa on välilehtipalkki eikä sivupalkkia, ja mitä Liquid Glass
+> tarkoittaa propin kannalta.
+
+### Kaikissa kolmessa: kelluva välilehtipalkki alalaidassa
+
+Ei sivupalkkia. Apple ohjeistaa harkitsemaan pystyasennossa ensin
+välilehtipalkkia, koska sivupalkki vie vaakatilaa sisällöltä. Navigointi
+kelluu sisällön päällä ja sisältö vierii sen alta.
+
 ### CANDLR — kryptopörssi
 
 Reapercoin (RPR). Iso kaavio, kurssilukema, prosenttimuutos, ostopainikkeet,
 tilin kate, salkkulista.
+
+Kolme rakenteellista asiaa, jotka tulevat suoraan oikeasta pörssistä:
+
+- **Aikavälipillerit** `1H 1D 1W 1M 1Y ALL` kurssin oikealla puolella, valittu
+  täytettynä. Nämä ovat genren tunnistettavin merkki — tee ne isoina
+- **Hinta-asteikko kaavion oikeassa laidassa**, aika alalaidassa. Vasemmalle
+  sijoitettu asteikko lukee heti vääränä
+- **Muutos kolmena osana**: nuoli, euromäärä ja prosentti suluissa
 
 - **Romahduskaavio.** Verenpunainen sahalaita, joka **lävistää asteikon
   diagonaalisesti** ylhäältä alas — käsikirjoituksen sanamuoto, ja se on
@@ -284,6 +303,10 @@ tilin kate, salkkulista.
 Aihealueita, postauslista, äänestysnuolet, kommenttimäärät. Päällä
 kirjoituskenttä ja **sovelluksen oma näppäimistö**.
 
+Rivillä on otsikko, sen alla aihealue pienellä, äänestysnuolet ja pistemäärä
+vasemmassa laidassa, kommenttimäärä ja **suhteellinen aika** (`3 t`, ei
+`03:31`). Suodatinrivi ylhäällä: `Uusimmat · Kuumat · Ylin`.
+
 Näppäimistö on piirretty käyttöliittymä, ei iOS:n oma — muuten automaattikorjaus
 ja ennakoiva tekstipalkki pilaavat oton. Sen pitää näyttää oikealta lähikuvassa:
 **iPadin näppäimistö on eri asia kuin puhelimen** — leveämpi, enemmän näppäimiä,
@@ -296,6 +319,13 @@ Otsikko, jonka Alvina kirjoittaa:
 
 Ostosrivilista. Jokaisella rivillä kauppias, tuote, summa, eräpäivä ja tila.
 **Valtaosa merkitty ERÄÄNTYNEEKSI.** Ylhäällä kokonaissumma ja myöhästymismaksut.
+
+Rivi ei ole lasku vaan **maksusuunnitelma**: siinä näkyy erälaskuri (`1/4`,
+`3/4`) ja yhden erän summa, ei vain kokonaissummaa. Se yksityiskohta erottaa
+osamaksusovelluksen laskusovelluksesta.
+
+Erääntymisilme on vapaasti keksittävissä: alan sovellukset eivät näytä
+maksunäkymiään ulospäin, joten tavaramerkkiriskiä ei tässä juuri ole.
 
 Rivit tulevat `sisalto.json`-tiedostosta, joten määrä ja sisältö voivat muuttua
 vielä myöhään. Suunnittele rivi, älä listaa.

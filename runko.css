@@ -78,7 +78,7 @@ body.ko-proppi {
    sovellus 0 · hohto 20 · musta 30 · kulmat 40 · palkki 50 · ilmoitus 60 */
 
 #ko-sovellus {
-  position: fixed; inset: 0;
+  position: absolute; inset: 0;
   filter: brightness(var(--kirkkaus));
   will-change: filter;
   z-index: 0;

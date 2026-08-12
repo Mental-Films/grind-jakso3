@@ -8,7 +8,7 @@
  * Ajossa oleva versionumero näkyy propin ohjauspalkissa.
  */
 
-var VERSIO = 'grind3-v0.2.0';
+var VERSIO = 'grind3-v0.3.1';
 
 /* Pakolliset. Jos yksikin puuttuu, asennus epäonnistuu ja se on oikein —
    silloin proppi ei väitä olevansa offline-valmis. */
@@ -21,6 +21,8 @@ var PAKOLLISET = [
   'runko.css',
   'moottori.js',
   'kartta.js',
+  'glitch.js',
+  'glitch.css',
   'hopp.css',
   'teema.json',
   'sisalto.json'
@@ -78,26 +80,44 @@ self.addEventListener('fetch', function (t) {
   var osoite = new URL(pyynto.url);
   if (osoite.origin !== location.origin) return;
 
-  /* ?tuore=1 ohittaa välimuistin kokonaan. Graafikko käyttää tätä, kun
-     teema.json tai sisalto.json ei näytä päivittyneen. */
+  /* ?tuore=1 ohittaa välimuistin kokonaan. */
   if (osoite.search.indexOf('tuore') !== -1) {
-    t.respondWith(fetch(pyynto).catch(function () { return caches.match(pyynto, { ignoreSearch: true }); }));
+    t.respondWith(fetch(pyynto).catch(function () {
+      return caches.match(pyynto, { ignoreSearch: true });
+    }));
     return;
   }
 
-  /* Sivupyyntö: välimuisti ensin, jotta lentotila toimii. Verkko päivittää
-     taustalla, jotta seuraava avaus on tuore. */
+  /* VERKKO ENSIN, välimuisti varana — ei toisin päin.
+   *
+   * Välimuisti ensin olisi nopeampi, mutta se tarkoittaa että laitteessa voi
+   * pyöriä vanha versio ilman että kukaan huomaa. Kuvauspaikalla on
+   * tärkeämpää tietää mikä build ajaa kuin säästää millisekunteja.
+   *
+   * Lentotilassa fetch epäonnistuu heti (ei reittiä verkkoon), joten
+   * varaan siirrytään käytännössä viiveettä. Aikakatkaisu on siltä varalta,
+   * että laite on kiinni verkossa joka ei vastaa — esimerkiksi kuvauspaikan
+   * tukiasema ilman internetiä. Ilman sitä proppi jäisi odottamaan. */
+  var AIKAKATKAISU = 2500;
+
   t.respondWith(
     caches.match(pyynto, { ignoreSearch: true }).then(function (osuma) {
-      var verkosta = fetch(pyynto).then(function (vastaus) {
-        if (vastaus && vastaus.ok) {
-          var kopio = vastaus.clone();
-          caches.open(VERSIO).then(function (v) { v.put(pyynto, kopio); });
-        }
-        return vastaus;
-      }).catch(function () { return osuma; });
+      var verkosta = new Promise(function (valmis, hylkaa) {
+        var ajastin = setTimeout(function () { hylkaa(new Error('aikakatkaisu')); }, AIKAKATKAISU);
+        fetch(pyynto).then(function (vastaus) {
+          clearTimeout(ajastin);
+          if (vastaus && vastaus.ok) {
+            var kopio = vastaus.clone();
+            caches.open(VERSIO).then(function (v) { v.put(pyynto, kopio); });
+          }
+          valmis(vastaus);
+        }).catch(function (e) { clearTimeout(ajastin); hylkaa(e); });
+      });
 
-      return osuma || verkosta;
+      return verkosta.catch(function () {
+        if (osuma) return osuma;
+        throw new Error('ei verkkoa eikä välimuistia: ' + osoite.pathname);
+      });
     })
   );
 });

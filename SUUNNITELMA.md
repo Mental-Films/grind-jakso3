@@ -295,6 +295,7 @@ proppi_tabletti.html    iPad — CANDLR, GRUMBL, TABB. Ajolista ja cue-määritt
 proppi_puhelin.html     iPhone — HOPP Partner. Ajolista ja cue-määrittelyt
 moottori.js             Cue-moottori, hohto, kirkkaus, kulmat, laitetiedot, esikatselu
 kartta.js               Karttamoottori — tiestö, reitti, kamera, paikannin
+glitch.js · glitch.css  Räpsy — siirretty tuotannon aiemmasta propista
 runko.css               Rakenteen tyylit (värit tulevat teema.json:ista)
 hopp.css                HOPP Partnerin ulkoasu
 teema.json              Värit ja kirjasimet          ← graafikko muokkaa
@@ -352,19 +353,27 @@ Näkyy aina kun ohjauspalkki on esillä, piiloutuu `H`:lla oton ajaksi.
 muodossa, jonka voi liittää `sisalto.json`:iin kohtaan `hopp.kartta`. Näin
 etsitty näkymä ei katoa, kun laite tyhjennetään.
 
-### Laitteen paikannin
+### Laitteen paikannin — vain nopeus
 
-`G` kytkee iPhonen oman paikantimen. **GPS toimii lentotilassa** — se on
-vastaanotin eikä tarvitse verkkoa, ensimmäinen paikannus vain kestää kauemmin
-ilman verkkoapua. Tässä tilassa auto liikkuu oikean liikkeen mukaan ja reitti
-piirtyy ajetusta jäljestä, mutta tiestö ympärillä pysyy fiktiivisenä.
+Ensimmäinen versio yritti seurata absoluuttista sijaintia. Se oli väärä idea, ja
+syyn huomasi heti kokeilussa: **kartan tiestö on fiktiivinen, joten ei ole
+paikkaa johon paikantaa.** Auto olisi ajanut kadulla jota ei ole olemassa.
 
-Käyttö on tilannekohtainen:
+`L` kytkee paikantimen, ja siitä otetaan vain se mikä on fiktiivisellä kartalla
+merkityksellistä: **nopeus.** Kartta liikkuu silloin samaa vauhtia kuin auto
+ikkunan takana mutta kulkee omaa reittiään. GPS toimii lentotilassa — se on
+vastaanotin eikä tarvitse verkkoa — mutta paikannuslupa on annettava kerran ja
+ensimmäinen lukema kestää ilman verkkoapua.
+
+Sama asia hoituu myös käsin: **`F` nopeuttaa ja `J` jarruttaa** 6 km/h
+kerrallaan. Se on käytännössä luotettavampi ja toimii myös paikallaan
+seisovassa autossa.
 
 | Tila | Milloin |
 |---|---|
-| **Simuloitu ajo** (oletus) | Kaikki otot, joissa toistettavuus ratkaisee. Nopeus `sisalto.json`:ista, eteneminen cue-suhteellisesta ajasta |
-| **Paikannin** | Jos ohjaaja haluaa kartan reagoivan auton oikeaan liikkeeseen. Ei toistu identtisenä otosta toiseen — käytä harkiten |
+| **Simuloitu ajo** (oletus) | Kaikki otot. Nopeus `sisalto.json`:ista, eteneminen cue-suhteellisesta ajasta — toistuu identtisenä |
+| **Käsisäätö** `F` `J` | Kun kartan vauhti pitää sovittaa ikkunan takaiseen maisemaan |
+| **Paikannin** `L` | Kun sovitus halutaan automaattisesti. Ei toistu identtisenä otosta toiseen |
 
 ### Jos halutaan oikea maantiede
 
@@ -381,6 +390,45 @@ kartan pitää täsmätä.
 
 ---
 
+## 14. Räpsy
+
+Käsikirjoituksen "ruutu räpsyy" on toteutettu siirtämällä glitch-moottori
+tuotannon aiemmasta propista. Samat neljä tyyppiä, samat näppäimet ja sama
+periaate: efekti ei maalaa viivoja kuvan päälle vaan **siirtää itse kuvaa**.
+Ruudusta otetaan kaksi pysäytyskuvaa, jotka maski pilkkoo kaistoiksi ja
+animaatio siirtää eri verran sivuun ja sävyttää eri suuntaan.
+
+| Näppäin | Tyyppi | Miltä näyttää |
+|:---:|---|---|
+| `G` | repeytyminen | Vaakakaistat irtoavat paikaltaan, sisältö näkyy väärässä kohdassa |
+| `X` | blokkiintuminen | Pakkaus hajoaa, osa lohkoista tippuu mustaksi. Kuva ei tärise |
+| `Y` | kuva väärinpäin | Signaali kääntyy ylösalaisin ja peilikuvaksi |
+| `Z` | sahalaita | Lomituksen kampa, tekstin reunat hajoavat puna-syaaniksi |
+
+Painallus = purske 0,36–0,66 s, `⇧` + sama näppäin jää päälle. Purskeen kesto ja
+lohkojen paikat arvotaan joka kerta — tämä on tarkoituksellinen poikkeus propin
+jatkuvuussääntöön.
+
+**Cuessa 1 räpsähtely käynnistyy itsestään**, koska kuvauspaikalla
+operaattorilla on vain klikkeri. Tahti on `sisalto.json`:in `hopp.rapsy`.
+
+Kolme muutosta alkuperäiseen:
+
+1. **Mitat ovat vw/vh-yksiköitä.** Alkuperäinen proppi on kiinteä 1920 × 1080
+   -lava; tässä ruutu on 393 px leveä. Pikselimitat olisivat puhelimessa
+   viisi kertaa liian isoja suhteessa ruutuun
+2. **Kloonit kopioivat myös canvaksen.** `cloneNode()` ei kopioi canvaksen
+   bittikarttaa, joten HOPP:n kartta olisi klooneissa tyhjä — suurin osa
+   ruudusta olisi mustaa juuri glitchin aikana
+3. **Tärinän jakso on 0,33 s eikä 0,22 s.** Askeleessa on koko ruudun
+   luminanssimuutos, joka olisi toistunut 4,5 kertaa sekunnissa ja rikkonut
+   propin oman välkyntärajan (kohta 7). Ilme ei muutu, tahti hidastuu
+
+Ääni on oletuksena pois. Puhelin on telineessä keskellä dialogia eikä propin
+rahina saa mennä ääniraidalle.
+
+---
+
 ### Tila 12.8.2026
 
 Vaihe 1 tehty ja testattu: cue-moottori, hohtokerros, kirkkaus, piilotetut
@@ -391,8 +439,10 @@ kulmat, näyttelijän kosketustila, offline-asennus, `laitetiedot.html`,
 oli koko propin suurin tekninen riski. Kuljettajanäkymä, kyytipyyntö
 ajastinrenkaineen, navigaattori, liikkuva kartta ja KÄÄNNY YMPÄRI ovat valmiit.
 
-Jäljellä: CANDLR (vaihe 3), GRUMBL haamunäppäimistöineen (vaihe 4), TABB
-(vaihe 5) ja räpsy-efekti. Tabletin cuet ovat yhä paikkamerkeillä.
+Räpsy siirretty aiemmasta propista ja käytössä molemmissa propeissa.
+
+Jäljellä: CANDLR (vaihe 3), GRUMBL haamunäppäimistöineen (vaihe 4) ja TABB
+(vaihe 5). Tabletin cuet ovat yhä paikkamerkeillä.
 
 Seuraavaksi vaihe 2: asennus oikeille laitteille ja kameratesti.
 

@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  var VERSIO = '0.2.0';
+  var VERSIO = '0.3.1';
 
   /* ══ Siemennetty satunnaisluku ══════════════════════════════════════════
      Jatkuvuus vaatii, että sama cue piirtää saman kuvan joka otossa.
@@ -209,6 +209,14 @@
     };
     M._ctx = ctx;
 
+    /* Räpsy nollataan ENNEN piirtoa: cue voi käynnistää oman automaattinsa
+       piirra-funktiossaan, ja nollaus jälkikäteen sammuttaisi sen heti. */
+    if (global.GRIND && global.GRIND.glitch) {
+      global.GRIND.glitch.automaattiPois();
+      global.GRIND.glitch.jatkuva = false;
+      global.GRIND.glitch.pois();
+    }
+
     if (typeof c.piirra === 'function') c.piirra(juuri, ctx);
 
     /* Kosketustila: kun näyttelijä koskee ruutua, operaattorin piilotetut
@@ -284,6 +292,8 @@
     ilmoitusAjastin = setTimeout(function () { el.classList.remove('ko-nakyy'); }, 1100);
   }
 
+  M.ilmoita = ilmoita;
+
   M.palkki = function (esilla) {
     M.palkkiEsilla = esilla === undefined ? !M.palkkiEsilla : !!esilla;
     document.body.classList.toggle('ko-palkki-esilla', M.palkkiEsilla);
@@ -305,6 +315,14 @@
      näppäimistöllä valmistelussa. */
   function nappain(t) {
     if (t.metaKey || t.ctrlKey || t.altKey) return;
+
+    /* Glitch-näppäimet G X Y Z ovat samat kuin tuotannon aiemmassa propissa,
+       jotta operaattorin lihasmuisti kantaa jaksosta toiseen. */
+    if (global.GRIND && global.GRIND.glitch && global.GRIND.glitch.nappain(t)) {
+      t.preventDefault();
+      return;
+    }
+
     var n = t.key;
 
     if (n === ' ' || n === 'ArrowRight' || n === 'ArrowDown' || n === 'PageDown') { t.preventDefault(); M.seuraava(); return; }
@@ -416,7 +434,16 @@
 
       document.body.classList.add('ko-proppi');
       document.body.innerHTML =
-        '<div id="ko-sovellus"></div>' +
+        '<div id="ko-kuori">' +
+          '<div id="ko-sovellus"></div>' +
+          '<div id="ko-blokit"></div>' +
+          '<div id="ko-glitch">' +
+            '<div class="ko-slice a"></div><div class="ko-slice b"></div>' +
+            '<div class="ko-glitch-lohkot"></div>' +
+            '<div class="ko-juova"></div>' +
+            '<div class="ko-rahina"></div>' +
+          '</div>' +
+        '</div>' +
         '<div id="ko-hohto"></div>' +
         '<div id="ko-musta"></div>' +
         '<div id="ko-palkki"></div>' +
@@ -428,6 +455,8 @@
       M._el.musta = document.getElementById('ko-musta');
       M._el.palkki = document.getElementById('ko-palkki');
       M._el.ilmoitus = document.getElementById('ko-ilmoitus');
+
+      if (global.GRIND && global.GRIND.glitch) global.GRIND.glitch.ilmoita = ilmoita;
 
       teeKulmat();
       M.palkki(true);

@@ -283,53 +283,72 @@
     this.paivitaSijainti();
   };
 
-  /* ── GPS ────────────────────────────────────────────────────────────────
-     iPhonen paikannin toimii lentotilassa: GPS on vastaanotin eikä tarvitse
-     verkkoa. Ensimmäinen paikannus vain kestää kauemmin ilman verkkoapua.
-     Tässä tilassa auto liikkuu oikean liikkeen mukaan ja reitti piirtyy
-     ajetusta jäljestä — tiestö ympärillä on edelleen fiktiivinen. */
-  Kartta.prototype.seuraaGps = function (paalla, ilmoita) {
+  /* ── Laitteen paikannin ─────────────────────────────────────────────────
+     Aiemmin tämä yritti seurata absoluuttista sijaintia. Se oli väärä idea:
+     kartan tiestö on fiktiivinen, joten ei ole paikkaa johon paikantaa —
+     auto olisi ajanut kadulla jota ei ole olemassa.
+
+     Paikantimesta otetaan siksi vain se, mikä on merkityksellistä
+     fiktiivisellä kartalla: NOPEUS. Kartta liikkuu silloin samaa vauhtia
+     kuin auto ikkunan takana, mutta kulkee omaa reittiään.
+
+     GPS toimii lentotilassa — se on vastaanotin eikä tarvitse verkkoa.
+     Ensimmäinen paikannus vain kestää kauemmin ilman verkkoapua, ja
+     paikannuslupa on annettava kerran laitteen asetuksista. */
+  Kartta.prototype.seuraaNopeus = function (paalla, ilmoita) {
     var self = this;
+
     if (!paalla) {
       if (this.gpsVahti != null) navigator.geolocation.clearWatch(this.gpsVahti);
       this.gpsVahti = null;
       this.gps = null;
+      this.nopeus = (this.asetukset.nopeusKmh || 42) / 3.6;
+      if (ilmoita) ilmoita('paikannin pois · nopeus ' + Math.round(this.nopeus * 3.6) + ' km/h');
       return;
     }
-    if (!navigator.geolocation) { if (ilmoita) ilmoita('GPS ei käytettävissä'); return; }
 
-    this.gpsJalki = [];
+    if (!navigator.geolocation) {
+      if (ilmoita) ilmoita('paikannin ei käytettävissä tällä laitteella');
+      return;
+    }
+    if (!window.isSecureContext) {
+      if (ilmoita) ilmoita('paikannin vaatii HTTPS-osoitteen');
+      return;
+    }
+
+    if (ilmoita) ilmoita('paikannin: odotetaan ensimmäistä lukemaa…');
+    var edellinen = null;
+
     this.gpsVahti = navigator.geolocation.watchPosition(function (sij) {
-      var c = sij.coords;
-      if (!self.gpsNolla) self.gpsNolla = { lat: c.latitude, lon: c.longitude };
+      var c = sij.coords, nopeus = c.speed;
 
-      /* Aste → metri paikallisesti. Riittää muutaman kilometrin alueella. */
-      var mLat = 111320;
-      var mLon = 111320 * Math.cos(self.gpsNolla.lat * Math.PI / 180);
-      var px = (c.longitude - self.gpsNolla.lon) * mLon;
-      var py = -(c.latitude - self.gpsNolla.lat) * mLat;
-
-      self.gps = { x: px, y: py, tarkkuus: c.accuracy, nopeus: c.speed || 0 };
-      self.gpsJalki.push([px, py]);
-      if (self.gpsJalki.length > 1) {
-        self.reitti = self.gpsJalki.slice();
-        self.reitinPituus = pituus(self.reitti);
-        self.matka = self.reitinPituus;
+      /* coords.speed on usein null paikallaan tai heikolla signaalilla.
+         Lasketaan silloin peräkkäisistä lukemista. */
+      if (nopeus == null || isNaN(nopeus)) {
+        if (edellinen) {
+          var dt = (sij.timestamp - edellinen.aika) / 1000;
+          if (dt > 0.4) {
+            var mLat = 111320, mLon = 111320 * Math.cos(c.latitude * Math.PI / 180);
+            var dx = (c.longitude - edellinen.lon) * mLon;
+            var dy = (c.latitude - edellinen.lat) * mLat;
+            nopeus = Math.hypot(dx, dy) / dt;
+          }
+        }
       }
-      var edellinen = self.gpsJalki[self.gpsJalki.length - 2];
-      self.auto = {
-        x: px, y: py,
-        suunta: (c.heading != null && !isNaN(c.heading))
-          ? (c.heading - 90) * Math.PI / 180
-          : (edellinen ? Math.atan2(py - edellinen[1], px - edellinen[0]) : 0)
-      };
-      self.keskus = self.vapaa || { x: px, y: py };
-      self.suunta = self.auto.suunta;
-      if (ilmoita) ilmoita('GPS ' + Math.round(c.accuracy) + ' m · ' +
-        Math.round((c.speed || 0) * 3.6) + ' km/h');
+      edellinen = { lat: c.latitude, lon: c.longitude, aika: sij.timestamp };
+
+      if (nopeus != null && !isNaN(nopeus)) {
+        self.nopeus = Math.max(0, Math.min(60, nopeus));   // katto 216 km/h
+        self.gps = { nopeus: self.nopeus, tarkkuus: c.accuracy };
+        if (ilmoita) ilmoita('paikannin · ' + Math.round(self.nopeus * 3.6) + ' km/h · ±' +
+          Math.round(c.accuracy) + ' m');
+      }
     }, function (virhe) {
-      if (ilmoita) ilmoita('GPS: ' + virhe.message);
-    }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+      var syyt = { 1: 'paikannuslupa evätty — anna se Asetukset → Safari → Sijainti',
+                   2: 'sijaintia ei saatavilla', 3: 'paikannus aikakatkaistiin' };
+      if (ilmoita) ilmoita('paikannin: ' + (syyt[virhe.code] || virhe.message));
+      self.gpsVahti = null;
+    }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 25000 });
   };
 
   /* ── Piirto ─────────────────────────────────────────────────────────── */

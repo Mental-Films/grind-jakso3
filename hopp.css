@@ -270,3 +270,27 @@
 body.ko-palkki-esilla .hopp-karttatyokalu { display: flex; }
 .hopp-karttatyokalu b { color: var(--teksti); }
 .hopp-karttatyokalu .hopp-tt-rivi { display: flex; justify-content: space-between; gap: 8px; }
+
+/* ── Kyyti hyväksytty ───────────────────────────────────────────────────
+   Pyyntökortti vaihtuu tähän HYVÄKSY-painalluksesta. Jää ruudulle: cue
+   vaihdetaan klikkerillä, ei näyttelijän sormesta. */
+.hopp-pyynto.hopp-vahvistettu { background: rgba(6,8,11,.42); }
+.hopp-vahvistus { border-color: var(--hopp); }
+.hopp-vahvistus-ylin { display: flex; align-items: center; gap: 14px; }
+.hopp-vahvistus-merkki {
+  width: 46px; height: 46px; border-radius: 50%; flex: none;
+  background: rgba(62,158,146,.16);
+  display: grid; place-items: center;
+  animation: hopp-kuittaus .42s ease-out;
+}
+.hopp-vahvistus-merkki .hopp-nuoli { width: 26px; height: 26px; fill: var(--hopp); }
+@keyframes hopp-kuittaus {
+  0%   { transform: scale(.55); opacity: 0 }
+  60%  { transform: scale(1.08); opacity: 1 }
+  100% { transform: scale(1); opacity: 1 }
+}
+.hopp-vahvistus-otsikko {
+  font-size: 18px; font-weight: 600; letter-spacing: .06em;
+  color: var(--hopp);
+}
+.hopp-vahvistus-teksti { font-size: 14px; color: var(--himmea); margin-top: 3px; }

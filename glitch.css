@@ -1,0 +1,185 @@
+/* Glitch — siirretty tuotannon aiemmasta propista (peligraafikon työpöytä).
+ *
+ * Sama neljä tyyppiä ja sama periaate: efekti ei maalaa viivoja kuvan päälle
+ * vaan siirtää itse kuvaa. #ko-glitch sisältää kaksi KLOONIA sovelluksesta,
+ * kumpikin maskattu vaakakaistoiksi ja siirretty eri verran sivuun ja
+ * sävytetty eri suuntaan — kaistoissa näkyy oikeaa sisältöä väärässä kohdassa.
+ *
+ * MUUTOS ALKUPERÄISEEN: mitat ovat vw/vh-yksiköitä eivätkä pikseleitä.
+ * Alkuperäinen proppi on kiinteä 1920 × 1080 -lava; tässä ruutu on 393 px
+ * leveä puhelimessa ja 820 px tabletissa. Pikselimitat olisivat puhelimessa
+ * viisi kertaa liian isoja suhteessa ruutuun.
+ *
+ * Ei puhtaita valkoisia välähdyksiä — ne palaisivat kamerassa puhki.
+ * Koko ruudun luminanssimuutoksia enintään 3 sekunnissa, ks. SUUNNITELMA 7.
+ */
+
+#ko-kuori { position: fixed; inset: 0; z-index: 0; }
+
+#ko-glitch {
+  position: absolute; inset: 0;
+  overflow: hidden; pointer-events: none;
+  display: none;
+  z-index: 10;
+}
+#ko-glitch.ko-paalla { display: block; }
+
+.ko-slice { position: absolute; inset: 0; overflow: hidden; }
+.ko-slice > * { transform: none !important; }
+.ko-glitch-lohkot, .ko-juova { position: absolute; inset: 0; display: none; }
+
+.ko-rahina {
+  position: absolute; inset: 0; opacity: .13;
+  background-image:
+    repeating-linear-gradient(0deg,  rgba(200,208,216,.5) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.5) 0 1px, transparent 1px 2px);
+  animation: ko-rahina .09s steps(1) infinite;
+}
+@keyframes ko-rahina {
+  0%  { background-position: 0 0, 0 0 }
+  33% { background-position: 3px 2px, 1px 0 }
+  66% { background-position: -2px 1px, 2px 3px }
+}
+
+/* ── 1. REPEYTYMINEN (G) — kaistat irti paikaltaan ───────────────────────── */
+#ko-glitch.t-tear .ko-slice.a {
+  -webkit-mask-image: repeating-linear-gradient(0deg,#000 0 3vh,transparent 3vh 13.5vh);
+          mask-image: repeating-linear-gradient(0deg,#000 0 3vh,transparent 3vh 13.5vh);
+  filter: sepia(.55) hue-rotate(-34deg) saturate(2.1) brightness(1.04);
+  animation: ko-tearA .19s steps(1) infinite;
+}
+@keyframes ko-tearA {
+  0%  { transform: translateX(-7vw); mask-position: 0 0;     -webkit-mask-position: 0 0 }
+  25% { transform: translateX(4.5vw); mask-position: 0 -5vh; -webkit-mask-position: 0 -5vh }
+  50% { transform: translateX(-11vw); mask-position: 0 9vh;  -webkit-mask-position: 0 9vh }
+  75% { transform: translateX(2.5vw); mask-position: 0 -15vh;-webkit-mask-position: 0 -15vh }
+}
+#ko-glitch.t-tear .ko-slice.b {
+  -webkit-mask-image: repeating-linear-gradient(0deg,transparent 0 6.5vh,#000 6.5vh 9vh,transparent 9vh 19vh);
+          mask-image: repeating-linear-gradient(0deg,transparent 0 6.5vh,#000 6.5vh 9vh,transparent 9vh 19vh);
+  filter: sepia(.5) hue-rotate(142deg) saturate(2.3);
+  animation: ko-tearB .23s steps(1) infinite;
+}
+@keyframes ko-tearB {
+  0%  { transform: translateX(8.5vw);  mask-position: 0 0;     -webkit-mask-position: 0 0 }
+  33% { transform: translateX(-3.5vw); mask-position: 0 10vh;  -webkit-mask-position: 0 10vh }
+  66% { transform: translateX(13vw);   mask-position: 0 -7vh;  -webkit-mask-position: 0 -7vh }
+}
+#ko-glitch.t-tear .ko-glitch-lohkot {
+  display: block;
+  background:
+    linear-gradient(#0E1116 0 0) 0 0 / 55vw 3.2vh no-repeat,
+    linear-gradient(#151A21 0 0) 0 0 / 30vw 2vh no-repeat,
+    linear-gradient(#0B0E12 0 0) 0 0 / 92vw 1.7vh no-repeat;
+  animation: ko-tearblk .21s steps(1) infinite;
+}
+@keyframes ko-tearblk {
+  0%  { background-position: 12vw 17vh, 62vw 59vh, 35vw 81vh }
+  33% { background-position: 50vw 39vh, 15vw 19vh, 68vw 28vh }
+  66% { background-position:  6vw 70vh, 44vw 87vh, 21vw 48vh; opacity: .6 }
+}
+#ko-glitch.t-tear .ko-juova, #ko-glitch.t-flip .ko-juova {
+  display: block; inset: auto 0 auto 0; height: 14vh;
+  background: linear-gradient(180deg, transparent,
+    rgba(200,214,228,.15) 42%, rgba(200,214,228,.07) 62%, transparent);
+  animation: ko-juova 1.15s linear infinite;
+}
+@keyframes ko-juova { from { top: -16vh } to { top: 100vh } }
+
+/* ── 2. BLOKKIINTUMINEN (X) — pakkausartefakti ────────────────────────────
+   backdrop-filter sumentaa ja latistaa OIKEAA sisältöä lohkon sisällä, joten
+   kuva menee puuroksi eikä lohkon alle piiloon. Kuva ei tärise — pakkaus
+   hajoaa paikallaan. */
+#ko-blokit { position: absolute; inset: 0; z-index: 12; pointer-events: none; display: none; }
+#ko-blokit.ko-paalla { display: block; }
+#ko-blokit i {
+  position: absolute; display: block;
+  -webkit-backdrop-filter: blur(7px) contrast(1.6) saturate(.3);
+          backdrop-filter: blur(7px) contrast(1.6) saturate(.3);
+  background: rgba(20,26,34,.14);
+  animation: ko-blk .34s steps(1) infinite;
+}
+#ko-blokit i:nth-child(3n) {
+  -webkit-backdrop-filter: blur(13px) saturate(2.6) hue-rotate(18deg);
+          backdrop-filter: blur(13px) saturate(2.6) hue-rotate(18deg);
+}
+#ko-blokit i:nth-child(4n) {
+  -webkit-backdrop-filter: blur(3px) brightness(1.35) contrast(2.2);
+          backdrop-filter: blur(3px) brightness(1.35) contrast(2.2);
+}
+/* Joka seitsemäs on täysi pudotus — signaali katosi kokonaan. */
+#ko-blokit i:nth-child(7n) {
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  background: #0B0E12;
+}
+@keyframes ko-blk { 0% { opacity: 1 } 55% { opacity: .12 } 80% { opacity: .85 } }
+#ko-glitch.t-block .ko-rahina { opacity: .06; }
+
+/* ── 3. KUVA VÄÄRINPÄIN (Y) — signaali kääntyy ───────────────────────────── */
+#ko-glitch.t-flip .ko-slice.a { animation: ko-flipA .27s steps(1) infinite; }
+@keyframes ko-flipA {
+  0%  { transform: scaleY(-1);                   opacity: 1 }
+  38% { transform: scaleY(-1) translateY(-5vh);  opacity: .92 }
+  58% { transform: scaleX(-1);                   opacity: 1 }
+  78% { transform: scaleY(-1) scaleX(-1);        opacity: 1 }
+  92% { transform: none;                         opacity: 0 }
+}
+#ko-glitch.t-flip .ko-slice.b {
+  -webkit-mask-image: repeating-linear-gradient(0deg,#000 0 8.5vh,transparent 8.5vh 24vh);
+          mask-image: repeating-linear-gradient(0deg,#000 0 8.5vh,transparent 8.5vh 24vh);
+  filter: sepia(.45) hue-rotate(150deg) saturate(1.7);
+  animation: ko-flipB .19s steps(1) infinite;
+}
+@keyframes ko-flipB {
+  0%  { transform: scaleY(-1) translateX(3.5vw);  mask-position: 0 0;     -webkit-mask-position: 0 0 }
+  50% { transform: scaleY(-1) translateX(-5vw);   mask-position: 0 -11vh; -webkit-mask-position: 0 -11vh }
+}
+
+/* ── 4. SAHALAITA (Z) — lomituksen kampa ─────────────────────────────────
+   Parilliset ja parittomat juovaparit siirtyvät vastakkaisiin suuntiin, joten
+   jokainen pystyreuna hajoaa kammaksi. Juovaväli on pikseleissä, koska se on
+   juovaefekti eikä saa skaalautua ruudun koon mukaan. */
+#ko-glitch.t-comb .ko-slice.a {
+  -webkit-mask-image: repeating-linear-gradient(0deg,#000 0 2px,transparent 2px 4px);
+          mask-image: repeating-linear-gradient(0deg,#000 0 2px,transparent 2px 4px);
+  filter: sepia(.35) hue-rotate(-28deg) saturate(1.7);
+  animation: ko-combA .13s steps(1) infinite;
+}
+@keyframes ko-combA { 0% { transform: translateX(3vw) } 50% { transform: translateX(-2vw) } }
+#ko-glitch.t-comb .ko-slice.b {
+  -webkit-mask-image: repeating-linear-gradient(0deg,transparent 0 2px,#000 2px 4px);
+          mask-image: repeating-linear-gradient(0deg,transparent 0 2px,#000 2px 4px);
+  filter: sepia(.35) hue-rotate(152deg) saturate(1.7);
+  animation: ko-combB .13s steps(1) infinite;
+}
+@keyframes ko-combB { 0% { transform: translateX(-3.5vw) } 50% { transform: translateX(2.5vw) } }
+#ko-glitch.t-comb .ko-glitch-lohkot {
+  display: block;
+  background: repeating-linear-gradient(114deg,
+    rgba(200,214,228,.13) 0 8px, transparent 8px 27px);
+  animation: ko-saha .16s steps(1) infinite;
+}
+@keyframes ko-saha { 0% { background-position: 0 0 } 50% { background-position: 23px -14px } }
+#ko-glitch.t-comb .ko-rahina { opacity: .2; }
+
+/* Koko kuvan nykäisy. Tämä on kuorella eikä sovelluksella, koska
+   sovelluksella on jo kirkkaussuodin eikä animaatio saa syödä sitä. */
+/* Jakso on 0,33 s eikä alkuperäisen propin 0,22 s. Syy: askeleessa 52 % on
+   invert(.12), joka on koko ruudun luminanssimuutos. 0,22 s:n jaksolla se
+   toistuisi 4,5 kertaa sekunnissa ja rikkoisi propin oman välkyntärajan
+   (enintään 3 / s, ks. SUUNNITELMA 7). Ilme ei muutu, tahti hidastuu. */
+#ko-kuori.ko-tarise { animation: ko-tarise .33s steps(1) infinite; }
+@keyframes ko-tarise {
+  0%  { transform: none;                    filter: none }
+  18% { transform: translate(-1.8vw,.1vh);  filter: hue-rotate(10deg) saturate(1.2) }
+  36% { transform: translate(1vw,-1.5vh);   filter: none }
+  52% { transform: translateY(0) scaleY(1.014); filter: invert(.12) }
+  70% { transform: translate(2.3vw,.8vh);   filter: contrast(1.45) }
+  88% { transform: translate(-.8vw,-.2vh);  filter: none }
+}
+/* Blokkiintuminen ei tärise. */
+#ko-kuori.ko-tarise.ko-kevyt { animation: ko-tariseKevyt .5s steps(1) infinite; }
+@keyframes ko-tariseKevyt {
+  0%  { transform: none;               filter: none }
+  60% { transform: translate(-.5vw,0); filter: contrast(1.12) saturate(.9) }
+}

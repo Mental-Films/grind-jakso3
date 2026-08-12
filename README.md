@@ -56,15 +56,28 @@ P / V                       punainen / vihreä hohto
 O                           hohto pois
 U                           puhdas hohto — pelkkä valo, ei käyttöliittymää
 T                           kameratestikortti
+G X Y Z                     glitch  (⇧ = jatkuva)
 ```
+
+Glitchit ovat samat neljä kuin tuotannon aiemmassa propissa, samoilla
+näppäimillä: **G** repeytyminen, **X** blokkiintuminen, **Y** kuva väärinpäin,
+**Z** sahalaita. Painallus = purske 0,36–0,66 s, **⇧ + sama näppäin** jää
+päälle, toisen tyypin näppäin vaihtaa tyyppiä lennossa.
+
+Cuessa 1 räpsähtely **käynnistyy itsestään** — kuvauspaikalla operaattorilla on
+vain klikkeri eikä näppäimistöä. Tahti on `sisalto.json`:in `hopp.rapsy`.
+
+Glitchin ääni on oletuksena **pois**: puhelin on telineessä keskellä dialogia
+eikä propin rahina saa mennä ääniraidalle.
 
 Puhelinpropissa lisäksi karttatyökalu (näkyy kun ohjauspalkki on esillä):
 
 ```
 W A S D   siirrä karttaa      C  keskitä autoon
 Q E       zoom                K  kartan kääntyminen
+F         nopeampi            J  jarru
 N         uusi kaupunki       M  tallenna näkymä
-G         laitteen paikannin (toimii lentotilassa)
+L         laitteen paikannin (antaa nopeuden, ei sijaintia)
 ```
 
 Yksikään toiminto ei ole Shift-yhdistelmän takana: klikkeri ei lähetä Shiftiä,
@@ -159,6 +172,7 @@ proppi_tabletti.html    Ajolista ja cue-määrittelyt — iPad
 proppi_puhelin.html     Ajolista ja cue-määrittelyt — iPhone
 moottori.js             Cue-moottori, hohto, kirkkaus, kulmat, laitetiedot, esikatselu
 kartta.js               Karttamoottori — tiestö, reitti, kamera, paikannin
+glitch.js · glitch.css  Räpsy — neljä tyyppiä, siirretty aiemmasta propista
 runko.css               Rakenteen tyylit
 hopp.css                HOPP Partnerin ulkoasu
 teema.json              Värit ja kirjasimet

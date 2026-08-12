@@ -205,6 +205,7 @@ VÄLILYÖNTI / →   seuraava cue        [ ]   kirkkaus
 R                alkuun              O     hohto pois
 B                musta ruutu         U     puhdas hohto
 H                ohjauspalkki        T     kameratestikortti
+G X Y Z          glitch (⇧ jatkuva)
 ```
 
 Jos klikkeri pettää: ruudun **oikea yläkulma** = seuraava cue, **vasen yläkulma**

@@ -41,8 +41,8 @@
 .hopp-tila {
   display: flex; align-items: center; gap: 9px;
   background: rgba(21,26,33,.94);
-  border: 1px solid var(--viiva-2);
-  border-radius: 999px;
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-pilleri);
   padding: 8px 15px 8px 12px;
   backdrop-filter: blur(8px);
 }
@@ -56,17 +56,17 @@
   margin-left: auto;
   font-family: var(--fontti-mono);
   font-variant-numeric: tabular-nums;
-  font-weight: 600; font-size: 15px;
+  font-weight: 600; font-size: var(--teksti-leipa);
 }
 
 /* ── Käännösohje ajon aikana ────────────────────────────────────────────── */
 .hopp-ohje {
   display: flex; align-items: center; gap: 14px;
   background: var(--paneeli-3);
-  border: 1px solid var(--viiva-2);
-  border-radius: 14px;
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-m);
   padding: 14px 16px;
-  box-shadow: 0 8px 26px rgba(0,0,0,.5);
+  box-shadow: var(--varjo-kelluva);
 }
 .hopp-ohje.hopp-hatatila {
   background: #3A1610;
@@ -80,17 +80,17 @@
   font-size: 26px; font-weight: 600; line-height: 1.05;
   letter-spacing: -.01em;
 }
-.hopp-ohje-teksti { font-size: 15px; color: var(--himmea); margin-top: 2px; }
+.hopp-ohje-teksti { font-size: var(--teksti-leipa); color: var(--himmea); margin-top: 2px; }
 .hopp-hatatila .hopp-ohje-matka { font-size: 23px; color: var(--virhe); letter-spacing: .04em; }
 .hopp-hatatila .hopp-ohje-teksti { color: #D9A79C; }
 
 /* ── Alapaneeli ─────────────────────────────────────────────────────────── */
 .hopp-paneeli {
   background: var(--paneeli);
-  border: 1px solid var(--viiva-2);
-  border-radius: 18px;
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-l);
   padding: 16px;
-  box-shadow: 0 -6px 30px rgba(0,0,0,.55);
+  box-shadow: var(--varjo-paneeli);
 }
 .hopp-kahva {
   width: 38px; height: 4px; border-radius: 2px;
@@ -99,7 +99,7 @@
 }
 .hopp-otsikko {
   font-family: var(--fontti-mono);
-  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  font-size: var(--teksti-mikro); letter-spacing: .14em; text-transform: uppercase;
   color: var(--himmea-2);
   margin-bottom: 7px;
 }
@@ -109,7 +109,7 @@
 .hopp-luku {
   flex: 1;
   background: var(--paneeli-2);
-  border-radius: 11px;
+  border-radius: var(--kaarre-s);
   padding: 11px 10px;
 }
 .hopp-luku span {
@@ -130,18 +130,18 @@
 .hopp-vuoro-luku {
   font-family: var(--fontti-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 46px; font-weight: 600; line-height: 1;
+  font-size: var(--teksti-iso); font-weight: 600; line-height: 1;
   letter-spacing: -.02em;
   color: var(--varoitus);
 }
-.hopp-vuoro-min { font-family: var(--fontti-mono); font-size: 19px; color: var(--himmea); }
+.hopp-vuoro-min { font-family: var(--fontti-mono); font-size: var(--teksti-otsikko); color: var(--himmea); }
 
 .hopp-varoitus {
   display: flex; align-items: center; gap: 9px;
   margin-top: 13px; padding: 11px 13px;
   background: rgba(199,154,58,.1);
   border: 1px solid rgba(199,154,58,.42);
-  border-radius: 11px;
+  border-radius: var(--kaarre-s);
   font-size: 13.5px; color: var(--varoitus);
 }
 
@@ -151,16 +151,16 @@
   width: 44px; height: 44px; border-radius: 50%;
   background: var(--paneeli-3);
   display: grid; place-items: center;
-  font-size: 17px; font-weight: 600; color: var(--himmea);
+  font-size: var(--teksti-vali); font-weight: 600; color: var(--himmea);
   flex: none;
 }
-.hopp-matkustaja-nimi { font-size: 17px; font-weight: 600; }
-.hopp-matkustaja-tieto { font-size: 13px; color: var(--himmea); margin-top: 2px; }
+.hopp-matkustaja-nimi { font-size: var(--teksti-vali); font-weight: 600; }
+.hopp-matkustaja-tieto { font-size: var(--teksti-pieni); color: var(--himmea); margin-top: 2px; }
 .hopp-arvio {
   margin-left: auto; text-align: right;
   font-family: var(--fontti-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 15px; font-weight: 600;
+  font-size: var(--teksti-leipa); font-weight: 600;
 }
 
 .hopp-osoite { display: flex; gap: 11px; margin-top: 14px; }
@@ -179,19 +179,19 @@
   margin-top: 15px; padding: 17px;
   min-height: 44px;
   background: var(--hopp);
-  border: none; border-radius: 13px;
+  border: none; border-radius: var(--kaarre-m);
   color: #0B0F13;
   font-family: var(--fontti);
-  font-size: 17px; font-weight: 600; letter-spacing: .06em;
+  font-size: var(--teksti-vali); font-weight: 600; letter-spacing: .06em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 .hopp-nappi:active { filter: brightness(.82); transform: translateY(1px); }
 .hopp-nappi.hopp-toissijainen {
   background: transparent;
-  border: 1px solid var(--viiva-2);
+  border: var(--reuna) solid var(--viiva-2);
   color: var(--himmea);
-  font-size: 15px; letter-spacing: 0;
+  font-size: var(--teksti-leipa); letter-spacing: 0;
   padding: 13px;
   margin-top: 9px;
 }
@@ -206,10 +206,10 @@
 }
 .hopp-pyynto-kortti {
   background: var(--paneeli);
-  border: 1px solid var(--viiva-2);
-  border-radius: 20px;
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-xl);
   padding: 18px 16px 16px;
-  box-shadow: 0 -10px 40px rgba(0,0,0,.7);
+  box-shadow: var(--varjo-arkki);
 }
 .hopp-pyynto-ylin { display: flex; align-items: center; gap: 14px; }
 .hopp-tuotto {
@@ -249,7 +249,7 @@
 .hopp-pyynto-tieto span { display: block; font-size: 11px; color: var(--himmea-2); margin-bottom: 3px; }
 .hopp-pyynto-tieto b {
   font-family: var(--fontti-mono); font-variant-numeric: tabular-nums;
-  font-size: 15px; font-weight: 600;
+  font-size: var(--teksti-leipa); font-weight: 600;
 }
 
 /* ── Operaattorin karttapaneeli ─────────────────────────────────────────
@@ -260,10 +260,10 @@
   display: none;
   flex-direction: column; gap: 6px;
   background: rgba(8,10,14,.92);
-  border: 1px solid var(--viiva-2);
+  border: var(--reuna) solid var(--viiva-2);
   border-radius: 10px;
   padding: 9px;
-  font-family: var(--fontti-mono); font-size: 10.5px; color: var(--himmea);
+  font-family: var(--fontti-mono); font-size: var(--teksti-mikro); color: var(--himmea);
   z-index: 5;
   max-width: 172px;
 }

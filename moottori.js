@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  var VERSIO = '0.5.0';
+  var VERSIO = '0.6.0';
 
   /* ══ Siemennetty satunnaisluku ══════════════════════════════════════════
      Jatkuvuus vaatii, että sama cue piirtää saman kuvan joka otossa.
@@ -101,6 +101,19 @@
     var juuri = document.documentElement;
     Object.keys(T.varit || {}).forEach(function (avain) {
       juuri.style.setProperty('--' + avain, T.varit[avain]);
+    });
+
+    /* Mitat, typografia ja varjot menevät CSS-muuttujiksi samalla tavalla
+       kuin värit. Näin koko ulkoasun voi vaihtaa teema.json:ista — myös
+       silloin kun graafikon ohjeistus tulee vasta myöhemmin. */
+    Object.keys(T.mitat || {}).forEach(function (avain) {
+      juuri.style.setProperty('--' + avain, T.mitat[avain]);
+    });
+    Object.keys(T.typografia || {}).forEach(function (avain) {
+      juuri.style.setProperty('--teksti-' + avain, T.typografia[avain]);
+    });
+    Object.keys(T.varjot || {}).forEach(function (avain) {
+      juuri.style.setProperty('--varjo-' + avain, T.varjot[avain]);
     });
     if (T.fontit) {
       if (T.fontit.teksti) juuri.style.setProperty('--fontti', T.fontit.teksti);

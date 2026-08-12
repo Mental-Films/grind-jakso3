@@ -13,10 +13,12 @@
 <link rel="stylesheet" href="runko.css">
 <link rel="stylesheet" href="glitch.css">
 <link rel="stylesheet" href="candlr.css">
+<link rel="stylesheet" href="grumbl.css">
 <title>GRIND 3 — tabletti</title>
 </head>
 <body>
 <script src="kaavio.js"></script>
+<script src="nappaimisto.js"></script>
 <script src="glitch.js"></script>
 <script src="moottori.js"></script>
 <script>
@@ -30,7 +32,7 @@
  * vaakatilaa, jota 820 pt:n pystyruudussa ei ole.
  */
 (function () {
-  var kaavio = null, kangas = null;
+  var kaavio = null, kangas = null, nappaimisto = null;
 
   function el(luokka, sisus) {
     var d = document.createElement('div');
@@ -71,7 +73,26 @@
   }
 
   /* ── Kaavio ───────────────────────────────────────────────────────────── */
-  function kaavioon(juuri, ctx, nousu) {
+  /* Kolme kurssitilaa: romahdus, raketti ja loppukuvan jyrkkä romahdus.
+     Jokaisella oma kurssi, oma käyrän muoto ja oma asteikko. */
+  function tila(ctx, asetukset) {
+    var L = ctx.S.luvut;
+    if (asetukset.nousu) {
+      return { suunta: 'nousu', nousu: true, kurssi: L.rprKurssiHuippu,
+               muutosEur: L.rprMuutosEurNousu, muutos: L.rprMuutosNousu,
+               ylin: L.rprKurssiHuippu * 1.12, alin: L.rprKurssi * 0.85 };
+    }
+    if (asetukset.loppu) {
+      return { suunta: 'lasku-jyrkka', nousu: false, kurssi: L.rprKurssiLoppu,
+               muutosEur: L.rprMuutosEurLoppu, muutos: L.rprMuutosLoppu,
+               ylin: L.rprKurssiHuippu * 1.1, alin: 0 };
+    }
+    return { suunta: 'lasku', nousu: false, kurssi: L.rprKurssi,
+             muutosEur: L.rprMuutosEur, muutos: L.rprMuutos,
+             ylin: L.rprKurssi * 2.1, alin: L.rprKurssi * 0.92 };
+  }
+
+  function kaavioon(juuri, ctx, T) {
     var C = ctx.S.candlr, L = ctx.S.luvut;
     var kehys = el('candlr-kaavio');
 
@@ -85,34 +106,22 @@
           pohja: ctx.T.varit.pohja
         }),
         fontti: 'ui-monospace, monospace',
-        ajat: C.ajat,
-        /* Asteikko oikeassa laidassa, kuten pörsseissä: tuorein hinta on
-           kaavion oikeassa reunassa. */
-        asteikko: function (osuus) {
-          var ylin = nousu ? L.rprKurssiHuippu * 1.12 : L.rprKurssi * 2.1;
-          var alin = nousu ? L.rprKurssi * 0.85 : L.rprKurssi * 0.92;
-          return ctx.eD(ylin - (ylin - alin) * osuus, 4);
-        },
-        nykyhinta: function () {
-          return ctx.eD(nousu ? L.rprKurssiHuippu : L.rprKurssi, 4);
-        }
+        ajat: C.ajat
       });
       GRIND.kaavio = kaavio;
     }
+    /* Asteikko oikeassa laidassa, kuten pörsseissä: tuorein hinta on
+       kaavion oikeassa reunassa. */
     kaavio.a.asteikko = function (osuus) {
-      var ylin = nousu ? L.rprKurssiHuippu * 1.12 : L.rprKurssi * 2.1;
-      var alin = nousu ? L.rprKurssi * 0.85 : L.rprKurssi * 0.92;
-      return ctx.eD(ylin - (ylin - alin) * osuus, 4);
+      return ctx.eD(T.ylin - (T.ylin - T.alin) * osuus, 4);
     };
-    kaavio.a.nykyhinta = function () {
-      return ctx.eD(nousu ? L.rprKurssiHuippu : L.rprKurssi, 4);
-    };
-    kaavio.asetaSuunta(nousu ? 'nousu' : 'lasku');
+    kaavio.a.nykyhinta = function () { return ctx.eD(T.kurssi, 4); };
+    kaavio.asetaSuunta(T.suunta);
     kehys.appendChild(kangas);
 
     /* Vilkkuvat miinusmerkit ja tappioluvut. Paikat siemennetystä
        satunnaisluvusta, joten ne ovat joka otossa samat. */
-    if (!nousu) {
+    if (!T.nousu) {
       var r = ctx.rnd;
       var t = el('candlr-tappiot');
       C.tappiot.forEach(function (teksti, i) {
@@ -137,7 +146,8 @@
   /* ── CANDLR-perusnäkymä ───────────────────────────────────────────────── */
   function candlr(juuri, ctx, asetukset) {
     var C = ctx.S.candlr, L = ctx.S.luvut;
-    var nousu = !!asetukset.nousu;
+    var T = tila(ctx, asetukset);
+    var nousu = T.nousu;
 
     var d = el('candlr');
     var sisus = el('candlr-sisus');
@@ -159,13 +169,12 @@
     /* Kurssi, muutos ja aikavälipillerit samalla rivillä */
     var rivi = el('candlr-kurssirivi');
     var vasen = el('');
-    vasen.appendChild(el('candlr-kurssi',
-      ctx.eD(nousu ? L.rprKurssiHuippu : L.rprKurssi, 4) + ' €'));
+    vasen.appendChild(el('candlr-kurssi', ctx.eD(T.kurssi, 4) + ' €'));
     vasen.appendChild(el('candlr-muutos ' + (nousu ? 'nousu' : 'lasku'),
       nuoliMerkki(nousu) +
-      '<span>' + ctx.eD(Math.abs(nousu ? L.rprMuutosEurNousu : L.rprMuutosEur), 4) + ' €</span>' +
+      '<span>' + ctx.eD(Math.abs(T.muutosEur), 4) + ' €</span>' +
       '<span class="candlr-suluissa">(' + (nousu ? '+' : '−') +
-        ctx.e1(Math.abs(nousu ? L.rprMuutosNousu : L.rprMuutos)) + ' %)</span>'));
+        ctx.e1(Math.abs(T.muutos)) + ' %)</span>'));
     rivi.appendChild(vasen);
 
     var valit = el('candlr-valit');
@@ -182,13 +191,12 @@
        kohtauksen luettava luku eikä sitä saa peittää. */
     if (asetukset.banneri) sisus.appendChild(banneri(ctx));
 
-    kaavioon(sisus, ctx, nousu);
+    kaavioon(sisus, ctx, T);
 
     /* Salkku. Arvo lasketaan omistuksesta ja kurssista, tuotto siitä ja
        sijoitetusta summasta. Mikään näistä ei ole erikseen kirjattu luku,
        joten ne eivät voi ajautua ristiriitaan keskenään. */
-    var kurssi = nousu ? L.rprKurssiHuippu : L.rprKurssi;
-    var salkkuArvo = L.omistus * kurssi;
+    var salkkuArvo = L.omistus * T.kurssi;
     var tulos = salkkuArvo - L.sijoitettu;
     var tulosPros = (tulos / L.sijoitettu) * 100;
     var salkku = el('candlr-salkku');
@@ -234,6 +242,12 @@
     var osta = document.createElement('button');
     osta.className = 'candlr-nappi candlr-osta';
     osta.textContent = C.ostaNappi;
+    /* BUY avaa ostoarkin, kuten oikeassa sovelluksessa. Cuessa 4 tämä on
+       se, mitä Alvina painaa bannerin jälkeen — ja arkki paljastaa 3,31 €. */
+    osta.addEventListener('click', function () {
+      if (d.querySelector('.candlr-osto-arkki')) return;
+      d.appendChild(ostoArkki(ctx));
+    });
     var myy = document.createElement('button');
     myy.className = 'candlr-nappi candlr-myy';
     myy.textContent = C.myyNappi;
@@ -288,6 +302,113 @@
     return arkki;
   }
 
+  /* ══ GRUMBL — keskustelupalsta ══════════════════════════════════════════
+     Rakenne oikeasta foorumialustasta: suodatinrivi, äänestysnuolet ja
+     pisteet vasemmalla, otsikko, aihealue pienellä, suhteellinen aika.
+     Ks. REFERENSSIT.md kohta 3. */
+
+  var K_YLOS  = '<svg class="grumbl-nuoli" viewBox="0 0 24 24"><path d="M12 4 3 14h5v6h8v-6h5z"/></svg>';
+  var K_ALAS  = '<svg class="grumbl-nuoli" viewBox="0 0 24 24"><path d="M12 20 3 10h5V4h8v6h5z"/></svg>';
+  var K_PUHE  = '<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V6a2 2 0 0 1 0-2z"/></svg>';
+  var K_JAKO2 = '<svg viewBox="0 0 24 24"><path d="M18 16a3 3 0 0 0-2 .8l-7-4a3 3 0 0 0 0-1.6l7-4a3 3 0 1 0-1-2.2c0 .3 0 .5.1.8l-7 4a3 3 0 1 0 0 4.4l7 4a3 3 0 1 0 2.9-2.2z"/></svg>';
+
+  function grumblSyote(ctx) {
+    var G = ctx.S.grumbl;
+    var d = el('grumbl');
+
+    var yla = el('grumbl-yla');
+    yla.appendChild(el('grumbl-alue-merkki', G.alueMerkki));
+    yla.appendChild(el('',
+      '<div class="grumbl-alue">' + G.alue + '</div>' +
+      '<div class="grumbl-jasenet">' + G.alueJasenet + '</div>'));
+    var liity = document.createElement('button');
+    liity.className = 'grumbl-liity';
+    liity.textContent = G.liityNappi;
+    yla.appendChild(liity);
+    d.appendChild(yla);
+
+    var suodattimet = el('grumbl-suodattimet');
+    G.suodattimet.forEach(function (nimi, i) {
+      var b = document.createElement('button');
+      b.className = 'grumbl-suodatin' + (i === G.suodatinValittu ? ' valittu' : '');
+      b.textContent = nimi;
+      suodattimet.appendChild(b);
+    });
+    d.appendChild(suodattimet);
+
+    /* Kirjoituspalkki. Napautus avaa kirjoitusnäkymän. */
+    var kirjoita = el('grumbl-kirjoita',
+      '<span style="font-size:20px">✎</span><span>' + G.kirjoitaVihje + '</span>');
+    kirjoita.addEventListener('click', function () { avaaKirjoitus(d, ctx); });
+    d.appendChild(kirjoita);
+
+    var lista = el('grumbl-lista');
+    G.postaukset.forEach(function (p, i) {
+      var rivi = el('grumbl-postaus');
+      rivi.appendChild(el('grumbl-aanet',
+        K_YLOS.replace('grumbl-nuoli', 'grumbl-nuoli' + (i === 0 ? ' ylos-aktiivinen' : '')) +
+        '<div class="grumbl-pisteet' + (i === 0 ? ' aktiivinen' : '') + '">' +
+          ctx.e0(p.aanet) + '</div>' + K_ALAS));
+      rivi.appendChild(el('grumbl-sisus',
+        '<div class="grumbl-meta">' + p.kayttaja + ' · ' + p.aika + '</div>' +
+        '<div class="grumbl-otsikko">' + p.otsikko + '</div>' +
+        '<div class="grumbl-alarivi">' +
+          '<span>' + K_PUHE + ctx.e0(p.kommentit) + ' ' + G.kommentitSana + '</span>' +
+          '<span>' + K_JAKO2 + G.jakoSana + '</span>' +
+        '</div>'));
+      lista.appendChild(rivi);
+    });
+    d.appendChild(lista);
+    return d;
+  }
+
+  /* Kirjoitusnäkymä. Näppäimistö on piirretty, ei iOS:n oma — muuten
+     automaattikorjaus ja ennakoiva tekstipalkki pilaisivat oton. Mikä
+     tahansa näppäin vie käsikirjoituksen tekstiä eteenpäin. */
+  function avaaKirjoitus(juuri, ctx) {
+    if (juuri.querySelector('.grumbl-kirjoitus')) return;
+    var G = ctx.S.grumbl;
+
+    var k = el('grumbl-kirjoitus');
+    var yla = el('grumbl-kirjoitus-yla');
+    var peruuta = document.createElement('button');
+    peruuta.className = 'grumbl-peruuta';
+    peruuta.textContent = G.peruutaNappi;
+    peruuta.addEventListener('click', function () { k.remove(); });
+    yla.appendChild(peruuta);
+    yla.appendChild(el('grumbl-kirjoitus-otsikko', G.alue));
+    var julkaise = document.createElement('button');
+    julkaise.className = 'grumbl-julkaise';
+    julkaise.textContent = G.julkaisuNappi;
+    yla.appendChild(julkaise);
+    k.appendChild(yla);
+
+    var kentta = el('grumbl-kentta');
+    kentta.appendChild(el('grumbl-kentta-alue', G.otsikkoKentta));
+    var teksti = el('grumbl-teksti');
+    teksti.setAttribute('data-vihje', G.otsikkoVihje);
+    kentta.appendChild(teksti);
+    var laskuri = el('grumbl-laskuri', '0 / 300');
+    kentta.appendChild(laskuri);
+    kentta.appendChild(el('grumbl-runko', G.runkoVihje));
+    k.appendChild(kentta);
+
+    nappaimisto = new GRIND.Nappaimisto({
+      teksti: G.postausOtsikko,
+      virhe: G.kirjoitusvirhe,
+      onMuutos: function (arvo, valmis) {
+        teksti.innerHTML = arvo.replace(/&/g, '&amp;').replace(/</g, '&lt;') +
+          '<span class="grumbl-kohdistin"></span>';
+        laskuri.textContent = arvo.length + ' / 300';
+        julkaise.classList.toggle('aktiivinen', arvo.length > 0);
+      }
+    });
+    k.appendChild(nappaimisto.el);
+    teksti.innerHTML = '<span class="grumbl-kohdistin"></span>';
+
+    juuri.appendChild(k);
+  }
+
   /* Kaavio elää cue-suhteellisen ajan mukaan, joten se toistuu otosta toiseen. */
   function kaavioTick(juuri, ctx) {
     if (kaavio && juuri.querySelector('.candlr-kaavio')) kaavio.piirra(ctx.t);
@@ -304,15 +425,17 @@
         piirra: function (juuri, ctx) { candlr(juuri, ctx, {}); },
         tick: kaavioTick },
 
-      /* 1 — GRUMBL, postauksen kirjoitus. Vaihe 4. */
+      /* 1 — GRUMBL. Kirjoitusnäkymä auki: Alvina naputtelee otsikon.
+             Mikä tahansa näppäin vie tekstiä eteenpäin, joten hän saa
+             kirjoittaa luontevasti ja katsoa ylös kesken lauseen. */
       { id: 1, nimi: 'Postaus', sovellus: 'grumbl',
         kosketus: true,
         hohto: { vari: 'punainen', voima: 3 },
-        piirra: M.paikkamerkki({
-          sovellus: 'grumbl',
-          otsikko: 'Alvina kirjoittaa postauksen',
-          kuvaus: function (c) { return c.S.grumbl.postausOtsikko; }
-        }) },
+        piirra: function (juuri, ctx) {
+          var d = grumblSyote(ctx);
+          juuri.appendChild(d);
+          avaaKirjoitus(d, ctx);
+        } },
 
       /* 2 — TABB, erääntyneet maksut. Vaihe 5. */
       { id: 2, nimi: 'Ostosrivit', sovellus: 'tabb',
@@ -348,14 +471,28 @@
         tick: kaavioTick },
 
       /* 6 — Loppukuva. Pumppaus romahti, punainen palaa kasvoille. */
+      /* 6 — Loppukuva. Pumppaus petti: jyrkkä romahdus, eri käyrän muoto
+             kuin cue 0. Punainen palaa kasvoille. */
       { id: 6, nimi: 'Loppukuva', sovellus: 'candlr',
         hohto: { vari: 'punainen', voima: 7 },
-        piirra: function (juuri, ctx) { candlr(juuri, ctx, {}); },
+        piirra: function (juuri, ctx) { candlr(juuri, ctx, { loppu: true }); },
         tick: kaavioTick },
 
       { id: 7, nimi: 'Kameratesti', piirra: M.testikortti() }
 
     ]; }
+  }).then(function () {
+    /* Operaattorin lisänäppäin: A kirjoittaa postauksen itsestään, jos
+       ohjaaja haluaa tekstin ilmestyvän ilman näyttelijän kosketusta.
+       Sama näppäin pysäyttää, ⇧A nollaa kentän uutta ottoa varten. */
+    window.addEventListener('keydown', function (t) {
+      if (t.metaKey || t.ctrlKey || t.altKey) return;
+      if (t.key.toLowerCase() !== 'a' || !nappaimisto) return;
+      t.preventDefault();
+      if (t.shiftKey) { nappaimisto.nollaa(); GRIND.ilmoita('kenttä tyhjennetty'); return; }
+      if (nappaimisto.automaatti) { nappaimisto.automaattiPois(); GRIND.ilmoita('automaattikirjoitus pois'); }
+      else { nappaimisto.automaattiPaalle(7); GRIND.ilmoita('automaattikirjoitus päällä'); }
+    });
   });
 })();
 </script>

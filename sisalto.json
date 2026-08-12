@@ -45,6 +45,12 @@
     "rprKurssiHuippu":  0.1431,    // € — kurssi raketin jälkeen
     "rprMuutosEurNousu": 0.1100,   // €
     "rprMuutosNousu":   331.0,     // % — raketti
+
+    // Loppukuva: pumppaus petti. Jyrkkä romahdus, eri käyrän muoto kuin
+    // cue 0 — leikkauksessa niiden pitää erottua toisistaan.
+    "rprKurssiLoppu":   0.0033,    // €
+    "rprMuutosEurLoppu": -0.1398,  // €
+    "rprMuutosLoppu":   -97.7,     // %
     // Salkun arvo EI ole oma lukunsa vaan lasketaan: omistus × kurssi.
     // Näin kurssi, salkku ja tuotto eivät voi olla ristiriidassa.
     //   9 993,20 RPR × 0,0331 € = 331 €   (romahdus)
@@ -113,10 +119,20 @@
   // ══ GRUMBL — keskustelupalsta (englanti) ═══════════════════════════════
   "grumbl": {
     "alue":            "c/cryptolosses",
-    "alueJasenet":     "331k members",
+    "alueJasenet":     "331k members · 1 331 online",
+    "alueMerkki":      "c/",
+    "liityNappi":      "Join",
+    "suodattimet":     ["Latest", "Hot", "Top"],
+    "suodatinValittu": 0,
     "kirjoitaOtsikko": "Create post",
+    "kirjoitaVihje":   "Post to c/cryptolosses…",
+    "otsikkoKentta":   "Title",
     "otsikkoVihje":    "An interesting title",
+    "runkoVihje":      "Body (optional)",
     "julkaisuNappi":   "Post",
+    "peruutaNappi":    "Cancel",
+    "kommentitSana":   "comments",
+    "jakoSana":        "Share",
 
     // Otsikko, jonka Alvina kirjoittaa. Tulee ruudulle merkki kerrallaan
     // näyttelijän näppäilyn tahdissa — mihin tahansa hän osuukin.
@@ -131,7 +147,12 @@
       { "kayttaja": "u/liquidated_again", "aika": "4h",  "otsikko": "Lost 3 years of savings in 40 minutes", "aanet": 1331, "kommentit": 208 },
       { "kayttaja": "u/nightshiftnancy",  "aika": "7h",  "otsikko": "Anyone else can't sleep because of this?", "aanet": 892, "kommentit": 331 },
       { "kayttaja": "u/theexitliquidity", "aika": "11h", "otsikko": "It's not a loss until you sell (cope thread)", "aanet": 447, "kommentit": 96 },
-      { "kayttaja": "u/margin_call_mike", "aika": "14h", "otsikko": "My wife doesn't know yet", "aanet": 3310, "kommentit": 512 }
+      { "kayttaja": "u/margin_call_mike", "aika": "14h", "otsikko": "My wife doesn't know yet", "aanet": 3310, "kommentit": 512 },
+      { "kayttaja": "u/exit_liquidity_",   "aika": "16h", "otsikko": "Down 90% and the withdrawal button is greyed out", "aanet": 1104, "kommentit": 187 },
+      { "kayttaja": "u/nofloor_nocap",     "aika": "19h", "otsikko": "Chart looks like a waterfall. Is this normal?", "aanet": 664,  "kommentit": 129 },
+      { "kayttaja": "u/one_more_trade",    "aika": "21h", "otsikko": "I keep telling myself just one more trade", "aanet": 2218, "kommentit": 331 },
+      { "kayttaja": "u/tetherhands",       "aika": "23h", "otsikko": "PSA: the guy sliding into your DMs is not going to fix this", "aanet": 973,  "kommentit": 244 },
+      { "kayttaja": "u/riskmgmt_never",    "aika": "1d",  "otsikko": "Nobody talks about what this does to you at 3am", "aanet": 1331, "kommentit": 208 }
     ]
   },
 

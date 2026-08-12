@@ -29,9 +29,30 @@ Kolme mekanismia. Kaikki toimivat pelkällä tiedoston tallennuksella.
 
 | Mitä muutat | Miten |
 |---|---|
-| **Kuvat, logot, kartta, ikonit** | Pudota tiedosto `assets/`-kansioon oikealla nimellä. Se korvaa paikkamerkin automaattisesti |
-| **Värit, kirjasimet, pyöristykset, varjot** | Muokkaa `teema.json`-tiedostoa tekstieditorissa. Yksi hex-koodi, tallenna, päivitä sivu |
+| **Kuvat, logot, ikonit** | Pudota tiedosto `assets/`-kansioon oikealla nimellä. Se korvaa paikkamerkin automaattisesti |
+| **Värit, kirjasimet, pyöristykset, välit, tekstikoot, varjot** | Muokkaa `teema.json`-tiedostoa tekstieditorissa. Yksi arvo, tallenna, päivitä sivu |
 | **Kaikki teksti ja numerot** — postauksen otsikko, ostosrivit, kadunnimet, painikkeiden tekstit | Muokkaa `sisalto.json`-tiedostoa |
+
+### Jos toimitat valmiin ilmeen
+
+**Koko ulkoasu vaihdetaan `teema.json`:ista, ei CSS-tiedostoja muokkaamalla.**
+Tämä on rakennettu sitä varten, että ohjeistus voi tulla vasta myöhemmin —
+esimerkiksi valmiina Figma-sivuna. Tiedostossa on neljä lohkoa:
+
+| Lohko | Mitä siinä on |
+|---|---|
+| `varit` | Koko paletti |
+| `mitat` | Pyöristykset (`kaarre-s` … `kaarre-xl`), välit (`vali-xs` … `vali-xl`), viivanpaksuudet, pienin kosketusalue |
+| `typografia` | Tekstikokoportaat `jatti` · `iso` · `suuri` · `otsikko` · `vali` · `leipa` · `pieni` · `mikro` |
+| `varjot` | Kelluvien kerrosten varjot |
+
+Sovellukset eivät sisällä yhtään pistekokoa tai pyöristystä suoraan — ne
+käyttävät vain näitä nimiä. Käytännössä: kun annat uuden ilmeen, kerro se
+näiden kahdeksan tekstikoon ja viiden pyöristyksen kautta, niin kaikki neljä
+sovellusta muuttuvat kerralla eikä mitään jää vanhaan.
+
+Jos ilmeessä on jotain, mikä ei taivu näihin nimiin, sano — lisätään lohkoon
+uusi nimi. Se on aina parempi kuin luvun kirjoittaminen CSS:ään.
 
 Kumpaakaan JSON-tiedostoa ei tarvitse osata koodata. Ne ovat listoja muotoa
 `"nimi": "arvo"`, ja jokaisella rivillä on kommentti siitä mikä se on.

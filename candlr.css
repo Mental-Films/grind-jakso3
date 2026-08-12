@@ -47,13 +47,13 @@
 .candlr-tunnus img { width: 100%; height: 100%; display: block; }
 .candlr-tunnus span {
   font-family: var(--fontti-mono);
-  font-size: 15px; font-weight: 600;
+  font-size: var(--teksti-leipa); font-weight: 600;
   color: var(--virhe);
 }
-.candlr-nimi { font-size: 19px; font-weight: 600; }
+.candlr-nimi { font-size: var(--teksti-otsikko); font-weight: 600; }
 .candlr-lyhenne {
   font-family: var(--fontti-mono);
-  font-size: 13px; color: var(--himmea);
+  font-size: var(--teksti-pieni); color: var(--himmea);
   margin-left: 7px;
 }
 .candlr-ylaoikea { margin-left: auto; display: flex; align-items: center; gap: 16px; }
@@ -61,10 +61,10 @@
 .candlr-valuutta {
   display: flex; align-items: center; gap: 5px;
   background: var(--paneeli-2);
-  border: 1px solid var(--viiva-2);
-  border-radius: 999px;
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-pilleri);
   padding: 6px 12px;
-  font-size: 13px; font-weight: 600;
+  font-size: var(--teksti-pieni); font-weight: 600;
 }
 
 /* ── Kurssi ja aikavälit ────────────────────────────────────────────────── */
@@ -72,7 +72,7 @@
 .candlr-kurssi {
   font-family: var(--fontti-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 46px; font-weight: 600; line-height: 1;
+  font-size: var(--teksti-iso); font-weight: 600; line-height: 1;
   letter-spacing: -.02em;
 }
 /* Muutos kolmena osana: nuoli, euromäärä, prosentti suluissa. */
@@ -81,7 +81,7 @@
   margin-top: 10px;
   font-family: var(--fontti-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 17px; font-weight: 600;
+  font-size: var(--teksti-vali); font-weight: 600;
 }
 .candlr-muutos.lasku { color: var(--virhe); }
 .candlr-muutos.nousu { color: var(--ok); }
@@ -93,18 +93,18 @@
   margin-left: auto;
   display: flex; gap: 5px;
   background: var(--paneeli-2);
-  border: 1px solid var(--viiva);
-  border-radius: 999px;
+  border: var(--reuna) solid var(--viiva);
+  border-radius: var(--kaarre-pilleri);
   padding: 4px;
 }
 .candlr-vali {
   border: none; background: transparent;
   color: var(--himmea);
   font-family: var(--fontti-mono);
-  font-size: 13px; font-weight: 600;
+  font-size: var(--teksti-pieni); font-weight: 600;
   letter-spacing: .04em;
   padding: 8px 15px;
-  border-radius: 999px;
+  border-radius: var(--kaarre-pilleri);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -148,14 +148,14 @@
 .candlr-salkku {
   margin-top: 16px;
   background: var(--paneeli);
-  border: 1px solid var(--viiva-2);
-  border-radius: 16px;
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-l);
   padding: 17px 19px;
   display: flex; align-items: center; gap: 18px;
 }
 .candlr-salkku-otsikko {
   font-family: var(--fontti-mono);
-  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  font-size: var(--teksti-mikro); letter-spacing: .14em; text-transform: uppercase;
   color: var(--himmea-2);
   margin-bottom: 6px;
 }
@@ -171,14 +171,14 @@
 .candlr-positio {
   margin-top: 14px;
   background: var(--paneeli);
-  border: 1px solid var(--viiva-2);
-  border-radius: 16px;
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-l);
   padding: 17px 19px;
 }
 .candlr-positio-rivi {
   display: flex; align-items: baseline;
   padding: 9px 0;
-  font-size: 15px;
+  font-size: var(--teksti-leipa);
 }
 .candlr-positio-rivi + .candlr-positio-rivi { border-top: 1px solid var(--viiva); }
 .candlr-positio-rivi > span { color: var(--himmea); }
@@ -186,7 +186,7 @@
   margin-left: auto;
   font-family: var(--fontti-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 17px; font-weight: 600;
+  font-size: var(--teksti-vali); font-weight: 600;
 }
 .candlr-positio-rivi > b.lasku { color: var(--virhe); }
 .candlr-positio-rivi > b.nousu { color: var(--ok); }
@@ -197,8 +197,8 @@
   display: grid; grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   background: var(--viiva);
-  border: 1px solid var(--viiva);
-  border-radius: 14px;
+  border: var(--reuna) solid var(--viiva);
+  border-radius: var(--kaarre-m);
   overflow: hidden;
 }
 .candlr-luku { background: var(--paneeli); padding: 13px 15px; }
@@ -226,16 +226,16 @@
 .candlr-nappi {
   flex: 1;
   padding: 18px;
-  border: none; border-radius: 14px;
+  border: none; border-radius: var(--kaarre-m);
   font-family: var(--fontti);
-  font-size: 17px; font-weight: 600; letter-spacing: .06em;
+  font-size: var(--teksti-vali); font-weight: 600; letter-spacing: .06em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 .candlr-osta { background: var(--candlr); color: #0B0F13; }
 .candlr-myy {
   background: transparent;
-  border: 1px solid var(--viiva-2);
+  border: var(--reuna) solid var(--viiva-2);
   color: var(--teksti);
 }
 .candlr-nappi:active { filter: brightness(.85); }
@@ -247,8 +247,8 @@
   margin: 14px 26px 0;
   display: flex;
   background: rgba(21, 26, 33, .92);
-  border: 1px solid var(--viiva-2);
-  border-radius: 999px;
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-pilleri);
   padding: 6px;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -257,7 +257,7 @@
   flex: 1;
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   padding: 9px 0;
-  border-radius: 999px;
+  border-radius: var(--kaarre-pilleri);
   color: var(--himmea-2);
   font-size: 11.5px; font-weight: 600;
 }
@@ -272,19 +272,19 @@
   flex: none;
   background: linear-gradient(180deg, #1D3A26, #16301F);
   border: 1px solid var(--ok);
-  border-radius: 16px;
+  border-radius: var(--kaarre-l);
   padding: 17px 19px;
-  box-shadow: 0 10px 34px rgba(0,0,0,.55);
+  box-shadow: var(--varjo-kelluva);
   display: flex; align-items: center; gap: 16px;
 }
-.candlr-banneri-teksti { font-size: 17px; font-weight: 600; line-height: 1.35; }
+.candlr-banneri-teksti { font-size: var(--teksti-vali); font-weight: 600; line-height: 1.35; }
 .candlr-banneri-nappi {
   margin-left: auto; flex: none;
   background: var(--ok); color: #0B0F13;
-  border: none; border-radius: 11px;
+  border: none; border-radius: var(--kaarre-s);
   padding: 14px 22px;
   font-family: var(--fontti);
-  font-size: 15px; font-weight: 600; letter-spacing: .06em;
+  font-size: var(--teksti-leipa); font-weight: 600; letter-spacing: .06em;
 }
 .candlr-raketti-kuvake { width: 30px; height: 30px; fill: var(--ok); flex: none; }
 
@@ -299,20 +299,20 @@
 }
 .candlr-osto-kortti {
   background: var(--paneeli);
-  border: 1px solid var(--viiva-2);
-  border-radius: 22px;
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-xl);
   padding: 24px;
-  box-shadow: 0 -12px 44px rgba(0,0,0,.7);
+  box-shadow: var(--varjo-arkki);
 }
 .candlr-osto-otsikko {
   display: flex; align-items: center; gap: 11px;
-  font-size: 19px; font-weight: 600;
+  font-size: var(--teksti-otsikko); font-weight: 600;
   margin-bottom: 22px;
 }
 .candlr-maara {
   font-family: var(--fontti-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 58px; font-weight: 600; line-height: 1;
+  font-size: var(--teksti-jatti); font-weight: 600; line-height: 1;
   letter-spacing: -.02em;
   text-align: center;
   color: var(--himmea-2);
@@ -331,8 +331,8 @@
   display: flex; align-items: center; gap: 14px;
   padding: 18px 20px;
   background: var(--paneeli-2);
-  border: 1px solid var(--viiva-2);
-  border-radius: 14px;
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-m);
 }
 .candlr-kate-otsikko {
   font-family: var(--fontti-mono);
@@ -343,18 +343,18 @@
   margin-left: auto;
   font-family: var(--fontti-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 34px; font-weight: 600;
+  font-size: var(--teksti-suuri); font-weight: 600;
   letter-spacing: -.01em;
 }
 .candlr-osto-vahvista {
   width: 100%;
   margin-top: 20px;
   padding: 19px;
-  border: none; border-radius: 14px;
+  border: none; border-radius: var(--kaarre-m);
   background: var(--paneeli-3);
   color: var(--himmea-2);
   font-family: var(--fontti);
-  font-size: 17px; font-weight: 600; letter-spacing: .06em;
+  font-size: var(--teksti-vali); font-weight: 600; letter-spacing: .06em;
 }
 .candlr-varoitus {
   margin-top: 14px;

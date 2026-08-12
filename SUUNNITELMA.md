@@ -295,11 +295,12 @@ proppi_tabletti.html    iPad — CANDLR, GRUMBL, TABB. Ajolista ja cue-määritt
 proppi_puhelin.html     iPhone — HOPP Partner. Ajolista ja cue-määrittelyt
 moottori.js             Cue-moottori, hohto, kirkkaus, kulmat, laitetiedot, esikatselu
 kartta.js               Karttamoottori — tiestö, reitti, kamera, paikannin
-kaavio.js               Kurssikaavio — romahdus ja raketti
+kaavio.js               Kurssikaavio — romahdus, raketti ja jyrkkä romahdus
+nappaimisto.js          Haamunäppäimistö — mikä tahansa näppäin vie tekstiä
 glitch.js · glitch.css  Räpsy — siirretty tuotannon aiemmasta propista
 runko.css               Rakenteen tyylit (värit tulevat teema.json:ista)
 hopp.css                HOPP Partnerin ulkoasu
-candlr.css              CANDLR:n ulkoasu
+candlr.css · grumbl.css CANDLR:n ja GRUMBL:n ulkoasu
 teema.json              Värit ja kirjasimet          ← graafikko muokkaa
 sisalto.json            Kaikki teksti ja numerot     ← graafikko ja ohjaaja muokkaavat
 assets/                 Grafiikka — pudota tänne     ← graafikko täyttää
@@ -473,7 +474,19 @@ kurssi +331 %, salkku silti −56,8 %.
 Cue 5 on ostolomake: banneri käskee ostaa, kate on 3,31 € ja painike on pois
 käytöstä. Se on kohtauksen pointti yhtenä ruutuna.
 
-Jäljellä: GRUMBL haamunäppäimistöineen (vaihe 4) ja TABB (vaihe 5).
+**GRUMBL tehty** (cue 1): palsta äänestysnuolineen ja suhteellisine
+aikoineen, sekä kirjoitusnäkymä ja sovelluksen oma näppäimistö. **Mikä tahansa
+näppäin vie käsikirjoituksen tekstiä eteenpäin**, joten Alvina saa naputella
+luontevasti ja katsoa ylös kesken lauseen — ruudulle tulee joka otossa
+täsmälleen oikea teksti, ja kirjoitusvirhe korjautuu matkalla. Operaattorin
+`A` kirjoittaa automaattisesti, `⇧A` tyhjentää kentän uutta ottoa varten.
+
+**Ulkoasu on nyt kokonaan teema.json:issa.** Aiemmin sieltä tulivat vain
+värit; nyt myös pyöristykset, välit, tekstikoot ja varjot. Syy on
+käytännöllinen: graafikon ohjeistus voi tulla vasta myöhemmin, ja silloin koko
+ilmeen pitää vaihtua yhdestä tiedostosta eikä neljästä CSS-tiedostosta.
+
+Jäljellä: TABB (vaihe 5).
 
 Seuraavaksi vaihe 2: asennus oikeille laitteille ja kameratesti.
 

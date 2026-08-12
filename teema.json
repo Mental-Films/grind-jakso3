@@ -70,6 +70,53 @@
     "auto-hehku":    "rgba(62,158,146,.45)"
   },
 
+  // ══ MITAT ═════════════════════════════════════════════════════════════
+  // Nämä ovat ulkoasun rakennuspalikat. Jos graafikko toimittaa uuden
+  // ilmeen — esimerkiksi Figma-sivuna — se ajetaan sisään TÄSTÄ, ei
+  // CSS-tiedostoja muokkaamalla. Sovellukset käyttävät vain näitä nimiä.
+  //
+  // Sääntö: jos jokin luku toistuu kahdessa paikassa, sen kuuluu olla täällä.
+  "mitat": {
+    "kaarre-s":       "11px",   // pienet napit, tunnusluvut
+    "kaarre-m":       "14px",   // paneelit, kortit
+    "kaarre-l":       "18px",   // isot kortit
+    "kaarre-xl":      "22px",   // arkit ja modaalit
+    "kaarre-pilleri": "999px",
+
+    "vali-xs":  "6px",
+    "vali-s":   "10px",
+    "vali-m":   "14px",
+    "vali-l":   "18px",
+    "vali-xl":  "26px",         // näytön sivumarginaali tabletilla
+
+    "reuna":       "1px",
+    "reuna-paksu": "2px",       // ohuin kameralle turvallinen viiva
+    "kosketus":    "44px"       // pienin kosketusalue
+  },
+
+  // ══ TYPOGRAFIA ════════════════════════════════════════════════════════
+  // Luettavuusportaat ovat BRIEF_GRAAFIKKO.md kohdassa 3. Nämä ovat ne
+  // portaat koodissa — älä kirjoita pistekokoja suoraan CSS:ään.
+  "typografia": {
+    "jatti":   "58px",   // lähikuvan yksittäinen luku
+    "iso":     "46px",   // kurssi
+    "suuri":   "34px",   // kate, laajan kuvan luku
+    "otsikko": "19px",
+    "vali":    "17px",
+    "leipa":   "15px",
+    "pieni":   "13px",
+    "mikro":   "10.5px"  // versaaliotsikot
+  },
+
+  // ══ VARJOT ════════════════════════════════════════════════════════════
+  // Kelluvat kerrokset erottuvat sisällöstä varjolla. Pidä ne pehmeinä:
+  // terävä varjo lukee kameralle reunaviivana.
+  "varjot": {
+    "kelluva":  "0 10px 34px rgba(0,0,0,.55)",
+    "paneeli":  "0 -6px 30px rgba(0,0,0,.55)",
+    "arkki":    "0 -12px 44px rgba(0,0,0,.7)"
+  },
+
   // Kirjasimet. IBM Plex on SIL OFL -lisensoitu, joten sen saa upottaa
   // levitykseen menevään tuotantoon. Pudota woff2-tiedostot kansioon
   // assets/fontit/ — ilman niitä käytetään laitteen omaa kirjasinta, mikä

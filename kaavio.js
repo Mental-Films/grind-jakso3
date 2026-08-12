@@ -46,7 +46,8 @@
      nousu ja lasku, jonka amplitudi vaihtelee. Pelkkä satunnaiskohina
      näyttäisi sumealta — sahalaita näyttää kurssilta. */
   Kaavio.prototype.generoi = function () {
-    var r = siemen((this.a.siemen || 331) + (this.suunta === 'nousu' ? 7000 : 0));
+    var siirto = this.suunta === 'nousu' ? 7000 : (this.suunta === 'lasku-jyrkka' ? 4400 : 0);
+    var r = siemen((this.a.siemen || 331) + siirto);
     var n = this.a.pisteita || 132;
     var p = [];
 
@@ -58,6 +59,11 @@
         /* Raketti: loiva alku, jyrkkä loppu. Käyrä lähtee alhaalta
            vasemmalta ja poistuu ylhäältä oikealta. */
         trendi = 0.88 - Math.pow(x, 2.6) * 0.80;
+      } else if (this.suunta === 'lasku-jyrkka') {
+        /* Jyrkkä romahdus: kurssi pitää pintansa ja pettää sitten kerralla.
+           Tämä on pumppauksen jälkeinen tila — eri kuva kuin cue 0:n tasainen
+           valuminen, mikä on tärkeää leikkauksessa. */
+        trendi = 0.08 + Math.pow(x, 3.6) * 0.88;
       } else {
         /* Romahdus: suora diagonaali ylhäältä vasemmalta alas oikealle. */
         trendi = 0.12 + x * 0.76;

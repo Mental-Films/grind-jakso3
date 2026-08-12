@@ -45,6 +45,23 @@
   --fontti:       "Plex", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --fontti-mono:  "PlexMono", ui-monospace, "SF Mono", Menlo, monospace;
 
+  /* Mitat, typografia ja varjot. teema.json ylikirjoittaa nämä ajossa —
+     nämä ovat vain varapuu, jotta ulkoasu ei romahda ennen latausta.
+     ÄLÄ kirjoita näitä lukuja suoraan sovellusten CSS:ään: koko ilme
+     vaihdetaan teema.json:ista, myös jos graafikon ohjeistus tulee vasta
+     myöhemmin. */
+  --kaarre-s: 11px;  --kaarre-m: 14px;  --kaarre-l: 18px;
+  --kaarre-xl: 22px; --kaarre-pilleri: 999px;
+  --vali-xs: 6px;  --vali-s: 10px;  --vali-m: 14px;
+  --vali-l: 18px;  --vali-xl: 26px;
+  --reuna: 1px;    --reuna-paksu: 2px;  --kosketus: 44px;
+  --teksti-jatti: 58px;   --teksti-iso: 46px;    --teksti-suuri: 34px;
+  --teksti-otsikko: 19px; --teksti-vali: 17px;   --teksti-leipa: 15px;
+  --teksti-pieni: 13px;   --teksti-mikro: 10.5px;
+  --varjo-kelluva: 0 10px 34px rgba(0,0,0,.55);
+  --varjo-paneeli: 0 -6px 30px rgba(0,0,0,.55);
+  --varjo-arkki:   0 -12px 44px rgba(0,0,0,.7);
+
   /* Runko täyttää nämä: turva-alueet ja säädöt */
   --turva-yla:    env(safe-area-inset-top, 0px);
   --turva-ala:    env(safe-area-inset-bottom, 0px);

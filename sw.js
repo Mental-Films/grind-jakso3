@@ -8,7 +8,7 @@
  * Ajossa oleva versionumero näkyy propin ohjauspalkissa.
  */
 
-var VERSIO = 'grind3-v0.1.0';
+var VERSIO = 'grind3-v0.1.1';
 
 /* Pakolliset. Jos yksikin puuttuu, asennus epäonnistuu ja se on oikein —
    silloin proppi ei väitä olevansa offline-valmis. */
@@ -29,6 +29,10 @@ var PAKOLLISET = [
 var VAPAAEHTOISET = [
   'manifest_tabletti.json',
   'manifest_puhelin.json',
+  'KAYTTOONOTTO.md',
+  'README.md',
+  'SUUNNITELMA.md',
+  'BRIEF_GRAAFIKKO.md',
   'assets/ikoni_tabletti.png',
   'assets/ikoni_puhelin.png',
   'assets/fontit/IBMPlexSans-Regular.woff2',

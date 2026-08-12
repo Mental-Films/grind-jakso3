@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  var VERSIO = '0.1.0';
+  var VERSIO = '0.1.1';
 
   /* ══ Siemennetty satunnaisluku ══════════════════════════════════════════
      Jatkuvuus vaatii, että sama cue piirtää saman kuvan joka otossa.
@@ -84,6 +84,7 @@
     musta: false,
     palkkiEsilla: true,
     kosketustila: false, // näyttelijä koskee ruutua → operaattorin kulmat pois
+    offlineTila: 'asentuu', // valmis | asentuu | purettu | ei-suojattu | ei-tuettu | pois
     alkuAika: 0,
     _el: {},
     _sidokset: []
@@ -254,6 +255,20 @@
       (M.hohto.voima && M.hohto.vari ? (M.hohto.puhdas ? 'puhdas ' : '') + M.hohto.vari + ' ' + M.hohto.voima : 'pois') + '</b>');
     if (M.musta) osat.push('<span class="ko-varoitus">MUSTA</span>');
     if (M.kosketustila) osat.push('<span class="ko-varoitus">NÄYTTELIJÄ KOSKEE — kulmat pois</span>');
+
+    /* Offline-tila on kuvauspaikalla tärkein yksittäinen tieto: lentotilassa
+       proppi joko toimii tai ei toimi, eikä sitä ehdi selvittää otossa. */
+    var offline = {
+      valmis:        ['ok',       'offline ✓'],
+      asentuu:       ['varoitus', 'offline asentuu — avaa uudelleen'],
+      purettu:       ['varoitus', 'OFFLINE PURETTU (?tuore) — avaa ilman sitä'],
+      'ei-suojattu': ['virhe',    'EI OFFLINE — avattu ilman HTTPS:ää'],
+      'ei-tuettu':   ['virhe',    'EI OFFLINE'],
+      pois:          ['himmea',   'offline pois']
+    }[M.offlineTila];
+    if (offline) {
+      osat.push('<span style="color:var(--' + offline[0] + ')">' + offline[1] + '</span>');
+    }
     osat.push('<span class="ko-versio">' + M.laite + ' · v' + VERSIO + '</span>');
     p.innerHTML = osat.join(' ');
     paivitaPalkkiTila();
@@ -438,8 +453,16 @@
      Rekisteröinti vaatii https:n tai localhostin — se on tiedossa ja
      dokumentoitu README:ssä. */
   function asennaOffline() {
-    if (!('serviceWorker' in navigator)) return;
-    if (location.protocol === 'file:') return;
+    /* Offline-tuki vaatii suojatun yhteyden: https tai localhost. Läppärin
+       http://192.168.x.x EI kelpaa — silloin selain ei anna service workeria
+       lainkaan ja proppi kuolisi lentotilassa. Tämä näytetään ohjauspalkissa
+       ja laitetiedoissa, jotta sitä ei tarvitse arvata kuvauspaikalla. */
+    if (location.protocol === 'file:') { M.offlineTila = 'pois'; return; }
+    if (!('serviceWorker' in navigator)) {
+      M.offlineTila = window.isSecureContext ? 'ei-tuettu' : 'ei-suojattu';
+      paivitaPalkki();
+      return;
+    }
 
     /* ?tuore=1 purkaa välimuistin kokonaan. Graafikko ja koodari käyttävät
        tätä, kun muutos ei näy. Offline-tuki asentuu uudelleen seuraavalla
@@ -450,10 +473,30 @@
         rekisterit.forEach(function (r) { r.unregister(); });
       });
       if (global.caches) caches.keys().then(function (avaimet) { avaimet.forEach(function (a) { caches.delete(a); }); });
+      M.offlineTila = 'purettu';
+      paivitaPalkki();
       return;
     }
 
-    navigator.serviceWorker.register('sw.js').catch(function () { /* paikallinen avaus ilman palvelinta */ });
+    M.offlineTila = navigator.serviceWorker.controller ? 'valmis' : 'asentuu';
+    paivitaPalkki();
+
+    navigator.serviceWorker.register('sw.js').then(function (rek) {
+      return rek.update().catch(function () {}).then(function () { return rek; });
+    }).then(function () {
+      /* Ensiasennuksella sivua ei vielä ohjata, vaan vasta seuraavalla
+         avauksella. Odotetaan sitä, jottei palkki lupaa liikoja. */
+      if (navigator.serviceWorker.controller) M.offlineTila = 'valmis';
+      paivitaPalkki();
+    }).catch(function () {
+      M.offlineTila = 'ei-tuettu';
+      paivitaPalkki();
+    });
+
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      M.offlineTila = 'valmis';
+      paivitaPalkki();
+    });
   }
 
   /* ══ Laitetiedot ════════════════════════════════════════════════════════
@@ -568,7 +611,13 @@
         ['Kotivalikkosovellus', (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches)
           ? '<span style="color:var(--ok)">kyllä</span>'
           : '<span style="color:var(--varoitus)">ei — avattu selaimessa</span>'],
-        ['Offline-tuki', ('serviceWorker' in navigator) ? 'käytettävissä' : 'ei tuettu'],
+        ['Offline-tuki', ('serviceWorker' in navigator)
+          ? '<span style="color:var(--ok)">käytettävissä</span>'
+          : (window.isSecureContext
+              ? '<span style="color:var(--virhe)">ei tuettu</span>'
+              : '<span style="color:var(--virhe)">EI — sivu avattu ilman HTTPS:ää</span>')],
+        ['Yhteys', location.protocol.replace(':', '') +
+          (window.isSecureContext ? ' · suojattu' : ' · EI suojattu')],
         ['Propin versio', 'v' + VERSIO]
       ]) +
 

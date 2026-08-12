@@ -14,6 +14,9 @@ laitetiedot ja esikatselu toimivat. Sovellusten ulkoasu on vielä paikkamerkeill
 
 ## Käyttöönotto laitteella
 
+> Täydet ohjeet julkaisusta, asennuksesta, offline-varmistuksesta ja
+> klikkerin kytkennästä: **[KAYTTOONOTTO.md](KAYTTOONOTTO.md)**
+
 1. Avaa proppi **Safarissa** kerran verkkoyhteydellä
 2. Jaa → **Lisää Koti-valikkoon**
 3. Avaa kotivalikon kuvakkeesta — koko ruutu, ei selainpalkkia

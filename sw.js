@@ -8,7 +8,7 @@
  * Ajossa oleva versionumero näkyy propin ohjauspalkissa.
  */
 
-var VERSIO = 'grind3-v0.3.1';
+var VERSIO = 'grind3-v0.3.2';
 
 /* Pakolliset. Jos yksikin puuttuu, asennus epäonnistuu ja se on oikein —
    silloin proppi ei väitä olevansa offline-valmis. */

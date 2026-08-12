@@ -234,6 +234,12 @@
     /* Vapaa siirto: kun operaattori haluaa katsoa muualle kuin auton kohdalle. */
     this.vapaa = null;
 
+    /* Auton pystysijainti ruudulla, 0–1. Navigaattoreissa se on noin 2/3
+       korkeudelta: tuleva reitti näkyy, ajettu ei vie tilaa. Propissa
+       paneelit peittävät ruudun alaosan, joten sovitaAuto() laskee tämän
+       näkyvän kaistan mukaan — muuten nuoli jäisi paneelin alle. */
+    this.autoY = 0.68;
+
     this.paivitaSijainti();
   }
 
@@ -377,9 +383,8 @@
     c.fillStyle = this.vari('maa', '#12161C');
     c.fillRect(0, 0, L, K);
 
-    /* Ajoneuvo istuu 68 % korkeudelta, kuten navigaattoreissa: tuleva
-       reitti näkyy, ajettu ei vie tilaa. */
-    var ax = L / 2, ay = K * 0.68;
+    /* Ajoneuvon paikka ruudulla, ks. autoY. */
+    var ax = L / 2, ay = K * this.autoY;
     c.save();
     c.translate(ax, ay);
     if (this.kaanny) c.rotate(-this.suunta - Math.PI / 2);

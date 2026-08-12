@@ -51,7 +51,7 @@
 
     "hyvaksymisprosentti": 83.1,   // HOPP, kuljettajan hyväksymisaste
     "ajastinSekunnit":  31,        // HOPP, aika hyväksyä kyyti
-    "provikka":         33.10,     // € — uuden kyydin ennuste, cue 5
+    "provikka":         3.31,      // € — arvioitu tuotto, cue 1 ja 5
     "tilausnumero":     "3310",
     "kyydit":           31,        // tämän vuoron kyydit
     "ajettuKm":         331,
@@ -167,11 +167,13 @@
     "kadut": ["Ruovaarantie", "Kivihaanväylä", "Louhoskaari", "Pyörretie", "Sammalpolku"],
     "maaranpaa": "Sammalpolku 31",
     "noutopaikka": "Louhoskaari 12",
-    "matkustajaNimi": "Icci",
     // Matkan pituus kilometreinä. Ruudulla näkyvä jäljellä oleva matka
     // lasketaan tästä, ei generoidun reitin todellisesta pituudesta —
     // muuten lukema hyppäisi heti kun kartta lähtee liikkeelle.
     "matkanPituusKm": 3.31,
+
+    // Noutoetäisyys. Sama luku kuin matka — 331-sarjaa, ei sattumaa.
+    "noutoEtaisyysKm": 3.31,
     "matkanKesto": "9 min",
 
     // Saapumisaika on sama kuin jäädytetty kello: matkustaja nousee kyytiin

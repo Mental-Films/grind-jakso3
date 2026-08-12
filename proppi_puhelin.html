@@ -64,6 +64,34 @@
     return kartta;
   }
 
+  /* Auton nuoli jäi paneelien alle, koska se on kiinteästi 68 % korkeudelta.
+     Mitataan päällä olevat kerrokset ja asetetaan nuoli näkyvän kaistan
+     alakolmannekseen: edessä oleva reitti näkyy, eikä nuoli piiloudu. */
+  function sovitaAuto(d) {
+    requestAnimationFrame(function () {
+      if (!kartta || !kangas) return;
+      var korkeus = kangas.clientHeight || window.innerHeight;
+      if (!korkeus) return;
+
+      var yla = 0;
+      var y = d.querySelector('.hopp-yla');
+      if (y) yla = Math.max(0, y.getBoundingClientRect().bottom);
+
+      var ala = 0;
+      var a = d.querySelector('.hopp-ala') || d.querySelector('.hopp-pyynto-kortti');
+      if (a) ala = Math.max(0, korkeus - a.getBoundingClientRect().top);
+
+      var nakyva = korkeus - yla - ala;
+      if (nakyva < 70) {            // kortti peittää lähes kaiken
+        kartta.autoY = Math.max(0.06, (korkeus - ala - 34) / korkeus);
+      } else {
+        kartta.autoY = (yla + nakyva * 0.62) / korkeus;
+      }
+      kartta.autoY = Math.min(0.94, Math.max(0.06, kartta.autoY));
+      kartta.piirra();
+    });
+  }
+
   function kuori(juuri) {
     var d = document.createElement('div');
     d.className = 'hopp';
@@ -83,6 +111,9 @@
      eri — jos lukema tulisi siitä, se hyppäisi kesken oton. */
   function matkaTeksti(ctx) {
     return ctx.e2(ctx.S.hopp.matkanPituusKm) + ' km';
+  }
+  function noutoTeksti(ctx) {
+    return ctx.e2(ctx.S.hopp.noutoEtaisyysKm) + ' km';
   }
   function jaljellaTeksti(ctx) {
     var osuus = kartta ? Math.max(0, 1 - kartta.matka / kartta.reitinPituus) : 1;
@@ -161,7 +192,7 @@
     k.appendChild(ylin);
 
     k.appendChild(el('hopp-pyynto-tiedot',
-      '<div class="hopp-pyynto-tieto"><span>' + H.etaisyysOtsikko + '</span><b>2,1 km</b></div>' +
+      '<div class="hopp-pyynto-tieto"><span>' + H.etaisyysOtsikko + '</span><b>' + noutoTeksti(ctx) + '</b></div>' +
       '<div class="hopp-pyynto-tieto"><span>Matka</span><b>' + matkaTeksti(ctx) + '</b></div>' +
       '<div class="hopp-pyynto-tieto"><span>Kesto</span><b>' + H.matkanKesto + '</b></div>'));
 
@@ -188,12 +219,13 @@
       '<div class="hopp-vahvistus-teksti">' + H.hyvaksyttyTeksti + '</div></div>'));
 
     k.appendChild(el('hopp-pyynto-tiedot',
-      '<div class="hopp-pyynto-tieto"><span>' + H.saavuOtsikko + '</span><b>2,1 km</b></div>' +
-      '<div class="hopp-pyynto-tieto"><span>Matkustaja</span><b>' + H.matkustajaNimi + '</b></div>' +
+      '<div class="hopp-pyynto-tieto"><span>' + H.saavuOtsikko + '</span><b>' + noutoTeksti(ctx) + '</b></div>' +
+      '<div class="hopp-pyynto-tieto"><span>Kesto</span><b>' + H.matkanKesto + '</b></div>' +
       '<div class="hopp-pyynto-tieto"><span>Perillä</span><b>' + H.saapumisaika + '</b></div>'));
 
     k.appendChild(osoiterivit(ctx, false));
     pyynto.appendChild(k);
+    sovitaAuto(pyynto.parentNode || pyynto);
   }
 
   /* ── Navigointi ──────────────────────────────────────────────────────────
@@ -229,6 +261,7 @@
     d.appendChild(ohjepalkki(ctx, ctx.S.hopp.ohjeet[0]));
     d.appendChild(ajopaneeli(ctx));
     if (kartta) kartta.liikkuu = true;
+    sovitaAuto(d);
   }
 
   /* Yhteinen ajon aikainen päivitys cueille 2 ja 3. */
@@ -307,6 +340,7 @@
           p.appendChild(el('hopp-varoitus', '<span>⚠</span><span>' + H.taukoVaroitus + '</span>'));
           a.appendChild(p);
           d.appendChild(a);
+          sovitaAuto(d);
         } },
 
       /* 1 — Ruutu räpsyy, hyväksymisajastin sykkii. Alvina painaa HYVÄKSY.
@@ -320,6 +354,7 @@
           d.appendChild(tilapalkki(ctx));
           karttatyokalu(d);
           d.appendChild(pyyntoKortti(ctx));
+          sovitaAuto(d);
           GRIND.glitch.automaatti(ctx.S.hopp.rapsy);
         },
         tick: function (juuri, ctx) { paivitaRengas(juuri, ctx.S.luvut.ajastinSekunnit, ctx.t); } },
@@ -341,15 +376,15 @@
           var p = el('hopp-paneeli');
           p.appendChild(el('hopp-kahva'));
           p.appendChild(el('hopp-otsikko', H.matkustaja));
-          p.appendChild(el('hopp-matkustaja',
-            '<div class="hopp-kuva">' + H.matkustajaNimi.charAt(0) + '</div>' +
-            '<div><div class="hopp-matkustaja-nimi">' + H.matkustajaNimi + '</div>' +
-            '<div class="hopp-matkustaja-tieto">' + matkaTeksti(ctx) +
-              ' · perillä ' + H.saapumisaika + '</div></div>'));
+          p.appendChild(el('hopp-luvut',
+            '<div class="hopp-luku"><span>Matka</span><b>' + matkaTeksti(ctx) + '</b></div>' +
+            '<div class="hopp-luku"><span>Kesto</span><b>' + H.matkanKesto + '</b></div>' +
+            '<div class="hopp-luku"><span>Perillä</span><b>' + H.saapumisaika + '</b></div>'));
           p.appendChild(osoiterivit(ctx, true));
           p.appendChild(nappi(H.aloitaNappi, null, function () { aloitaNavigointi(d, ctx); }));
           a.appendChild(p);
           d.appendChild(a);
+          sovitaAuto(d);
         },
         tick: function (juuri, ctx) { ajoTick(this, juuri, ctx); } },
 
@@ -363,6 +398,7 @@
           karttatyokalu(d);
           d.appendChild(ohjepalkki(ctx, ctx.S.hopp.ohjeet[0]));
           d.appendChild(ajopaneeli(ctx));
+          sovitaAuto(d);
         },
         tick: function (juuri, ctx) { ajoTick(this, juuri, ctx); } },
 
@@ -376,6 +412,7 @@
           var H = ctx.S.hopp;
           d.appendChild(ohjepalkki(ctx,
             { matka: H.kaannyNappi, teksti: H.ohjeet[H.ohjeet.length - 1].teksti }, true));
+          sovitaAuto(d);
         } },
 
       /* 5 — Uusi kyyti lähellä. Alvina painaa HYVÄKSY. */
@@ -387,6 +424,7 @@
           d.appendChild(tilapalkki(ctx));
           karttatyokalu(d);
           d.appendChild(pyyntoKortti(ctx));
+          sovitaAuto(d);
         },
         tick: function (juuri, ctx) { paivitaRengas(juuri, ctx.S.luvut.ajastinSekunnit, ctx.t); } },
 

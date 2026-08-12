@@ -12,93 +12,352 @@
 <link rel="manifest" href="manifest_tabletti.json">
 <link rel="stylesheet" href="runko.css">
 <link rel="stylesheet" href="glitch.css">
+<link rel="stylesheet" href="candlr.css">
 <title>GRIND 3 — tabletti</title>
 </head>
 <body>
+<script src="kaavio.js"></script>
 <script src="glitch.js"></script>
 <script src="moottori.js"></script>
 <script>
 /* Alvinan iPad — CANDLR, GRUMBL, TABB.
  *
- * Vaihe 1: cue-rakenne ja paikkamerkit. Sovellusten ulkoasu tehdään
- * vaiheissa 3–5, jolloin vain piirra-funktiot vaihtuvat — cue-numerot,
- * hohdon värit ja ajolista pysyvät. Ohjaaja voi siis harjoitella
- * ajolistan jo tällä versiolla.
+ * CANDLR on rakennettu (cuet 0, 4, 5, 6). GRUMBL ja TABB ovat vielä
+ * paikkamerkeillä — vaiheet 4 ja 5.
+ *
+ * Rakenne on tarkistettu oikeasta pörssistä, ks. REFERENSSIT.md kohta 2.
+ * Pystyasennossa välilehtipalkki, ei sivupalkkia: sivupalkki vaatii
+ * vaakatilaa, jota 820 pt:n pystyruudussa ei ole.
  */
-GRIND.kaynnista({
-  laite: 'tabletti',
+(function () {
+  var kaavio = null, kangas = null;
 
-  cuet: function (M) { return [
+  function el(luokka, sisus) {
+    var d = document.createElement('div');
+    d.className = luokka;
+    if (sisus != null) d.innerHTML = sisus;
+    return d;
+  }
 
-    { id: 0, nimi: 'Romahdus', sovellus: 'candlr',
-      hohto: { vari: 'punainen', voima: 6 },
-      piirra: M.paikkamerkki({
-        sovellus: 'candlr',
-        otsikko: 'Reapercoin romahtaa',
-        kuvaus: 'Verenpunainen sahalaitakäyrä lävistää asteikon diagonaalisesti. ' +
-                'Miinusmerkit ja tappioluvut vilkkuvat. Punainen hohto kasvoilla.',
-        luku: function (c) { return c.e1(c.S.luvut.rprMuutos) + ' %'; },
-        lukuvari: 'var(--virhe)'
-      }) },
+  var K_TAHTI   = '<svg class="candlr-kuvake" viewBox="0 0 24 24"><path d="m12 17.3-6.2 3.7 1.6-7L2 9.2l7.1-.6L12 2l2.9 6.6 7.1.6-5.4 4.8 1.6 7z"/></svg>';
+  var K_JAKO    = '<svg class="candlr-kuvake" viewBox="0 0 24 24"><path d="M18 16a3 3 0 0 0-2 .8l-7-4a3 3 0 0 0 0-1.6l7-4a3 3 0 1 0-1-2.2c0 .3 0 .5.1.8l-7 4a3 3 0 1 0 0 4.4l7 4a3 3 0 1 0 2.9-2.2z"/></svg>';
+  var K_RAKETTI = '<svg class="candlr-raketti-kuvake" viewBox="0 0 24 24"><path d="M14 3c3.9 1 6.6 4.3 7 8.6-3.3 3.3-6.1 5-8.4 5.3l-2.5-2.5c.3-2.3 2-5.1 5.3-8.4zM8.3 15.7 6 18l-1.4-1.4 2.3-2.3zM4 20l2-2 1.4 1.4-2 2z"/></svg>';
 
-    { id: 1, nimi: 'Postaus', sovellus: 'grumbl',
-      kosketus: true,                       // Alvina kirjoittaa → kulmat pois
-      hohto: { vari: 'punainen', voima: 3 },
-      piirra: M.paikkamerkki({
-        sovellus: 'grumbl',
-        otsikko: 'Alvina kirjoittaa postauksen',
-        kuvaus: function (c) { return c.S.grumbl.postausOtsikko; }
-      }) },
+  function nuoliMerkki(nousu) {
+    return '<svg class="candlr-nuoli-pieni" viewBox="0 0 24 24">' +
+      (nousu
+        ? '<path d="M7 17 17 7M9 7h8v8"/><path d="M17 7 7 17l1.4 1.4L18.4 8.4V15h2V5h-10v2z"/>'
+        : '<path d="M17 17H7V15h6.6L5.6 7l1.4-1.4 8 8V7h2z"/>') +
+      '</svg>';
+  }
 
-    { id: 2, nimi: 'Ostosrivit', sovellus: 'tabb',
-      hohto: { vari: 'punainen', voima: 3 },
-      piirra: M.paikkamerkki({
-        sovellus: 'tabb',
-        otsikko: 'Erääntyneet maksut',
-        kuvaus: 'Puhelin, takki ja neljä ruokatilausta. Valtaosa erääntynyt.',
-        luku: function (c) { return c.e2(c.S.luvut.eraantyneet) + ' €'; },
-        lukuvari: 'var(--virhe)'
-      }) },
+  /* ── Välilehtipalkki ──────────────────────────────────────────────────── */
+  var VALILEHTI_KUVAKKEET = [
+    '<svg viewBox="0 0 24 24"><path d="M3 17h4v4H3zm7-8h4v12h-4zm7-6h4v18h-4z"/></svg>',
+    '<svg viewBox="0 0 24 24"><path d="M3 5h18v4H3zm0 6h18v8H3z" opacity=".55"/><path d="M3 5h18v4H3z"/></svg>',
+    '<svg viewBox="0 0 24 24"><path d="m12 3 4 5h-3v5h-2V8H8zm0 18-4-5h3v-5h2v5h3z"/></svg>',
+    '<svg viewBox="0 0 24 24"><path d="M4 6h13a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H4zm12 6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>'
+  ];
 
-    { id: 3, nimi: 'Lepotila',
-      hohto: null,
-      piirra: M.paikkamerkki({
-        otsikko: 'Lepotila',
-        kuvaus: 'Musta ruutu. Ottojen väliin ja kohtiin, joissa Alvina nukkuu.'
-      }) },
+  function valilehdet(ctx) {
+    var C = ctx.S.candlr;
+    var v = el('candlr-valilehdet');
+    C.valilehdet.forEach(function (nimi, i) {
+      var t = el('candlr-valilehti' + (i === C.valilehtiValittu ? ' valittu' : ''),
+        VALILEHTI_KUVAKKEET[i] + '<span>' + nimi + '</span>');
+      v.appendChild(t);
+    });
+    return v;
+  }
 
-    { id: 4, nimi: 'Raketti', sovellus: 'candlr',
-      hohto: { vari: 'vihrea', voima: 6 },
-      piirra: M.paikkamerkki({
-        sovellus: 'candlr',
-        otsikko: 'Käyrä kääntyy vihreäksi',
-        kuvaus: function (c) { return c.S.candlr.rakettiBanneri; },
-        luku: function (c) { return '+' + c.e1(c.S.luvut.rprMuutosNousu) + ' %'; },
-        lukuvari: 'var(--ok)'
-      }) },
+  /* ── Kaavio ───────────────────────────────────────────────────────────── */
+  function kaavioon(juuri, ctx, nousu) {
+    var C = ctx.S.candlr, L = ctx.S.luvut;
+    var kehys = el('candlr-kaavio');
 
-    { id: 5, nimi: 'Saldo 3,31 €', sovellus: 'candlr',
-      hohto: { vari: 'vihrea', voima: 4 },
-      piirra: M.paikkamerkki({
-        sovellus: 'candlr',
-        otsikko: function (c) { return c.S.candlr.kateOtsikko; },
-        kuvaus: 'Lähikuva. Tämä on kohtauksen pointti — ostettavaa ei ole.',
-        luku: function (c) { return c.e2(c.S.luvut.kate) + ' €'; }
-      }) },
+    if (!kangas) { kangas = document.createElement('canvas'); }
+    if (!kaavio) {
+      kaavio = new GRIND.Kaavio(kangas, {
+        siemen: 331,
+        varit: Object.assign({}, ctx.T.varit, {
+          lasku: ctx.T.varit.virhe, nousu: ctx.T.varit.ok,
+          ruudukko: ctx.T.varit.viiva, asteikko: ctx.T.varit['himmea-2'],
+          pohja: ctx.T.varit.pohja
+        }),
+        fontti: 'ui-monospace, monospace',
+        ajat: C.ajat,
+        /* Asteikko oikeassa laidassa, kuten pörsseissä: tuorein hinta on
+           kaavion oikeassa reunassa. */
+        asteikko: function (osuus) {
+          var ylin = nousu ? L.rprKurssiHuippu * 1.12 : L.rprKurssi * 2.1;
+          var alin = nousu ? L.rprKurssi * 0.85 : L.rprKurssi * 0.92;
+          return ctx.eD(ylin - (ylin - alin) * osuus, 4);
+        },
+        nykyhinta: function () {
+          return ctx.eD(nousu ? L.rprKurssiHuippu : L.rprKurssi, 4);
+        }
+      });
+      GRIND.kaavio = kaavio;
+    }
+    kaavio.a.asteikko = function (osuus) {
+      var ylin = nousu ? L.rprKurssiHuippu * 1.12 : L.rprKurssi * 2.1;
+      var alin = nousu ? L.rprKurssi * 0.85 : L.rprKurssi * 0.92;
+      return ctx.eD(ylin - (ylin - alin) * osuus, 4);
+    };
+    kaavio.a.nykyhinta = function () {
+      return ctx.eD(nousu ? L.rprKurssiHuippu : L.rprKurssi, 4);
+    };
+    kaavio.asetaSuunta(nousu ? 'nousu' : 'lasku');
+    kehys.appendChild(kangas);
 
-    { id: 6, nimi: 'Loppukuva', sovellus: 'candlr',
-      hohto: { vari: 'punainen', voima: 7 },
-      piirra: M.paikkamerkki({
-        sovellus: 'candlr',
-        otsikko: 'Punainen palaa',
-        kuvaus: 'Ruutu heijastaa vihreän sijaan taas punaista hohdetta Alvinan kasvoille.'
-      }) },
+    /* Vilkkuvat miinusmerkit ja tappioluvut. Paikat siemennetystä
+       satunnaisluvusta, joten ne ovat joka otossa samat. */
+    if (!nousu) {
+      var r = ctx.rnd;
+      var t = el('candlr-tappiot');
+      C.tappiot.forEach(function (teksti, i) {
+        var s = document.createElement('span');
+        s.className = 'candlr-tappio';
+        s.textContent = teksti;
+        s.style.left = (6 + r() * 74) + '%';
+        s.style.top = (8 + r() * 74) + '%';
+        s.style.fontSize = (teksti === '−' ? 34 : 17 + r() * 9).toFixed(0) + 'px';
+        s.style.animationDelay = (r() * 2.4).toFixed(2) + 's';
+        t.appendChild(s);
+      });
+      kehys.appendChild(t);
+    }
 
-    /* Viimeinen cue on aina kameratestikortti. Näppäin T hyppää siihen. */
-    { id: 7, nimi: 'Kameratesti', piirra: M.testikortti() }
+    juuri.appendChild(kehys);
+    requestAnimationFrame(function () { kaavio.piirra(0); });
+    setTimeout(function () { kaavio.piirra(0); }, 120);
+    return kehys;
+  }
 
-  ]; }
-});
+  /* ── CANDLR-perusnäkymä ───────────────────────────────────────────────── */
+  function candlr(juuri, ctx, asetukset) {
+    var C = ctx.S.candlr, L = ctx.S.luvut;
+    var nousu = !!asetukset.nousu;
+
+    var d = el('candlr');
+    var sisus = el('candlr-sisus');
+
+    /* Yläpalkki */
+    var yla = el('candlr-yla');
+    var tunnus = el('candlr-tunnus', '<span>' + C.tunnus.charAt(0) + '</span>');
+    var kuva = new Image();
+    kuva.onload = function () { tunnus.innerHTML = ''; tunnus.appendChild(kuva); };
+    kuva.src = 'assets/rpr_tunnus.svg';
+    yla.appendChild(tunnus);
+    yla.appendChild(el('', '<span class="candlr-nimi">' + ctx.nimi('reapercoin') +
+      '</span><span class="candlr-lyhenne">' + C.tunnus + '</span>'));
+    var ylaoikea = el('candlr-ylaoikea', K_TAHTI + K_JAKO);
+    ylaoikea.appendChild(el('candlr-valuutta', C.valuutta + ' ▾'));
+    yla.appendChild(ylaoikea);
+    sisus.appendChild(yla);
+
+    /* Kurssi, muutos ja aikavälipillerit samalla rivillä */
+    var rivi = el('candlr-kurssirivi');
+    var vasen = el('');
+    vasen.appendChild(el('candlr-kurssi',
+      ctx.eD(nousu ? L.rprKurssiHuippu : L.rprKurssi, 4) + ' €'));
+    vasen.appendChild(el('candlr-muutos ' + (nousu ? 'nousu' : 'lasku'),
+      nuoliMerkki(nousu) +
+      '<span>' + ctx.eD(Math.abs(nousu ? L.rprMuutosEurNousu : L.rprMuutosEur), 4) + ' €</span>' +
+      '<span class="candlr-suluissa">(' + (nousu ? '+' : '−') +
+        ctx.e1(Math.abs(nousu ? L.rprMuutosNousu : L.rprMuutos)) + ' %)</span>'));
+    rivi.appendChild(vasen);
+
+    var valit = el('candlr-valit');
+    C.aikavalit.forEach(function (v) {
+      var b = document.createElement('button');
+      b.className = 'candlr-vali' + (v === C.aikavaliValittu ? ' valittu' : '');
+      b.textContent = v;
+      valit.appendChild(b);
+    });
+    rivi.appendChild(valit);
+    sisus.appendChild(rivi);
+
+    /* Banneri tulee riviin kurssin JÄLKEEN, ei sen päälle. Kurssi on
+       kohtauksen luettava luku eikä sitä saa peittää. */
+    if (asetukset.banneri) sisus.appendChild(banneri(ctx));
+
+    kaavioon(sisus, ctx, nousu);
+
+    /* Salkku. Arvo lasketaan omistuksesta ja kurssista, tuotto siitä ja
+       sijoitetusta summasta. Mikään näistä ei ole erikseen kirjattu luku,
+       joten ne eivät voi ajautua ristiriitaan keskenään. */
+    var kurssi = nousu ? L.rprKurssiHuippu : L.rprKurssi;
+    var salkkuArvo = L.omistus * kurssi;
+    var tulos = salkkuArvo - L.sijoitettu;
+    var tulosPros = (tulos / L.sijoitettu) * 100;
+    var salkku = el('candlr-salkku');
+    salkku.appendChild(el('',
+      '<div class="candlr-salkku-otsikko">' + C.salkkuOtsikko + '</div>' +
+      '<div class="candlr-salkku-arvo">' + ctx.e0(salkkuArvo) + ' €</div>'));
+    /* Oikealla salkun oma tuotto, ei kolikon vuorokausimuutos. Ne ovat eri
+       asia: kurssi voi raketoida ja salkku olla silti tappiolla. */
+    salkku.appendChild(el('candlr-salkku-oikea',
+      '<div class="candlr-salkku-otsikko">' + C.otsikko + '</div>' +
+      '<div class="candlr-muutos ' + (tulos >= 0 ? 'nousu' : 'lasku') +
+        '" style="margin-top:2px;justify-content:flex-end">' +
+      nuoliMerkki(tulos >= 0) + '<span>' + (tulos >= 0 ? '+' : '−') +
+        ctx.e1(Math.abs(tulosPros)) + ' %</span></div>'));
+    sisus.appendChild(salkku);
+
+    /* Oma positio. Tappio johdetaan salkun luvuista, jottei se voi
+       ajautua ristiriitaan niiden kanssa. */
+    var positio = el('candlr-positio');
+    positio.appendChild(el('candlr-positio-rivi',
+      '<span>' + C.positioOtsikko + '</span><b>' + ctx.e2(L.omistus) + ' ' + C.tunnus + '</b>'));
+    positio.appendChild(el('candlr-positio-rivi',
+      '<span>' + C.ostohintaOtsikko + '</span><b>' +
+      ctx.eD(L.sijoitettu / L.omistus, 4) + ' €</b>'));
+    positio.appendChild(el('candlr-positio-rivi',
+      '<span>' + C.tulosOtsikko + '</span><b class="' + (tulos >= 0 ? 'nousu' : 'lasku') + '">' +
+      (tulos >= 0 ? '+' : '−') + ctx.e0(Math.abs(tulos)) + ' €</b>'));
+    sisus.appendChild(positio);
+
+    /* Tunnusluvut, kolme saraketta */
+    var arvot = [C.marketCap, C.volyymi, C.huippu];
+    var luvut = el('candlr-luvut');
+    C.luvutOtsikot.forEach(function (otsikko, i) {
+      luvut.appendChild(el('candlr-luku',
+        '<span>' + otsikko + '</span><b>' + arvot[i] + '</b>'));
+    });
+    sisus.appendChild(luvut);
+
+    d.appendChild(sisus);
+
+    /* Osto ja myynti */
+    var toiminnot = el('candlr-toiminnot');
+    var osta = document.createElement('button');
+    osta.className = 'candlr-nappi candlr-osta';
+    osta.textContent = C.ostaNappi;
+    var myy = document.createElement('button');
+    myy.className = 'candlr-nappi candlr-myy';
+    myy.textContent = C.myyNappi;
+    toiminnot.appendChild(osta);
+    toiminnot.appendChild(myy);
+    d.appendChild(toiminnot);
+    d.appendChild(valilehdet(ctx));
+
+    if (asetukset.osto) d.appendChild(ostoArkki(ctx));
+
+    juuri.appendChild(d);
+    return d;
+  }
+
+  /* Huijausmainen ilmoitus. Suunniteltu sen näköiseksi. */
+  function banneri(ctx) {
+    var C = ctx.S.candlr;
+    var b = el('candlr-banneri', K_RAKETTI +
+      '<div class="candlr-banneri-teksti">' + C.rakettiBanneri + '</div>');
+    var n = document.createElement('button');
+    n.className = 'candlr-banneri-nappi';
+    n.textContent = C.rakettiNappi;
+    b.appendChild(n);
+    return b;
+  }
+
+  /* Cue 5. Banneri käskee ostaa — ja tilillä on 3,31 €. */
+  function ostoArkki(ctx) {
+    var C = ctx.S.candlr, L = ctx.S.luvut;
+    var arkki = el('candlr-osto-arkki');
+    var kortti = el('candlr-osto-kortti');
+
+    kortti.appendChild(el('candlr-osto-otsikko',
+      '<span>' + C.ostoOtsikko + '</span>'));
+    kortti.appendChild(el('candlr-maara', C.ostoMaara + ' €'));
+    kortti.appendChild(el('candlr-maara-vastine',
+      '0,0000 ' + C.tunnus + '  ·  ' + ctx.eD(L.rprKurssiHuippu, 4) + ' € / ' + C.tunnus));
+
+    var kate = el('candlr-kate',
+      '<div class="candlr-kate-otsikko">' + C.kateOtsikko + '</div>' +
+      '<div class="candlr-kate-arvo">' + ctx.e2(L.kate) + ' €</div>');
+    kortti.appendChild(kate);
+
+    var v = document.createElement('button');
+    v.className = 'candlr-osto-vahvista';
+    v.textContent = C.vahvistaNappi;
+    v.disabled = true;
+    kortti.appendChild(v);
+    kortti.appendChild(el('candlr-varoitus', C.eiKatetta));
+
+    arkki.appendChild(kortti);
+    return arkki;
+  }
+
+  /* Kaavio elää cue-suhteellisen ajan mukaan, joten se toistuu otosta toiseen. */
+  function kaavioTick(juuri, ctx) {
+    if (kaavio && juuri.querySelector('.candlr-kaavio')) kaavio.piirra(ctx.t);
+  }
+
+  /* ══ Cuet ═══════════════════════════════════════════════════════════════ */
+  GRIND.kaynnista({
+    laite: 'tabletti',
+    cuet: function (M) { return [
+
+      /* 0 — Reapercoin romahtaa. Sahalaita lävistää asteikon diagonaalisesti. */
+      { id: 0, nimi: 'Romahdus', sovellus: 'candlr',
+        hohto: { vari: 'punainen', voima: 6 },
+        piirra: function (juuri, ctx) { candlr(juuri, ctx, {}); },
+        tick: kaavioTick },
+
+      /* 1 — GRUMBL, postauksen kirjoitus. Vaihe 4. */
+      { id: 1, nimi: 'Postaus', sovellus: 'grumbl',
+        kosketus: true,
+        hohto: { vari: 'punainen', voima: 3 },
+        piirra: M.paikkamerkki({
+          sovellus: 'grumbl',
+          otsikko: 'Alvina kirjoittaa postauksen',
+          kuvaus: function (c) { return c.S.grumbl.postausOtsikko; }
+        }) },
+
+      /* 2 — TABB, erääntyneet maksut. Vaihe 5. */
+      { id: 2, nimi: 'Ostosrivit', sovellus: 'tabb',
+        hohto: { vari: 'punainen', voima: 3 },
+        piirra: M.paikkamerkki({
+          sovellus: 'tabb',
+          otsikko: 'Erääntyneet maksut',
+          kuvaus: 'Puhelin, takki ja neljä ruokatilausta. Valtaosa erääntynyt.',
+          luku: function (c) { return c.e2(c.S.luvut.eraantyneet) + ' €'; },
+          lukuvari: 'var(--virhe)'
+        }) },
+
+      /* 3 — Lepotila. */
+      { id: 3, nimi: 'Lepotila',
+        hohto: null,
+        piirra: M.paikkamerkki({
+          otsikko: 'Lepotila',
+          kuvaus: 'Musta ruutu. Ottojen väliin ja kohtiin, joissa Alvina nukkuu.'
+        }) },
+
+      /* 4 — Raketti. Käyrä vihreänä ja huijausmainen banneri päällä. */
+      { id: 4, nimi: 'Raketti', sovellus: 'candlr',
+        hohto: { vari: 'vihrea', voima: 6 },
+        piirra: function (juuri, ctx) { candlr(juuri, ctx, { nousu: true, banneri: true }); },
+        tick: kaavioTick },
+
+      /* 5 — Kate 3,31 €. Banneri käski ostaa; tilillä ei ole millä. */
+      { id: 5, nimi: 'Kate 3,31 €', sovellus: 'candlr',
+        hohto: { vari: 'vihrea', voima: 4 },
+        piirra: function (juuri, ctx) {
+          candlr(juuri, ctx, { nousu: true, osto: true });
+        },
+        tick: kaavioTick },
+
+      /* 6 — Loppukuva. Pumppaus romahti, punainen palaa kasvoille. */
+      { id: 6, nimi: 'Loppukuva', sovellus: 'candlr',
+        hohto: { vari: 'punainen', voima: 7 },
+        piirra: function (juuri, ctx) { candlr(juuri, ctx, {}); },
+        tick: kaavioTick },
+
+      { id: 7, nimi: 'Kameratesti', piirra: M.testikortti() }
+
+    ]; }
+  });
+})();
 </script>
 </body>
 </html>

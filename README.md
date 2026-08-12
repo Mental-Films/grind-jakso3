@@ -172,9 +172,11 @@ proppi_tabletti.html    Ajolista ja cue-määrittelyt — iPad
 proppi_puhelin.html     Ajolista ja cue-määrittelyt — iPhone
 moottori.js             Cue-moottori, hohto, kirkkaus, kulmat, laitetiedot, esikatselu
 kartta.js               Karttamoottori — tiestö, reitti, kamera, paikannin
+kaavio.js               Kurssikaavio — romahdus ja raketti
 glitch.js · glitch.css  Räpsy — neljä tyyppiä, siirretty aiemmasta propista
 runko.css               Rakenteen tyylit
 hopp.css                HOPP Partnerin ulkoasu
+candlr.css              CANDLR:n ulkoasu
 teema.json              Värit ja kirjasimet
 sisalto.json            Teksti, numerot ja nimet
 assets/                 Grafiikka

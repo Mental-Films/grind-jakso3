@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  var VERSIO = '0.4.0';
+  var VERSIO = '0.5.0';
 
   /* ══ Siemennetty satunnaisluku ══════════════════════════════════════════
      Jatkuvuus vaatii, että sama cue piirtää saman kuvan joka otossa.
@@ -67,6 +67,12 @@
   function e2(n) {
     return Number(n).toLocaleString('fi-FI', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
       .replace(/ /g, ' ');
+  }
+  /* Kryptokurssit tarvitsevat neljä desimaalia, eurot kaksi. */
+  function eD(n, desimaalit) {
+    return Number(n).toLocaleString('fi-FI',
+      { minimumFractionDigits: desimaalit, maximumFractionDigits: desimaalit })
+      .replace(/ /g, '\u00a0');
   }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
 
@@ -205,7 +211,7 @@
       S: M.S, T: M.T,
       laite: M.laite,
       nimi: M.nimi, tunnusvari: M.tunnusvari, sanamerkki: M.sanamerkki,
-      e0: e0, e1: e1, e2: e2, kello: M.kello
+      e0: e0, e1: e1, e2: e2, eD: eD, kello: M.kello
     };
     M._ctx = ctx;
 
@@ -751,7 +757,7 @@
           rnd: siemen((c.siemen !== undefined ? c.siemen : 331) + i * 1009),
           t: 0, S: M.S, T: M.T, laite: M.laite,
           nimi: M.nimi, tunnusvari: M.tunnusvari, sanamerkki: M.sanamerkki,
-          e0: e0, e1: e1, e2: e2, kello: M.kello
+          e0: e0, e1: e1, e2: e2, eD: eD, kello: M.kello
         });
       }
       kehys.appendChild(sisus);

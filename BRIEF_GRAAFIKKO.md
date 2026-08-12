@@ -186,7 +186,7 @@ sRGB, 8-bit.
 | `logo_grumbl.svg` | SVG | " | 2 |
 | `logo_tabb.svg` | SVG | " | 2 |
 | `logo_hopp.svg` | SVG | " | 2 |
-| `rpr_tunnus.svg` | SVG, neliö | Reapercoinin kolikkotunnus. Näkyy CANDLR:ssä isona | 2 |
+| `rpr_tunnus.svg` | SVG, neliö | Reapercoinin kolikkotunnus. **CANDLR:n ainoa kuvatiedosto** — kaikki muu on ladottua. Ilman sitä paikalla on kirjain R | **2** |
 | `kauppias_novex.svg` | SVG | Puhelinvalmistaja, TABB-rivillä | 3 |
 | `kauppias_nibbl.svg` | SVG | Ruokalähetti, TABB-riveillä (useita tilauksia) | 3 |
 | `kauppias_nordkap.svg` | SVG | Vaatemerkki, TABB-rivillä | 3 |

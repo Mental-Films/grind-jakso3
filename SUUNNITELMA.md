@@ -295,9 +295,11 @@ proppi_tabletti.html    iPad — CANDLR, GRUMBL, TABB. Ajolista ja cue-määritt
 proppi_puhelin.html     iPhone — HOPP Partner. Ajolista ja cue-määrittelyt
 moottori.js             Cue-moottori, hohto, kirkkaus, kulmat, laitetiedot, esikatselu
 kartta.js               Karttamoottori — tiestö, reitti, kamera, paikannin
+kaavio.js               Kurssikaavio — romahdus ja raketti
 glitch.js · glitch.css  Räpsy — siirretty tuotannon aiemmasta propista
 runko.css               Rakenteen tyylit (värit tulevat teema.json:ista)
 hopp.css                HOPP Partnerin ulkoasu
+candlr.css              CANDLR:n ulkoasu
 teema.json              Värit ja kirjasimet          ← graafikko muokkaa
 sisalto.json            Kaikki teksti ja numerot     ← graafikko ja ohjaaja muokkaavat
 assets/                 Grafiikka — pudota tänne     ← graafikko täyttää
@@ -458,8 +460,20 @@ ajastinrenkaineen, navigaattori, liikkuva kartta ja KÄÄNNY YMPÄRI ovat valmii
 
 Räpsy siirretty aiemmasta propista ja käytössä molemmissa propeissa.
 
-Jäljellä: CANDLR (vaihe 3), GRUMBL haamunäppäimistöineen (vaihe 4) ja TABB
-(vaihe 5). Tabletin cuet ovat yhä paikkamerkeillä.
+**CANDLR tehty** (cuet 0, 4, 5, 6) referenssien mukaan: aikavälipillerit,
+hinta-asteikko oikeassa laidassa, muutos kolmena osana, kelluva
+välilehtipalkki. Sahalaita lävistää asteikon diagonaalisesti, kuten
+käsikirjoitus vaatii.
+
+Salkun luvut **johdetaan omistuksesta ja kurssista** eikä kirjata erikseen:
+9 993,20 RPR × kurssi = arvo, arvo − 3 310 € = tuotto. Näin kurssi, salkku ja
+tuotto eivät voi olla ristiriidassa. Sivutuotteena raketti näyttää totuuden:
+kurssi +331 %, salkku silti −56,8 %.
+
+Cue 5 on ostolomake: banneri käskee ostaa, kate on 3,31 € ja painike on pois
+käytöstä. Se on kohtauksen pointti yhtenä ruutuna.
+
+Jäljellä: GRUMBL haamunäppäimistöineen (vaihe 4) ja TABB (vaihe 5).
 
 Seuraavaksi vaihe 2: asennus oikeille laitteille ja kameratesti.
 

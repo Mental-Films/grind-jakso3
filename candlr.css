@@ -1,0 +1,364 @@
+/* CANDLR — kryptopörssi, iPad pysty 820 pt.
+ *
+ * Rakenne on tarkistettu oikeasta pörssistä, ks. REFERENSSIT.md kohta 2.
+ * Kolme asiaa tulee sieltä suoraan: aikavälipillerit kurssin oikealla,
+ * hinta-asteikko kaavion oikeassa laidassa, ja muutos kolmena osana
+ * (nuoli, euromäärä, prosentti suluissa).
+ *
+ * Navigointi kelluu sisällön päällä ja sisältö vierii sen alta — iPadOS:n
+ * kerrosjako. Pystyasennossa välilehtipalkki, ei sivupalkkia.
+ *
+ * Tunnusväri on kulta. Punainen ja vihreä ovat varattuja: ne kertovat
+ * markkinan suunnan eivätkä ole brändiä.
+ */
+
+.candlr {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  background: var(--pohja);
+  color: var(--teksti);
+  font-family: var(--fontti);
+  --candlr: var(--tunnus, #C9A227);
+  padding:
+    calc(var(--turva-yla) + var(--palkki-tila, 0px)) var(--turva-oikea)
+    var(--turva-ala) var(--turva-vasen);
+}
+
+.candlr-sisus {
+  flex: 1;
+  overflow: hidden;
+  padding: 6px 26px 0;
+  display: flex; flex-direction: column;
+}
+
+/* ── Yläpalkki ──────────────────────────────────────────────────────────── */
+.candlr-yla {
+  display: flex; align-items: center; gap: 13px;
+  padding: 10px 0 16px;
+}
+.candlr-tunnus {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--paneeli-3);
+  display: grid; place-items: center;
+  flex: none;
+  overflow: hidden;
+}
+.candlr-tunnus img { width: 100%; height: 100%; display: block; }
+.candlr-tunnus span {
+  font-family: var(--fontti-mono);
+  font-size: 15px; font-weight: 600;
+  color: var(--virhe);
+}
+.candlr-nimi { font-size: 19px; font-weight: 600; }
+.candlr-lyhenne {
+  font-family: var(--fontti-mono);
+  font-size: 13px; color: var(--himmea);
+  margin-left: 7px;
+}
+.candlr-ylaoikea { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+.candlr-kuvake { width: 21px; height: 21px; fill: var(--himmea); }
+.candlr-valuutta {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--paneeli-2);
+  border: 1px solid var(--viiva-2);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px; font-weight: 600;
+}
+
+/* ── Kurssi ja aikavälit ────────────────────────────────────────────────── */
+.candlr-kurssirivi { display: flex; align-items: flex-start; gap: 20px; }
+.candlr-kurssi {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 46px; font-weight: 600; line-height: 1;
+  letter-spacing: -.02em;
+}
+/* Muutos kolmena osana: nuoli, euromäärä, prosentti suluissa. */
+.candlr-muutos {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px;
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 17px; font-weight: 600;
+}
+.candlr-muutos.lasku { color: var(--virhe); }
+.candlr-muutos.nousu { color: var(--ok); }
+.candlr-muutos .candlr-suluissa { opacity: .85; }
+.candlr-nuoli-pieni { width: 15px; height: 15px; fill: currentColor; }
+
+/* Aikavälipillerit. Genren tunnistettavin merkki — siksi isoina. */
+.candlr-valit {
+  margin-left: auto;
+  display: flex; gap: 5px;
+  background: var(--paneeli-2);
+  border: 1px solid var(--viiva);
+  border-radius: 999px;
+  padding: 4px;
+}
+.candlr-vali {
+  border: none; background: transparent;
+  color: var(--himmea);
+  font-family: var(--fontti-mono);
+  font-size: 13px; font-weight: 600;
+  letter-spacing: .04em;
+  padding: 8px 15px;
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.candlr-vali.valittu { background: var(--paneeli-3); color: var(--teksti); }
+
+/* ── Kaavio ─────────────────────────────────────────────────────────────── */
+/* Kaavio venyy jäljelle jäävään tilaan. Kiinteä korkeus jättäisi
+   tyhjää ruudun alalaitaan, ja kaavio on kohtauksen pääasia — sen
+   kuuluu ottaa se tila. Canvas mittaa itsensä joka piirrolla. */
+.candlr-kaavio {
+  position: relative;
+  flex: 1;
+  min-height: 260px;
+  margin-top: 14px;
+}
+.candlr-kaavio canvas { width: 100%; height: 100%; display: block; }
+
+/* Vilkkuvat miinusmerkit ja tappioluvut kaavion päällä.
+   Välkyntäraja: enintään 3 koko ruudun muutosta sekunnissa, eikä
+   kylläinen punainen saa peittää suurta pinta-alaa. Nämä ovat pieniä
+   ja hajallaan, joten ne eivät ole koko ruudun välähdys. */
+.candlr-tappiot { position: absolute; inset: 0; pointer-events: none; }
+.candlr-tappio {
+  position: absolute;
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--virhe);
+  opacity: 0;
+  animation: candlr-tappio 2.4s steps(1) infinite;
+  text-shadow: 0 0 14px rgba(196,64,47,.5);
+}
+@keyframes candlr-tappio {
+  0%, 46%  { opacity: 0 }
+  50%, 66% { opacity: 1 }
+  70%      { opacity: .25 }
+  74%, 100%{ opacity: 0 }
+}
+
+/* ── Salkku ─────────────────────────────────────────────────────────────── */
+.candlr-salkku {
+  margin-top: 16px;
+  background: var(--paneeli);
+  border: 1px solid var(--viiva-2);
+  border-radius: 16px;
+  padding: 17px 19px;
+  display: flex; align-items: center; gap: 18px;
+}
+.candlr-salkku-otsikko {
+  font-family: var(--fontti-mono);
+  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--himmea-2);
+  margin-bottom: 6px;
+}
+.candlr-salkku-arvo {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 30px; font-weight: 600; line-height: 1;
+}
+.candlr-salkku-oikea { margin-left: auto; text-align: right; }
+
+/* ── Oma positio ────────────────────────────────────────────────────────
+   Tässä on kohtauksen tunnepuoli: paljonko oli ja paljonko on. */
+.candlr-positio {
+  margin-top: 14px;
+  background: var(--paneeli);
+  border: 1px solid var(--viiva-2);
+  border-radius: 16px;
+  padding: 17px 19px;
+}
+.candlr-positio-rivi {
+  display: flex; align-items: baseline;
+  padding: 9px 0;
+  font-size: 15px;
+}
+.candlr-positio-rivi + .candlr-positio-rivi { border-top: 1px solid var(--viiva); }
+.candlr-positio-rivi > span { color: var(--himmea); }
+.candlr-positio-rivi > b {
+  margin-left: auto;
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 17px; font-weight: 600;
+}
+.candlr-positio-rivi > b.lasku { color: var(--virhe); }
+.candlr-positio-rivi > b.nousu { color: var(--ok); }
+
+/* ── Tunnusluvut, kolme saraketta ──────────────────────────────────────── */
+.candlr-luvut {
+  margin-top: 14px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--viiva);
+  border: 1px solid var(--viiva);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.candlr-luku { background: var(--paneeli); padding: 13px 15px; }
+.candlr-luku span {
+  display: block;
+  font-family: var(--fontti-mono);
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--himmea-2);
+  margin-bottom: 5px;
+}
+.candlr-luku b {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 16px; font-weight: 600;
+  white-space: nowrap;
+}
+.candlr-luku b.lasku { color: var(--virhe); }
+.candlr-luku b.nousu { color: var(--ok); }
+
+/* ── Osto ja myynti ─────────────────────────────────────────────────────── */
+.candlr-toiminnot {
+  display: flex; gap: 12px;
+  padding: 16px 26px 0;
+}
+.candlr-nappi {
+  flex: 1;
+  padding: 18px;
+  border: none; border-radius: 14px;
+  font-family: var(--fontti);
+  font-size: 17px; font-weight: 600; letter-spacing: .06em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.candlr-osta { background: var(--candlr); color: #0B0F13; }
+.candlr-myy {
+  background: transparent;
+  border: 1px solid var(--viiva-2);
+  color: var(--teksti);
+}
+.candlr-nappi:active { filter: brightness(.85); }
+
+/* ── Välilehtipalkki ────────────────────────────────────────────────────
+   Kelluu sisällön päällä, sisältö vierii alta. Pystyasennossa tämä
+   korvaa sivupalkin — ks. REFERENSSIT.md kohta 1. */
+.candlr-valilehdet {
+  margin: 14px 26px 0;
+  display: flex;
+  background: rgba(21, 26, 33, .92);
+  border: 1px solid var(--viiva-2);
+  border-radius: 999px;
+  padding: 6px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.candlr-valilehti {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 9px 0;
+  border-radius: 999px;
+  color: var(--himmea-2);
+  font-size: 11.5px; font-weight: 600;
+}
+.candlr-valilehti.valittu { background: var(--paneeli-3); color: var(--candlr); }
+.candlr-valilehti svg { width: 19px; height: 19px; fill: currentColor; }
+
+/* ── Rakettibanneri ─────────────────────────────────────────────────────
+   Huijausmainen ilmoitus. Suunniteltu sen näköiseksi: liian innokas,
+   liian kirkas, painike liian iso. */
+.candlr-banneri {
+  margin-top: 16px;
+  flex: none;
+  background: linear-gradient(180deg, #1D3A26, #16301F);
+  border: 1px solid var(--ok);
+  border-radius: 16px;
+  padding: 17px 19px;
+  box-shadow: 0 10px 34px rgba(0,0,0,.55);
+  display: flex; align-items: center; gap: 16px;
+}
+.candlr-banneri-teksti { font-size: 17px; font-weight: 600; line-height: 1.35; }
+.candlr-banneri-nappi {
+  margin-left: auto; flex: none;
+  background: var(--ok); color: #0B0F13;
+  border: none; border-radius: 11px;
+  padding: 14px 22px;
+  font-family: var(--fontti);
+  font-size: 15px; font-weight: 600; letter-spacing: .06em;
+}
+.candlr-raketti-kuvake { width: 30px; height: 30px; fill: var(--ok); flex: none; }
+
+/* ── Ostolomake ─────────────────────────────────────────────────────────
+   Cue 5. Kohtauksen pointti: banneri käskee ostaa, ja tilillä on 3,31 €. */
+.candlr-osto-arkki {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  background: rgba(6, 8, 11, .66);
+  padding: 0 26px calc(var(--turva-ala) + 22px);
+  z-index: 6;
+}
+.candlr-osto-kortti {
+  background: var(--paneeli);
+  border: 1px solid var(--viiva-2);
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 -12px 44px rgba(0,0,0,.7);
+}
+.candlr-osto-otsikko {
+  display: flex; align-items: center; gap: 11px;
+  font-size: 19px; font-weight: 600;
+  margin-bottom: 22px;
+}
+.candlr-maara {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 58px; font-weight: 600; line-height: 1;
+  letter-spacing: -.02em;
+  text-align: center;
+  color: var(--himmea-2);
+}
+.candlr-maara-vastine {
+  text-align: center;
+  font-family: var(--fontti-mono);
+  font-size: 14px; color: var(--himmea-2);
+  margin-top: 9px;
+}
+
+/* Kate. Tämä on kohtauksen lähikuva — suurin yksittäinen typografinen
+   ratkaisu koko propissa. */
+.candlr-kate {
+  margin-top: 24px;
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 20px;
+  background: var(--paneeli-2);
+  border: 1px solid var(--viiva-2);
+  border-radius: 14px;
+}
+.candlr-kate-otsikko {
+  font-family: var(--fontti-mono);
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--himmea-2);
+}
+.candlr-kate-arvo {
+  margin-left: auto;
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 34px; font-weight: 600;
+  letter-spacing: -.01em;
+}
+.candlr-osto-vahvista {
+  width: 100%;
+  margin-top: 20px;
+  padding: 19px;
+  border: none; border-radius: 14px;
+  background: var(--paneeli-3);
+  color: var(--himmea-2);
+  font-family: var(--fontti);
+  font-size: 17px; font-weight: 600; letter-spacing: .06em;
+}
+.candlr-varoitus {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--virhe);
+}

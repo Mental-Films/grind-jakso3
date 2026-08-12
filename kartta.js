@@ -137,6 +137,23 @@
       }
     }
 
+    /* 2b. Taksitolppa ja noutoreitti.
+          Alvina seisoo vuoron alussa tolpalla, ei reitillä. Kun kyyti
+          hyväksytään, hän ajaa tolpalta noutopaikkaan — ja noutopaikka on
+          pääreitin alku. Reitti asetetaan ruudukon linjoille, jotta se kulkee
+          katuja pitkin eikä leikkaa kortteleiden läpi. */
+    var gi = (2 + Math.floor(r() * 3)) * (r() < 0.5 ? 1 : -1);
+    var gj = (2 + Math.floor(r() * 3)) * (r() < 0.5 ? 1 : -1);
+    var tolppa = kierra(gi * koko, gj * koko);
+    maasto.taksitolppa = { x: tolppa[0], y: tolppa[1] };
+
+    var kulma = kierra(0, gj * koko);
+    var noutoreitti = pehmenna([
+      [tolppa[0], tolppa[1]],
+      [kulma[0], kulma[1]],
+      [0, 0]
+    ], 2);
+
     /* 3. Korttelit — tummat laatikot katujen väliin. Ilman näitä kaupunki
           näyttää viivapiirrokselta, näiden kanssa rakennetulta. */
     for (var i2 = -ruutuja; i2 < ruutuja; i2++) {
@@ -197,7 +214,11 @@
     }
     maasto.vedet.push(vesi);
 
-    return { maasto: maasto, reitti: reitti, pituus: pituus(reitti) };
+    return {
+      maasto: maasto,
+      reitit: { matka: reitti, nouto: noutoreitti },
+      tolppaSuunta: Math.atan2(kulma[1] - tolppa[1], kulma[0] - tolppa[0])
+    };
   }
 
   /* ══ Kartta ═════════════════════════════════════════════════════════════ */
@@ -218,8 +239,16 @@
 
     var luotu = generoi({ siemen: this.asetukset.siemen || 3310 });
     this.maasto = luotu.maasto;
-    this.reitti = luotu.reitti;
-    this.reitinPituus = luotu.pituus;
+    this.reitit = luotu.reitit;
+    this.tolppaSuunta = luotu.tolppaSuunta;
+
+    /* Kaksi reittiä: 'nouto' = taksitolpalta noutopaikkaan, 'matka' = itse
+       kyyti. Kuljettaja ei näe reittiä ennen kuin kyyti on hyväksytty, joten
+       reitin piirto on erikseen kytkettävissä. */
+    this.reitti = this.reitit.matka;
+    this.reitinPituus = pituus(this.reitti);
+    this.naytaReitti = true;
+    this.pysakoity = false;
 
     this.matka = 0;                                   // metriä reitin alusta
     this.nopeus = (this.asetukset.nopeusKmh || 42) / 3.6;
@@ -243,11 +272,37 @@
     this.paivitaSijainti();
   }
 
+  /* Vaihtaa aktiivisen reitin. Matka nollautuu, koska uusi reitti alkaa
+     alusta — kuljettaja on sen alkupäässä. */
+  Kartta.prototype.asetaReitti = function (nimi) {
+    var uusi = this.reitit[nimi];
+    if (!uusi) return;
+    this.reittiNimi = nimi;
+    this.reitti = uusi;
+    this.reitinPituus = pituus(uusi);
+    this.matka = 0;
+    this.paivitaSijainti();
+  };
+
   Kartta.prototype.vari = function (avain, oletus) {
     return this.varit[avain] || oletus;
   };
 
   Kartta.prototype.paivitaSijainti = function () {
+    if (this.pysakoity && this.maasto.taksitolppa) {
+      /* Auto seisoo tolpan VIERESSÄ, ei sen päällä: hieman taaempana
+         kadun suunnassa ja reunaan päin. Muuten nuoli peittäisi merkin ja
+         sen nimen. */
+      var t = this.maasto.taksitolppa, k = this.tolppaSuunta;
+      this.auto = {
+        x: t.x - Math.cos(k) * 48 - Math.sin(k) * 9,
+        y: t.y - Math.sin(k) * 48 + Math.cos(k) * 9,
+        suunta: k
+      };
+      this.keskus = this.vapaa || { x: this.auto.x, y: this.auto.y };
+      this.suunta = this.auto.suunta;
+      return;
+    }
     var k = kohdassa(this.reitti, this.matka);
     this.auto = k;
     this.keskus = this.vapaa || { x: k.x, y: k.y };
@@ -427,7 +482,7 @@
     }, this);
 
     /* Reitti: ajettu osuus himmeänä, edessä oleva kirkkaana. */
-    if (this.reitti.length > 1) {
+    if (this.naytaReitti && !this.pysakoity && this.reitti.length > 1) {
       var jaettu = this.jaaReitti();
       var reittiLev = Math.max(10, 5 / this.zoom);
       c.strokeStyle = this.vari('reitti-ajettu', '#5A2A22');
@@ -444,6 +499,7 @@
 
     c.restore();
 
+    this.piirraTolppa(c, ax, ay);
     this.piirraKadunnimet(c, ax, ay);
     this.piirraAuto(c, ax, ay);
   };
@@ -468,6 +524,46 @@
     }
     if (!lisatty) takana.push(this.reitti[this.reitti.length - 1]);
     return { takana: takana, edessa: edessa };
+  };
+
+  /* Taksitolppa. Piirretään ruutukoordinaatistossa, jotta merkki pysyy
+     pystyssä kartan kääntyessä — kuten navigaattorien pysäkkimerkit. */
+  Kartta.prototype.piirraTolppa = function (c, ax, ay) {
+    var t = this.maasto.taksitolppa;
+    if (!t) return;
+    var s = this.ruudulle(t.x, t.y, ax, ay);
+    if (s.x < -40 || s.x > this.leveys + 40 || s.y < -40 || s.y > this.korkeus + 40) return;
+
+    c.save();
+    c.translate(s.x, s.y);
+
+    /* Pisara: ympyrä ja kärki alaspäin. */
+    c.beginPath();
+    c.arc(0, -13, 9.5, Math.PI, 0);
+    c.lineTo(0, 2);
+    c.closePath();
+    c.fillStyle = this.vari('tolppa', '#C79A3A');
+    c.fill();
+    c.lineWidth = 2;
+    c.strokeStyle = this.vari('maa', '#12161C');
+    c.stroke();
+
+    c.beginPath();
+    c.arc(0, -13, 3.6, 0, Math.PI * 2);
+    c.fillStyle = this.vari('maa', '#12161C');
+    c.fill();
+
+    if (this.tolpanNimi) {
+      c.font = '600 10.5px ' + (this.asetukset.fontti || 'system-ui, sans-serif');
+      c.textAlign = 'center';
+      c.textBaseline = 'top';
+      c.lineWidth = 3.5;
+      c.strokeStyle = this.vari('maa', '#12161C');
+      c.strokeText(this.tolpanNimi, 0, 6);
+      c.fillStyle = this.vari('tolppa', '#C79A3A');
+      c.fillText(this.tolpanNimi, 0, 6);
+    }
+    c.restore();
   };
 
   /* Kadunnimet piirretään ruutukoordinaatistossa eikä kartan mukana, jotta

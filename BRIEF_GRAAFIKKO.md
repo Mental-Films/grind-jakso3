@@ -228,6 +228,7 @@ piirtoon:
 | `tie-kuori` | tumma reunus tien alla |
 | `tie-paa` · `tie` · `tie-pieni` | tiehierarkia: valtaväylä, katu, metsätie |
 | `kadunnimi` | tekstin väri |
+| `tolppa` | taksitolpan merkki — Alvina on vuoron alussa parkissa tolpalla |
 | `reitti` · `reitti-kuori` · `reitti-ajettu` | punainen reittiviiva, ajettu osuus himmeänä |
 | `auto` · `auto-hehku` | ajoneuvon merkki |
 

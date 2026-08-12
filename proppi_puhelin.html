@@ -49,12 +49,24 @@
         fontti: 'system-ui, sans-serif'
       });
       kartta.kaanny = K.kaanny !== false;
+      /* Kahva konsolia varten: operaattori ja graafikko voivat tarkistaa
+         kartan tilan selaimen konsolista ilman koodin lukemista. */
+      GRIND.kartta = kartta;
     }
     juuri.appendChild(kangas);
+    kartta.tolpanNimi = ctx.S.hopp.taksitolppa;
+
+    /* Vuoron alussa Alvina seisoo taksitolpalla eikä reitillä. Reittiä ei
+       piirretä lainkaan ennen kuin kyyti on hyväksytty — kuljettaja ei näe
+       reittiä ennen sitä. */
+    kartta.pysakoity = !!asetukset.pysakoity;
+    kartta.naytaReitti = asetukset.naytaReitti !== false;
+    kartta.keskitaAutoon();
+
+    if (asetukset.reitti) kartta.asetaReitti(asetukset.reitti);
 
     var osuudet = (ctx.S.hopp.kartta && ctx.S.hopp.kartta.osuudet) || {};
-    if (asetukset.osuus != null) {
-      kartta.keskitaAutoon();
+    if (!asetukset.pysakoity && asetukset.osuus != null) {
       kartta.asetaOsuus(osuudet[asetukset.osuus] != null ? osuudet[asetukset.osuus] : 0.4);
     }
     kartta.liikkuu = !!asetukset.liikkuu;
@@ -68,7 +80,12 @@
      Mitataan päällä olevat kerrokset ja asetetaan nuoli näkyvän kaistan
      alakolmannekseen: edessä oleva reitti näkyy, eikä nuoli piiloudu. */
   function sovitaAuto(d) {
-    requestAnimationFrame(function () {
+    /* Kahdesti: requestAnimationFrame osuu heti kun sommittelu on valmis,
+       ajastin varmistaa asian jos ruutu ei ole edessä eikä rAF laukea. */
+    requestAnimationFrame(sovita);
+    setTimeout(sovita, 140);
+
+    function sovita() {
       if (!kartta || !kangas) return;
       var korkeus = kangas.clientHeight || window.innerHeight;
       if (!korkeus) return;
@@ -89,7 +106,7 @@
       }
       kartta.autoY = Math.min(0.94, Math.max(0.06, kartta.autoY));
       kartta.piirra();
-    });
+    }
   }
 
   function kuori(juuri) {
@@ -134,12 +151,12 @@
   var RUKSI        = '<svg class="hopp-nuoli" viewBox="0 0 24 24"><path d="M9.6 16.2 4.8 11.4l-1.4 1.4 6.2 6.2L21 7.6l-1.4-1.4z"/></svg>';
 
   /* ── Osat ────────────────────────────────────────────────────────────── */
-  function tilapalkki(ctx) {
+  function tilapalkki(ctx, tila) {
     var y = el('hopp-yla');
     y.appendChild(el('hopp-tila',
       '<div class="hopp-piste"></div>' +
       '<b>' + ctx.nimi('hopp') + '</b>' +
-      '<span style="color:var(--himmea);font-size:13px">' + ctx.S.hopp.otsikko + '</span>' +
+      '<span style="color:var(--himmea);font-size:13px">' + (tila || ctx.S.hopp.otsikko) + '</span>' +
       '<span class="hopp-ansiot">' + ctx.e2(ctx.S.luvut.ansiot) + ' €</span>'));
     return y;
   }
@@ -209,6 +226,20 @@
 
   function naytaVahvistus(pyynto, ctx) {
     var H = ctx.S.hopp;
+
+    /* Hyväksyntä irrottaa auton tolpalta: noutoreitti ilmestyy kartalle ja
+       Alvina lähtee ajamaan noutopaikkaan. Näin se menee oikeissakin
+       kyytisovelluksissa — reittiä ei näe ennen kuin kyyti on hyväksytty. */
+    if (kartta) {
+      kartta.pysakoity = false;
+      kartta.naytaReitti = true;
+      kartta.asetaReitti('nouto');
+      kartta.liikkuu = true;
+      kartta.piirra();
+    }
+    var tila = document.querySelector('.hopp-tila span');
+    if (tila) tila.textContent = H.hyvaksyttyTeksti;
+
     pyynto.classList.add('hopp-vahvistettu');
     pyynto.innerHTML = '';
 
@@ -319,8 +350,8 @@
       { id: 0, nimi: 'Vuoroloki', sovellus: 'hopp',
         piirra: function (juuri, ctx) {
           var d = kuori(juuri);
-          karttaan(d, ctx, { osuus: 'nouto' });
-          d.appendChild(tilapalkki(ctx));
+          karttaan(d, ctx, { pysakoity: true, naytaReitti: false });
+          d.appendChild(tilapalkki(ctx, ctx.S.hopp.tilaVapaana));
           karttatyokalu(d);
 
           var H = ctx.S.hopp, L = ctx.S.luvut;
@@ -350,14 +381,20 @@
         kosketus: true,
         piirra: function (juuri, ctx) {
           var d = kuori(juuri);
-          karttaan(d, ctx, { osuus: 'nouto' });
-          d.appendChild(tilapalkki(ctx));
+          karttaan(d, ctx, { pysakoity: true, naytaReitti: false });
+          d.appendChild(tilapalkki(ctx, ctx.S.hopp.tilaVapaana));
           karttatyokalu(d);
           d.appendChild(pyyntoKortti(ctx));
           sovitaAuto(d);
           GRIND.glitch.automaatti(ctx.S.hopp.rapsy);
+          this._edellinen = 0;
         },
-        tick: function (juuri, ctx) { paivitaRengas(juuri, ctx.S.luvut.ajastinSekunnit, ctx.t); } },
+        /* Ajastin pyörii koko ajan; kartta liikkuu vasta kun kyyti on
+           hyväksytty ja auto on lähtenyt tolpalta. */
+        tick: function (juuri, ctx) {
+          paivitaRengas(juuri, ctx.S.luvut.ajastinSekunnit, ctx.t);
+          ajoTick(this, juuri, ctx);
+        } },
 
       /* 2 — Matkustaja kyydissä. START RIDE piilottaa paneelin ja aloittaa
              navigoinnin. Alvina painaa itse. */
@@ -367,8 +404,8 @@
           var cue = this;
           cue._edellinen = 0;
           var d = kuori(juuri);
-          karttaan(d, ctx, { osuus: 'nouto' });
-          d.appendChild(tilapalkki(ctx));
+          karttaan(d, ctx, { reitti: 'matka', osuus: 0, naytaReitti: true });
+          d.appendChild(tilapalkki(ctx, ctx.S.hopp.tilaKyydissa));
           karttatyokalu(d);
 
           var H = ctx.S.hopp;
@@ -394,7 +431,7 @@
           var cue = this;
           cue._edellinen = 0;
           var d = kuori(juuri);
-          karttaan(d, ctx, { osuus: 'ajossa', liikkuu: true });
+          karttaan(d, ctx, { reitti: 'matka', osuus: 'ajossa', liikkuu: true });
           karttatyokalu(d);
           d.appendChild(ohjepalkki(ctx, ctx.S.hopp.ohjeet[0]));
           d.appendChild(ajopaneeli(ctx));
@@ -407,7 +444,7 @@
         hohto: { vari: 'punainen', voima: 3 },
         piirra: function (juuri, ctx) {
           var d = kuori(juuri);
-          karttaan(d, ctx, { osuus: 'metsatie' });
+          karttaan(d, ctx, { reitti: 'matka', osuus: 'metsatie' });
           karttatyokalu(d);
           var H = ctx.S.hopp;
           d.appendChild(ohjepalkki(ctx,
@@ -420,7 +457,7 @@
         kosketus: true,
         piirra: function (juuri, ctx) {
           var d = kuori(juuri);
-          karttaan(d, ctx, { osuus: 'metsatie' });
+          karttaan(d, ctx, { reitti: 'matka', osuus: 'metsatie' });
           d.appendChild(tilapalkki(ctx));
           karttatyokalu(d);
           d.appendChild(pyyntoKortti(ctx));
@@ -475,6 +512,7 @@
       siemen: uusi, zoom: kartta.zoom, nopeusKmh: vanha.nopeusKmh,
       kadut: vanha.kadut, varit: vanha.varit, fontti: vanha.fontti
     });
+    GRIND.kartta = kartta;
     GRIND.ilmoita('siemen ' + uusi);
   }
 

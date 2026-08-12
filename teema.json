@@ -62,6 +62,7 @@
     "tie":           "#2A323D",   // katu ja maantie
     "tie-pieni":     "#222932",   // metsätie
     "kadunnimi":     "#7A8694",
+    "tolppa":        "#C79A3A",   // taksitolpan merkki kartalla
     "reitti":        "#C4402F",
     "reitti-kuori":  "#7A1E14",
     "reitti-ajettu": "#4A241D",   // jo ajettu osuus, himmeä

@@ -125,6 +125,9 @@
   // ══ HOPP Partner — kyytipalvelu (suomi) ════════════════════════════════
   "hopp": {
     "otsikko":         "Kuljettaja",
+    "tilaVapaana":     "Vapaana · tolpalla",
+    "tilaKyydissa":    "Kyyti käynnissä",
+    "taksitolppa":     "Kivihaanväylä",
     "vuoroOtsikko":    "Työvuoro käynnissä",
     "ansiotOtsikko":   "Vuoron ansiot",
     "kyyditOtsikko":   "Kyytejä",
@@ -204,8 +207,12 @@
 
       // Missä kohtaa reittiä ollaan kussakin cuessa, 0–1.
       // 0 = kaupunki, 0,5 = maantie, 0,9+ = metsätie
+      // Missä kohtaa MATKAREITTIÄ ollaan kussakin cuessa, 0–1.
+      // 0 = noutopaikka, 0,5 = maantie, 0,9+ = metsätie.
+      //
+      // Cuet 0 ja 1 eivät käytä näitä: Alvina on taksitolpalla eikä
+      // reitillä. Reitti ilmestyy vasta kun kyyti hyväksytään.
       "osuudet": {
-        "nouto": 0.06,
         "ajossa": 0.42,
         "metsatie": 0.93
       },

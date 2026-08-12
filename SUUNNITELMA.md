@@ -154,9 +154,9 @@ Cue 4 on tila, ei siirtymä: Alvina *herää* vihreään ruutuun. Siirtymäversi
 
 | Cue | Ruudulla |
 |:---:|---|
-| **0** | **Vuoroloki.** Työvuoro **18 tuntia**. Ansiot, hyväksymisprosentti |
-| **1** | **Räpsy + ajastin.** Ruutu häiriöityy. Hyväksymisajastin sykkii ja laskee sekunteja |
-| **2** | **Matkustaja kyydissä.** Navigaattori aukeaa, **START RIDE** -painike. Alvina painaa itse |
+| **0** | **Vuoroloki.** Alvina on parkissa **taksitolpalla**. Kartalla tolpan merkki, ei reittiä. Työvuoro **18 tuntia**, ansiot, hyväksymisprosentti |
+| **1** | **Räpsy + ajastin.** Yhä tolpalla. Ruutu häiriöityy, hyväksymisajastin sykkii. **HYVÄKSY** irrottaa auton tolpalta: noutoreitti ilmestyy ja Alvina lähtee hakemaan kyytiläisen |
+| **2** | **Matkustaja kyydissä.** Ollaan noutopaikassa, matkareitti näkyy. **START RIDE** piilottaa paneelin ja aloittaa navigoinnin. Alvina painaa itse |
 | **3** | **Ajossa.** GPS-näkymä, punainen reittiviiva etenee kartalla |
 | **4** | **Metsätie.** Näytölle: **KÄÄNNY YMPÄRI** |
 | **5** | **Uusi kyytipyyntö.** Lähellä oleva asiakas, hyvä provikkaennuste, laskeva ajastin. Alvina painaa **HYVÄKSY** |
@@ -334,6 +334,23 @@ kaupungin samalla tyylillä, sama luku antaa aina saman kartan.
 Reitti syntyy ensin ja tiestö sen ympärille, joten auto on aina tiellä. Reitti
 kulkee kaupungista maantielle ja päättyy metsätiehen, joka ohenee kartalla —
 käännekohta on luettavissa kuvasta ennen kuin teksti kertoo sen.
+
+### Taksitolppa ja kaksi reittiä
+
+Alvina on vuoron alussa parkissa taksitolpalla eikä reitillä. Se näkyy kartalla
+kolmena asiana: **tolpan merkki**, auto sen vieressä pysäköitynä, ja **ei
+reittiviivaa lainkaan** — kuljettaja ei näe reittiä ennen kuin kyyti on
+hyväksytty. Näin se menee oikeissakin kyytisovelluksissa.
+
+Kartalla on siksi kaksi reittiä:
+
+| Reitti | Mistä mihin | Milloin näkyy |
+|---|---|---|
+| `nouto` | taksitolpalta noutopaikkaan | HYVÄKSY-painalluksesta eteenpäin |
+| `matka` | noutopaikasta metsätielle | cuesta 2 eteenpäin |
+
+Noutoreitti asetetaan katuruudukon linjoille, jotta se kulkee katuja pitkin
+eikä leikkaa kortteleiden läpi.
 
 ### Operaattorin karttatyökalu
 

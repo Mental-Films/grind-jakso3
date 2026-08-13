@@ -59,9 +59,11 @@
     "sijoitettu":       3310,      // € — paljonko Alvina on laittanut sisään
     "omistus":          9993.20,   // RPR
 
-    "eraantyneet":      1331.00,   // TABB, erääntynyt yhteensä
-    "myohastymismaksu": 33.00,     // TABB
-    "tabbErat":         4,         // montako erää per ostos
+    // TABB:n erääntynyt kokonaissumma EI ole oma lukunsa vaan lasketaan
+    // riveistä: erääntyneiden rivien maksamattomat erät yhteensä. Rivit on
+    // viritetty osumaan 1 331,00 €:oon. Jos muutat riviä, summa muuttuu
+    // mukana eikä voi ajautua ristiriitaan.
+    "myohastymismaksu": 33.00,     // € — kiinteä myöhästymismaksu
 
     "hyvaksymisprosentti": 83.1,   // HOPP, kuljettajan hyväksymisaste
     "ajastinSekunnit":  31,        // HOPP, aika hyväksyä kyyti
@@ -131,8 +133,9 @@
     "runkoVihje":      "Body (optional)",
     "julkaisuNappi":   "Post",
     "peruutaNappi":    "Cancel",
-    "kommentitSana":   "comments",
+    "kommentitSana":   "",
     "jakoSana":        "Share",
+    "merkinnat":       { "tappio": "LOSS", "apua": "HELP", "puhetta": "DISCUSSION" },
 
     // Otsikko, jonka Alvina kirjoittaa. Tulee ruudulle merkki kerrallaan
     // näyttelijän näppäilyn tahdissa — mihin tahansa hän osuukin.
@@ -143,16 +146,19 @@
     "kirjoitusvirhe":  { "kohta": 31, "vaarin": "tankinh", "oikein": "tanking" },
 
     // Taustalla näkyvä lista. Käyttäjänimet ovat keksittyjä ja tarkistettuja.
+    // Merkinta: tappio | apua | puhetta (tai jätä pois)
+    // kuva: true lisää riville pikkukuvan — älä laita kaikkiin, tasapaksu
+    // lista lukee sähköpostina eikä foorumina.
     "postaukset": [
-      { "kayttaja": "u/liquidated_again", "aika": "4h",  "otsikko": "Lost 3 years of savings in 40 minutes", "aanet": 1331, "kommentit": 208 },
-      { "kayttaja": "u/nightshiftnancy",  "aika": "7h",  "otsikko": "Anyone else can't sleep because of this?", "aanet": 892, "kommentit": 331 },
-      { "kayttaja": "u/theexitliquidity", "aika": "11h", "otsikko": "It's not a loss until you sell (cope thread)", "aanet": 447, "kommentit": 96 },
-      { "kayttaja": "u/margin_call_mike", "aika": "14h", "otsikko": "My wife doesn't know yet", "aanet": 3310, "kommentit": 512 },
-      { "kayttaja": "u/exit_liquidity_",   "aika": "16h", "otsikko": "Down 90% and the withdrawal button is greyed out", "aanet": 1104, "kommentit": 187 },
-      { "kayttaja": "u/nofloor_nocap",     "aika": "19h", "otsikko": "Chart looks like a waterfall. Is this normal?", "aanet": 664,  "kommentit": 129 },
-      { "kayttaja": "u/one_more_trade",    "aika": "21h", "otsikko": "I keep telling myself just one more trade", "aanet": 2218, "kommentit": 331 },
-      { "kayttaja": "u/tetherhands",       "aika": "23h", "otsikko": "PSA: the guy sliding into your DMs is not going to fix this", "aanet": 973,  "kommentit": 244 },
-      { "kayttaja": "u/riskmgmt_never",    "aika": "1d",  "otsikko": "Nobody talks about what this does to you at 3am", "aanet": 1331, "kommentit": 208 }
+      { "kayttaja": "u/liquidated_again", "aika": "4 t",  "merkinta": "tappio",  "kuva": true,  "otsikko": "Lost 3 years of savings in 40 minutes", "aanet": 1331, "kommentit": 208 },
+      { "kayttaja": "u/nightshiftnancy",  "aika": "7 t",  "merkinta": "apua",                   "otsikko": "Anyone else can't sleep because of this?", "aanet": 892, "kommentit": 331 },
+      { "kayttaja": "u/theexitliquidity", "aika": "11 t", "merkinta": "puhetta", "kuva": true,  "otsikko": "It's not a loss until you sell (cope thread)", "aanet": 447, "kommentit": 96 },
+      { "kayttaja": "u/margin_call_mike", "aika": "14 t", "merkinta": "tappio",                 "otsikko": "My wife doesn't know yet", "aanet": 3310, "kommentit": 512 },
+      { "kayttaja": "u/exit_liquidity_",  "aika": "16 t", "merkinta": "apua",    "kuva": true,  "otsikko": "Down 90% and the withdrawal button is greyed out", "aanet": 1104, "kommentit": 187 },
+      { "kayttaja": "u/nofloor_nocap",    "aika": "19 t", "merkinta": "puhetta",                "otsikko": "Chart looks like a waterfall. Is this normal?", "aanet": 664, "kommentit": 129 },
+      { "kayttaja": "u/one_more_trade",   "aika": "21 t", "merkinta": "tappio",  "kuva": true,  "otsikko": "I keep telling myself just one more trade", "aanet": 2218, "kommentit": 331 },
+      { "kayttaja": "u/tetherhands",      "aika": "23 t", "merkinta": "apua",                   "otsikko": "PSA: the guy sliding into your DMs is not going to fix this", "aanet": 973, "kommentit": 244 },
+      { "kayttaja": "u/riskmgmt_never",   "aika": "1 pv", "merkinta": "puhetta",                "otsikko": "Nobody talks about what this does to you at 3am", "aanet": 1331, "kommentit": 208 }
     ]
   },
 
@@ -164,18 +170,26 @@
     "maksettuMerkki":  "PAID",
     "yhteensaOtsikko": "Total overdue",
     "maksuOtsikko":    "Late fees",
-    "maksaNappi":      "Pay now",
+    "maksaNappi":      "PAY NOW",
+    "osioOtsikko":     "Payment plans",
+    "osioMaara":       "7 open",
+    "valilehdet":      ["Payments", "Shop", "Wallet", "Profile"],
+    "valilehtiValittu": 0,
+    "profiili":        "A",
 
-    // Ostosrivit. Lisää, poista ja järjestä vapaasti — ruutu sopeutuu.
+    // Ostosrivit. "erat" on maksusuunnitelman erien määrä ja "maksettu"
+    // montako niistä on hoidettu — nämä kaksi tekevät rivistä
+    // maksusuunnitelman eivätkä laskua. Erän summa lasketaan: summa / erat.
+    //
     // "kauppias" viittaa nimet-lohkoon, joten nimen vaihto menee läpi tästäkin.
     "rivit": [
-      { "kauppias": "novex",   "tuote": "NOVEX 14 Pro 256 GB",     "summa": 1099.00, "erapaiva": "12 Mar", "tila": "eraantynyt" },
-      { "kauppias": "nordkap", "tuote": "Wool parka, black",       "summa": 449.00,  "erapaiva": "28 Mar", "tila": "eraantynyt" },
-      { "kauppias": "nibbl",   "tuote": "Order #8841 · late night", "summa": 43.10,  "erapaiva": "02 Apr", "tila": "eraantynyt" },
-      { "kauppias": "nibbl",   "tuote": "Order #8903 · late night", "summa": 38.50,  "erapaiva": "04 Apr", "tila": "eraantynyt" },
-      { "kauppias": "nibbl",   "tuote": "Order #9014 · late night", "summa": 51.20,  "erapaiva": "09 Apr", "tila": "eraantynyt" },
-      { "kauppias": "nibbl",   "tuote": "Order #9122 · late night", "summa": 29.90,  "erapaiva": "16 Apr", "tila": "avoin" },
-      { "kauppias": "novex",   "tuote": "Screen protector",         "summa": 19.90,  "erapaiva": "16 Apr", "tila": "maksettu" }
+      { "kauppias": "novex",   "tuote": "14 Pro 256 GB",            "summa": 1199.00, "erat": 4, "maksettu": 1, "erapaiva": "12.3.", "tila": "eraantynyt" },
+      { "kauppias": "nordkap", "tuote": "Wool parka, black",        "summa": 449.00,  "erat": 4, "maksettu": 1, "erapaiva": "28.3.", "tila": "eraantynyt" },
+      { "kauppias": "nibbl",   "tuote": "Order #8841 · late night", "summa": 43.10,   "erat": 4, "maksettu": 2, "erapaiva": "2.4.",  "tila": "eraantynyt" },
+      { "kauppias": "nibbl",   "tuote": "Order #8903 · late night", "summa": 38.50,   "erat": 4, "maksettu": 1, "erapaiva": "4.4.",  "tila": "eraantynyt" },
+      { "kauppias": "nibbl",   "tuote": "Order #9014 · late night", "summa": 44.57,   "erat": 4, "maksettu": 0, "erapaiva": "9.4.",  "tila": "eraantynyt" },
+      { "kauppias": "nibbl",   "tuote": "Order #9122 · late night", "summa": 29.90,   "erat": 4, "maksettu": 2, "erapaiva": "16.4.", "tila": "avoin" },
+      { "kauppias": "novex",   "tuote": "Screen protector",         "summa": 19.90,   "erat": 4, "maksettu": 4, "erapaiva": "16.4.", "tila": "maksettu" }
     ]
   },
 

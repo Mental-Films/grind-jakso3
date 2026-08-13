@@ -161,6 +161,15 @@ python3 -m http.server 8731
 
 Sitten `http://localhost:8731/`.
 
+> **Kehityksen aikana selaimen oma HTTP-välimuisti valehtelee.** `http.server`
+> ei lähetä cache-otsakkeita, jolloin selain tarjoilee vanhaa CSS:ää eikä käy
+> palvelimella lainkaan — muutos ei näy vaikka tiedosto on oikein. Se on eri
+> välimuisti kuin service workerin oma, eikä `?tuore=1` auta siihen.
+>
+> Service worker hakee nyt `cache: 'no-cache'` -lipulla, mikä korjaa asian
+> asennetussa propissa. Paikallisessa kehityksessä helpoin varmistus on
+> palvelin, joka lähettää `Cache-Control: no-store`.
+
 Julkaisu: GitHub Pages on jo päällä. `git push` riittää — Pages rakentaa uuden
 version noin minuutissa. `robots.txt` ja `noindex` pitävät sivun poissa
 hakukoneista.
@@ -177,7 +186,7 @@ nappaimisto.js          Haamunäppäimistö — mikä tahansa näppäin vie teks
 glitch.js · glitch.css  Räpsy — neljä tyyppiä, siirretty aiemmasta propista
 runko.css               Rakenteen tyylit
 hopp.css                HOPP Partnerin ulkoasu
-candlr.css · grumbl.css CANDLR:n ja GRUMBL:n ulkoasu
+candlr.css · grumbl.css · tabb.css   sovellusten ulkoasut
 teema.json              Värit ja kirjasimet
 sisalto.json            Teksti, numerot ja nimet
 assets/                 Grafiikka

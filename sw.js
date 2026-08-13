@@ -8,7 +8,7 @@
  * Ajossa oleva versionumero näkyy propin ohjauspalkissa.
  */
 
-var VERSIO = 'grind3-v0.6.0';
+var VERSIO = 'grind3-v0.8.0';
 
 /* Pakolliset. Jos yksikin puuttuu, asennus epäonnistuu ja se on oikein —
    silloin proppi ei väitä olevansa offline-valmis. */
@@ -24,6 +24,7 @@ var PAKOLLISET = [
   'kaavio.js',
   'nappaimisto.js',
   'grumbl.css',
+  'tabb.css',
   'candlr.css',
   'glitch.js',
   'glitch.css',
@@ -107,9 +108,22 @@ self.addEventListener('fetch', function (t) {
 
   t.respondWith(
     caches.match(pyynto, { ignoreSearch: true }).then(function (osuma) {
+      /* cache: 'no-cache' pakottaa selaimen tarkistamaan palvelimelta.
+         Ilman tätä verkko-ensin ei auta mitään: selaimen OMA HTTP-välimuisti
+         vastaa fetchiin vanhalla tiedostolla eikä pyyntö koskaan lähde
+         verkkoon. Tämä on eri välimuisti kuin service workerin oma. */
+      var haettava;
+      try {
+        haettava = pyynto.mode === 'navigate'
+          ? new Request(pyynto.url, { cache: 'no-cache', credentials: 'same-origin' })
+          : new Request(pyynto, { cache: 'no-cache' });
+      } catch (e) {
+        haettava = pyynto;
+      }
+
       var verkosta = new Promise(function (valmis, hylkaa) {
         var ajastin = setTimeout(function () { hylkaa(new Error('aikakatkaisu')); }, AIKAKATKAISU);
-        fetch(pyynto).then(function (vastaus) {
+        fetch(haettava).then(function (vastaus) {
           clearTimeout(ajastin);
           if (vastaus && vastaus.ok) {
             var kopio = vastaus.clone();

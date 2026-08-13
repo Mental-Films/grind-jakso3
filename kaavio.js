@@ -1,6 +1,7 @@
 /* GRIND jakso 3 — kurssikaavio.
  *
- * CANDLR:n kaavio canvakselle. Kaksi tilaa: romahdus ja raketti.
+ * CANDLR:n kaavio canvakselle. Kolme tilaa: romahdus, raketti ja
+ * loppukuvan jyrkkä romahdus.
  *
  * Muoto tulee käsikirjoituksesta: "verenpunainen sahalaitakäyrä lävistää
  * asteikon diagonaalisesti". Käyrä kulkee siis kulmasta kulmaan — se ei ole
@@ -42,38 +43,115 @@
   };
 
   /* ── Data ────────────────────────────────────────────────────────────────
-     Trendi on suora kulmasta kulmaan. Päälle sahalaita: vuorotteleva
-     nousu ja lasku, jonka amplitudi vaihtelee. Pelkkä satunnaiskohina
-     näyttäisi sumealta — sahalaita näyttää kurssilta. */
+     Kurssi ei heilu tasaisesti. Ensimmäinen versio oli säännöllinen
+     sahalaita — joka toinen piste ylös, joka toinen alas — ja se lukee heti
+     koristeena eikä markkinana.
+
+     Oikeassa kurssikäyrässä on kolme asiaa, joita säännöllisessä
+     sahalaidassa ei ole:
+
+       1. LIIKEMÄÄRÄ. Suunta jatkuu useamman pisteen ajan ennen kääntymistä,
+          joten syntyy nousuja ja laskuja eikä pelkkää värinää.
+       2. VOLATILITEETTIRYPPÄÄT. Rauhallisia jaksoja ja hurjia jaksoja
+          vuorotellen. Amplitudi ei ole vakio.
+       3. SHOKIT. Yksittäisiä isoja piikkejä, jotka rikkovat rytmin.
+
+     Satunnaiskulku tuottaa kaikki kolme, mutta se ajautuu minne sattuu.
+     Siksi kulku suoristetaan: siitä vähennetään sen oma lineaarinen ajautuma,
+     minkä jälkeen päälle lisätään haluttu trendi. Näin käyrä alkaa ja päättyy
+     siellä missä kohtaus vaatii, mutta välissä se elää.
+
+     Kaikki on siemennettyä, joten sama cue piirtää saman käyrän joka otossa. */
   Kaavio.prototype.generoi = function () {
     var siirto = this.suunta === 'nousu' ? 7000 : (this.suunta === 'lasku-jyrkka' ? 4400 : 0);
     var r = siemen((this.a.siemen || 331) + siirto);
-    var n = this.a.pisteita || 132;
-    var p = [];
+    var n = this.a.pisteita || 150;
 
+    /* 1. Satunnaiskulku liikemäärällä, vaihtelevalla volatiliteetilla ja
+          satunnaisilla shokeilla. */
+    var kulku = new Array(n);
+    var arvo = 0, vauhti = 0, vola = 0.6;
     for (var i = 0; i < n; i++) {
       var x = i / (n - 1);
+
+      /* Volatiliteetti vaeltaa ja purskahtaa. Loppua kohti hermostuneempi. */
+      vola += (r() - 0.5) * 0.34;
+      if (r() < 0.05) vola += r() * 1.7;
+      vola = Math.max(0.28, Math.min(2.6, vola)) * (0.65 + x * 0.8);
+
+      var isku = (r() - 0.5) * 2 * vola;
+      if (r() < 0.035) isku *= 2.6 + r() * 2.2;      // shokki
+
+      /* Liikemäärä: edellinen liike jatkuu osittain. Tästä syntyvät
+         useamman pisteen mittaiset nousut ja laskut. */
+      vauhti = vauhti * 0.32 + isku * 0.68;
+      arvo += vauhti;
+      kulku[i] = arvo;
+    }
+
+    /* 2. Poistetaan kulun oma ajautuma, jotta trendi määrää suunnan. */
+    var alkuArvo = kulku[0], loppuArvo = kulku[n - 1];
+    for (var j = 0; j < n; j++) {
+      kulku[j] -= alkuArvo + (loppuArvo - alkuArvo) * (j / (n - 1));
+    }
+
+    /* 2b. Ylipäästö: vähennetään kulun oma pitkä aalto.
+           Pelkkä ajautuman poisto jättää kulun yhdeksi isoksi kaareksi
+           trendin toiselle puolelle — kurssi ei heilu trendin YMPÄRILLÄ
+           vaan kaartaa sen ali. Liukuvan keskiarvon vähentäminen jättää
+           jäljelle sen taajuuden, joka lukee markkinaliikkeenä. */
+    var ikkuna = Math.max(9, Math.round(n / 5));
+    var tasoitettu = new Array(n);
+    for (var t = 0; t < n; t++) {
+      var alkuI = Math.max(0, t - (ikkuna >> 1));
+      var loppuI = Math.min(n - 1, t + (ikkuna >> 1));
+      var sum = 0;
+      for (var q = alkuI; q <= loppuI; q++) sum += kulku[q];
+      tasoitettu[t] = sum / (loppuI - alkuI + 1);
+    }
+    for (var u = 0; u < n; u++) kulku[u] -= tasoitettu[u];
+
+    /* Kiinnitetään päätepisteet trendille: viimeinen piste on nykyhinta,
+       joka näkyy kaavion lipukkeessa.
+
+       Tämä tehdään kaventamalla eikä vähentämällä päiden kautta vedettyä
+       suoraa. Liukuva keskiarvo vääristyy reunoilla — ikkuna on siellä
+       katkaistu — joten päätepisteet jäävät poikkeuksellisen korkeiksi, ja
+       niiden kautta vedetyn suoran vähentäminen painaisi KOKO käyrän trendin
+       alapuolelle. Silloin kurssi ei heilu trendin ympärillä vaan kaartaa
+       sen ali, mikä oli juuri se, mikä piti korjata. */
+    var kavennus = Math.max(3, Math.round(n / 28));
+    for (var w = 0; w < kavennus; w++) {
+      var kerta = w / kavennus;
+      kulku[w] *= kerta;
+      kulku[n - 1 - w] *= kerta;
+    }
+
+    /* 3. Skaalataan hajonnan mukaan, EI maksimin. Maksimilla skaalaaminen
+          antaa yhden shokin litistää koko muun käyrän, jolloin trendi jyrää
+          kohinan yli ja jäljelle jää sileä viiva. Hajonnalla skaalattuna
+          tyypillinen heilahtelu pysyy näkyvänä ja shokit saavat jäädä
+          isoiksi — ne rajautuvat vasta ruudun reunaan. */
+    var summa = 0;
+    for (var h = 0; h < n; h++) summa += kulku[h] * kulku[h];
+    var hajonta = Math.sqrt(summa / n);
+    var kerroin = hajonta > 0 ? (this.a.heilahtelu || 0.115) / hajonta : 0;
+
+    var p = [];
+    for (var k = 0; k < n; k++) {
+      var xx = k / (n - 1);
       var trendi;
-
       if (this.suunta === 'nousu') {
-        /* Raketti: loiva alku, jyrkkä loppu. Käyrä lähtee alhaalta
-           vasemmalta ja poistuu ylhäältä oikealta. */
-        trendi = 0.88 - Math.pow(x, 2.6) * 0.80;
+        /* Raketti: loiva alku, jyrkkä loppu. */
+        trendi = 0.86 - Math.pow(xx, 2.6) * 0.76;
       } else if (this.suunta === 'lasku-jyrkka') {
-        /* Jyrkkä romahdus: kurssi pitää pintansa ja pettää sitten kerralla.
-           Tämä on pumppauksen jälkeinen tila — eri kuva kuin cue 0:n tasainen
-           valuminen, mikä on tärkeää leikkauksessa. */
-        trendi = 0.08 + Math.pow(x, 3.6) * 0.88;
+        /* Kurssi pitää pintansa ja pettää sitten kerralla. */
+        trendi = 0.10 + Math.pow(xx, 3.6) * 0.84;
       } else {
-        /* Romahdus: suora diagonaali ylhäältä vasemmalta alas oikealle. */
-        trendi = 0.12 + x * 0.76;
+        /* Tasainen valuminen kulmasta kulmaan. */
+        trendi = 0.14 + xx * 0.72;
       }
-
-      /* Sahalaita: joka toinen piste vastakkaiseen suuntaan. Amplitudi
-         kasvaa loppua kohti — markkina käy hermostuneemmaksi. */
-      var terava = (i % 2 === 0 ? 1 : -1) * (0.012 + r() * 0.030) * (0.5 + x);
-      var aalto = (r() - 0.5) * 0.05;
-      p.push({ x: x, y: Math.max(0.03, Math.min(0.97, trendi + terava + aalto)) });
+      p.push({ x: xx, y: Math.max(0.02, Math.min(0.98, trendi + kulku[k] * kerroin)) });
     }
     this.pisteet = p;
   };

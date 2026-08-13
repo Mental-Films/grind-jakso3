@@ -1,0 +1,201 @@
+/* TABB — osta nyt, maksa myöhemmin. iPad pysty 820 pt.
+ *
+ * Rakenne: ks. REFERENSSIT.md kohta 4. Olennaisin havainto sieltä on se,
+ * että rivi ei ole lasku vaan MAKSUSUUNNITELMA. Rivillä näkyy erälaskuri
+ * ja yhden erän summa, ei pelkkää kokonaissummaa. Se yksityiskohta erottaa
+ * osamaksusovelluksen laskusovelluksesta.
+ *
+ * Erääntymisilme on vapaasti keksitty: alan sovellukset eivät näytä
+ * maksunäkymiään ulospäin, joten tavaramerkkiriskiä ei tässä ole.
+ *
+ * Kaikki mitat ja tekstikoot tulevat teema.json:ista.
+ */
+
+.tabb {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  background: var(--pohja);
+  color: var(--teksti);
+  font-family: var(--fontti);
+  --tabb: var(--tunnus, #A8746A);
+  padding:
+    calc(var(--turva-yla) + var(--palkki-tila, 0px)) var(--turva-oikea)
+    var(--turva-ala) var(--turva-vasen);
+}
+.tabb-sisus {
+  flex: 1;
+  overflow: hidden;
+  padding: 0 var(--vali-xl);
+  display: flex; flex-direction: column;
+}
+
+/* ── Yläpalkki ──────────────────────────────────────────────────────────── */
+.tabb-yla {
+  display: flex; align-items: center; gap: var(--vali-m);
+  padding: var(--vali-l) 0 var(--vali-m);
+}
+.tabb-merkki {
+  font-size: var(--teksti-otsikko); font-weight: 600;
+  letter-spacing: .16em;
+  color: var(--tabb);
+}
+.tabb-profiili {
+  margin-left: auto;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--paneeli-3);
+  display: grid; place-items: center;
+  font-size: var(--teksti-leipa); font-weight: 600;
+  color: var(--himmea);
+}
+
+/* ── Erääntynyt yhteensä ────────────────────────────────────────────────
+   Kohtauksen luettava luku. Punainen reunus ei ole koriste vaan se, mikä
+   erottaa tämän tavallisesta saldokortista. */
+.tabb-kortti {
+  background: var(--paneeli);
+  border: var(--reuna) solid var(--virhe);
+  border-radius: var(--kaarre-l);
+  padding: var(--vali-l) var(--vali-l) var(--vali-m);
+}
+.tabb-kortti-otsikko {
+  font-family: var(--fontti-mono);
+  font-size: var(--teksti-mikro);
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--virhe);
+  margin-bottom: var(--vali-s);
+}
+.tabb-summa {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--teksti-iso); font-weight: 600; line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--virhe);
+}
+.tabb-kortti-rivi {
+  display: flex; align-items: baseline;
+  margin-top: var(--vali-m);
+  padding-top: var(--vali-m);
+  border-top: var(--reuna) solid var(--viiva);
+  font-size: var(--teksti-leipa);
+  color: var(--himmea);
+}
+.tabb-kortti-rivi b {
+  margin-left: auto;
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--teksti-vali); font-weight: 600;
+  color: var(--varoitus);
+}
+
+/* ── Osiootsikko ────────────────────────────────────────────────────────── */
+.tabb-osio {
+  display: flex; align-items: baseline;
+  margin: var(--vali-l) 0 var(--vali-s);
+  font-family: var(--fontti-mono);
+  font-size: var(--teksti-mikro);
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--himmea-2);
+}
+.tabb-osio span { margin-left: auto; }
+
+/* ── Maksusuunnitelmarivit ─────────────────────────────────────────────── */
+.tabb-lista { flex: 1; overflow: hidden; }
+.tabb-rivi {
+  display: flex; align-items: center; gap: var(--vali-m);
+  padding: var(--vali-m) 0;
+  border-bottom: var(--reuna) solid var(--viiva);
+}
+.tabb-kauppias {
+  width: 52px; height: 52px;
+  flex: none;
+  border-radius: var(--kaarre-s);
+  background: var(--paneeli-2);
+  border: var(--reuna) solid var(--viiva);
+  display: grid; place-items: center;
+  font-family: var(--fontti-mono);
+  font-size: var(--teksti-pieni); font-weight: 600;
+  color: var(--himmea);
+  overflow: hidden;
+}
+.tabb-kauppias img { width: 100%; height: 100%; display: block; }
+.tabb-tiedot { flex: 1; min-width: 0; }
+.tabb-tuote {
+  font-size: var(--teksti-leipa); font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tabb-erarivi {
+  display: flex; align-items: center; gap: var(--vali-s);
+  margin-top: 6px;
+  font-family: var(--fontti-mono);
+  font-size: 12px;
+  color: var(--himmea-2);
+}
+
+/* Erälaskurin pisteet. Tämä on se, mikä tekee rivistä maksusuunnitelman
+   eikä laskua — ilman sitä sovellus lukee laskusovelluksena. */
+.tabb-erat { display: flex; gap: 4px; }
+.tabb-era {
+  width: 16px; height: 4px; border-radius: 2px;
+  background: var(--viiva-2);
+}
+.tabb-era.maksettu { background: var(--himmea); }
+.tabb-era.myohassa { background: var(--virhe); }
+
+.tabb-oikea { text-align: right; flex: none; }
+.tabb-erasumma {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--teksti-vali); font-weight: 600;
+}
+.tabb-erapaiva {
+  font-family: var(--fontti-mono);
+  font-size: 12px; color: var(--himmea-2);
+  margin-top: 4px;
+}
+
+.tabb-tila {
+  flex: none;
+  min-width: 104px;
+  text-align: center;
+  font-family: var(--fontti-mono);
+  font-size: 10.5px; font-weight: 600; letter-spacing: .1em;
+  padding: 7px 10px;
+  border-radius: var(--kaarre-pilleri);
+}
+.tabb-tila.eraantynyt { background: rgba(196,64,47,.18);  color: var(--virhe); }
+.tabb-tila.avoin      { background: rgba(199,154,58,.16); color: var(--varoitus); }
+.tabb-tila.maksettu   { background: var(--paneeli-2);     color: var(--himmea-2); }
+
+/* ── Maksupainike ja välilehdet ────────────────────────────────────────── */
+.tabb-maksa {
+  margin: var(--vali-m) var(--vali-xl) 0;
+  padding: 18px;
+  border: none; border-radius: var(--kaarre-m);
+  background: var(--tabb);
+  color: #0B0F13;
+  font-family: var(--fontti);
+  font-size: var(--teksti-vali); font-weight: 600; letter-spacing: .06em;
+}
+.tabb-maksa:active { filter: brightness(.85); }
+
+.tabb-valilehdet {
+  margin: var(--vali-m) var(--vali-xl) 0;
+  display: flex;
+  background: rgba(21, 26, 33, .92);
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-pilleri);
+  padding: 6px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.tabb-valilehti {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 9px 0;
+  border-radius: var(--kaarre-pilleri);
+  color: var(--himmea-2);
+  font-size: 11.5px; font-weight: 600;
+}
+.tabb-valilehti.valittu { background: var(--paneeli-3); color: var(--tabb); }
+.tabb-valilehti svg { width: 19px; height: 19px; fill: currentColor; }

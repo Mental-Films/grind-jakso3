@@ -300,7 +300,7 @@ nappaimisto.js          Haamunäppäimistö — mikä tahansa näppäin vie teks
 glitch.js · glitch.css  Räpsy — siirretty tuotannon aiemmasta propista
 runko.css               Rakenteen tyylit (värit tulevat teema.json:ista)
 hopp.css                HOPP Partnerin ulkoasu
-candlr.css · grumbl.css CANDLR:n ja GRUMBL:n ulkoasu
+candlr.css · grumbl.css · tabb.css   sovellusten ulkoasut
 teema.json              Värit ja kirjasimet          ← graafikko muokkaa
 sisalto.json            Kaikki teksti ja numerot     ← graafikko ja ohjaaja muokkaavat
 assets/                 Grafiikka — pudota tänne     ← graafikko täyttää
@@ -486,7 +486,25 @@ värit; nyt myös pyöristykset, välit, tekstikoot ja varjot. Syy on
 käytännöllinen: graafikon ohjeistus voi tulla vasta myöhemmin, ja silloin koko
 ilmeen pitää vaihtua yhdestä tiedostosta eikä neljästä CSS-tiedostosta.
 
-Jäljellä: TABB (vaihe 5).
+**TABB tehty** (cue 2): maksusuunnitelmarivit erälaskureineen. Rivi ei ole
+lasku vaan suunnitelma — erien pisteet ja yhden erän summa erottavat sen
+laskusovelluksesta. Erääntynyt kokonaissumma **lasketaan riveistä**, joten se
+ei voi ajautua ristiriitaan niiden kanssa; rivit on viritetty osumaan
+1 331,00 €:oon.
+
+**Kaikki neljä sovellusta ovat nyt rakennettu.** Jäljellä kirjasimet
+(`assets/fontit/`), graafikon assetit ja iPhonen malli.
+
+### Kurssikäyrä kirjoitettu uusiksi
+
+Ensimmäinen versio oli säännöllinen sahalaita — joka toinen piste ylös, joka
+toinen alas — ja se luki koristeena eikä markkinana. Nyt käyrä on
+satunnaiskulku, jossa on liikemäärä, volatiliteettiryppäitä ja shokkeja.
+Kulku suoristetaan ja ylipäästetään, jotta trendi määrää suunnan mutta kurssi
+heiluu sen ympärillä molemmin puolin.
+
+Mittarit: peräkkäisten samansuuntaisten liikkeiden ka. 2,4–2,6 pistettä
+(ennen: putki saattoi olla 79 pistettä eli puolet käyrästä yhteen suuntaan).
 
 Seuraavaksi vaihe 2: asennus oikeille laitteille ja kameratesti.
 

@@ -32,7 +32,7 @@ näkyy ajossa oleva versionumero.
 
 | Proppi | Laite | Cuet |
 |---|---|---|
-| `proppi_tabletti.html` | iPad Air, pysty | 0–6 + kameratesti |
+| `proppi_tabletti.html` | iPad Air, pysty | 0–5 + kameratesti |
 | `proppi_puhelin.html` | iPhone, pysty | 0–5 + kameratesti |
 
 ---
@@ -83,7 +83,12 @@ L         laitteen paikannin (antaa nopeuden, ei sijaintia)
 Yksikään toiminto ei ole Shift-yhdistelmän takana: klikkeri ei lähetä Shiftiä,
 ja operaattori säätää näitä pimeässä yhdellä sormella.
 
-**Piilota ohjauspalkki `H`:lla ennen ottoa.** Palkin ollessa esillä sisältö
+**Piilota ohjauspalkki `H`:lla ennen ottoa.** Samalla vaimenevat kaikki
+operaattorin ilmoitukset: kun palkki on piilossa, ruudulle ei ilmesty mitään
+mitä graafikko ei ole suunnitellut. Cue-vaihto ei ilmoita lainkaan — palkissa
+lukee jo cue ja sen nimi.
+
+ Palkin ollessa esillä sisältö
 työntyy sen verran alas — otossa sommittelu on se, jonka graafikko on
 suunnitellut.
 

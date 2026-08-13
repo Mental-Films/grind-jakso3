@@ -122,7 +122,8 @@ Kirkkautta säädetään ottojen välillä **propista** (`[` ja `]`), ei laittee
 kirkkaussäätimestä. Laitteen himmennys on pulssitusta, joka lyö kameran
 sulkijaa vastaan.
 
-Muista lopuksi **`H` — ohjauspalkki piiloon.**
+Muista lopuksi **`H` — ohjauspalkki piiloon.** Se piilottaa myös operaattorin
+ilmoitukset: piilossa olevan palkin kanssa ruudulle ei ilmesty mitään ylimääräistä.
 
 ---
 

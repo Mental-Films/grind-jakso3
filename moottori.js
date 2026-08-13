@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  var VERSIO = '0.9.0';
+  var VERSIO = '0.9.2';
 
   /* ══ Siemennetty satunnaisluku ══════════════════════════════════════════
      Jatkuvuus vaatii, että sama cue piirtää saman kuvan joka otossa.
@@ -249,7 +249,6 @@
     if (M.musta && !hiljaa) M.asetaMusta(false);
 
     paivitaPalkki();
-    if (!hiljaa) ilmoita(numero + ' · ' + c.nimi);
   };
 
   M.seuraava = function () { M.aja(M.cue + 1); };
@@ -305,6 +304,14 @@
   function ilmoita(teksti) {
     var el = M._el.ilmoitus;
     if (!el) return;
+
+    /* Ilmoitus näkyy VAIN kun ohjauspalkki on esillä. Otossa palkki on
+       piilossa (H), ja silloin ruudulle ei saa ilmestyä mitään mitä
+       graafikko ei ole suunnitellut — operaattorin palaute on kuvassa
+       yhtä lailla kuin sovelluksen sisältö.
+
+       Cue-vaihto ei ilmoita lainkaan: ohjauspalkissa lukee jo CUE ja nimi. */
+    if (!M.palkkiEsilla) return;
     el.textContent = teksti;
     el.classList.add('ko-nakyy');
     clearTimeout(ilmoitusAjastin);

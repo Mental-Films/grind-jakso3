@@ -142,13 +142,16 @@ teemassa kello kolmelta yöllä.
 | **0** | CANDLR | **Romahdus.** Reapercoin. Verenpunainen sahalaitakäyrä lävistää asteikon diagonaalisesti ylhäältä alas. Miinusmerkit ja tappioluvut vilkkuvat. Punainen hohto |
 | **1** | GRUMBL | **Postaus.** Alvina kirjoittaa otsikon: `My crypto portfolio is tanking!! WTF DO I DO???` |
 | **2** | TABB | **Ostosrivit.** NOVEX 14 Pro, NIBBL-tilauksia, NORDKAP-takki. Valtaosa merkitty **ERÄÄNTYNYT** |
-| **3** | — | **Lepotila.** Musta ruutu ottojen väliin ja kohtiin, joissa Alvina nukkuu |
-| **4** | CANDLR | **Raketti.** Käyrä vaihtuu vihreäksi ja nousee jyrkästi. Banneri: `Your portfolio is rocketing! Buy in before it's too late!` Vihreä hohto |
-| **5** | CANDLR | **Saldo.** Tilin kate: **3,31 €** |
-| **6** | CANDLR | **Loppukuva.** Hohto kääntyy takaisin punaiseksi |
+| **3** | CANDLR | **Raketti.** Käyrä vaihtuu vihreäksi ja nousee jyrkästi. Banneri: `Your portfolio is rocketing! Buy in before it's too late!` Vihreä hohto. **BUY avaa ostoarkin** |
+| **4** | CANDLR | **Kate 3,31 €.** Ostoarkki auki: banneri käski ostaa, tilillä ei ole millä |
+| **5** | CANDLR | **Loppukuva.** Pumppaus petti — jyrkkä romahdus, hohto takaisin punaiseksi |
 
-Cue 4 on tila, ei siirtymä: Alvina *herää* vihreään ruutuun. Siirtymäversio
-(`⇧4`) on olemassa siltä varalta, että ohjaaja haluaa värin kääntyvän kuvassa.
+Cue 3 on tila, ei siirtymä: Alvina *herää* vihreään ruutuun.
+
+**Lepotilalle ei ole omaa cueta.** Musta ruutu saadaan operaattorin
+`B`-näppäimellä missä tahansa cuessa, joten oma cue olisi vain väliporras
+ajolistassa — ja väliporras, joka pitää muistaa ohittaa klikkerillä kesken
+kohtauksen.
 
 ### Puhelin — `proppi_puhelin.html`
 

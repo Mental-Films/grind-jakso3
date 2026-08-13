@@ -25,12 +25,15 @@
 <script>
 /* Alvinan iPad — CANDLR, GRUMBL, TABB.
  *
- * CANDLR on rakennettu (cuet 0, 4, 5, 6). GRUMBL ja TABB ovat vielä
- * paikkamerkeillä — vaiheet 4 ja 5.
+ * Kaikki kolme sovellusta on rakennettu. Ajolista on cuet 0–5, ja viimeisenä
+ * kameratestikortti.
  *
- * Rakenne on tarkistettu oikeasta pörssistä, ks. REFERENSSIT.md kohta 2.
- * Pystyasennossa välilehtipalkki, ei sivupalkkia: sivupalkki vaatii
- * vaakatilaa, jota 820 pt:n pystyruudussa ei ole.
+ * Lepotila-cue on poistettu: musta ruutu saadaan operaattorin B-näppäimellä
+ * missä tahansa cuessa, joten sille ei tarvita omaa cueta eikä ajolistaan
+ * väliporrasta.
+ *
+ * Rakenteet on tarkistettu oikeista sovelluksista, ks. REFERENSSIT.md.
+ * CANDLR ja TABB ovat sovelluksia, GRUMBL on selaimessa auki oleva sivusto.
  */
 (function () {
   var kaavio = null, kangas = null, nappaimisto = null;
@@ -243,7 +246,7 @@
     var osta = document.createElement('button');
     osta.className = 'candlr-nappi candlr-osta';
     osta.textContent = C.ostaNappi;
-    /* BUY avaa ostoarkin, kuten oikeassa sovelluksessa. Cuessa 4 tämä on
+    /* BUY avaa ostoarkin, kuten oikeassa sovelluksessa. Cuessa 3 tämä on
        se, mitä Alvina painaa bannerin jälkeen — ja arkki paljastaa 3,31 €. */
     osta.addEventListener('click', function () {
       if (d.querySelector('.candlr-osto-arkki')) return;
@@ -603,37 +606,29 @@
         hohto: { vari: 'punainen', voima: 3 },
         piirra: function (juuri, ctx) { tabb(juuri, ctx); } },
 
-      /* 3 — Lepotila. */
-      { id: 3, nimi: 'Lepotila',
-        hohto: null,
-        piirra: M.paikkamerkki({
-          otsikko: 'Lepotila',
-          kuvaus: 'Musta ruutu. Ottojen väliin ja kohtiin, joissa Alvina nukkuu.'
-        }) },
-
-      /* 4 — Raketti. Käyrä vihreänä ja huijausmainen banneri päällä. */
-      { id: 4, nimi: 'Raketti', sovellus: 'candlr',
+      /* 3 — Raketti. Käyrä vihreänä ja huijausmainen banneri päällä. */
+      { id: 3, nimi: 'Raketti', sovellus: 'candlr',
         hohto: { vari: 'vihrea', voima: 6 },
         piirra: function (juuri, ctx) { candlr(juuri, ctx, { nousu: true, banneri: true }); },
         tick: kaavioTick },
 
-      /* 5 — Kate 3,31 €. Banneri käski ostaa; tilillä ei ole millä. */
-      { id: 5, nimi: 'Kate 3,31 €', sovellus: 'candlr',
+      /* 4 — Kate 3,31 €. Banneri käski ostaa; tilillä ei ole millä. */
+      { id: 4, nimi: 'Kate 3,31 €', sovellus: 'candlr',
         hohto: { vari: 'vihrea', voima: 4 },
         piirra: function (juuri, ctx) {
           candlr(juuri, ctx, { nousu: true, osto: true });
         },
         tick: kaavioTick },
 
-      /* 6 — Loppukuva. Pumppaus romahti, punainen palaa kasvoille. */
-      /* 6 — Loppukuva. Pumppaus petti: jyrkkä romahdus, eri käyrän muoto
+      /* 5 — Loppukuva. Pumppaus romahti, punainen palaa kasvoille. */
+      /* 5 — Loppukuva. Pumppaus petti: jyrkkä romahdus, eri käyrän muoto
              kuin cue 0. Punainen palaa kasvoille. */
-      { id: 6, nimi: 'Loppukuva', sovellus: 'candlr',
+      { id: 5, nimi: 'Loppukuva', sovellus: 'candlr',
         hohto: { vari: 'punainen', voima: 7 },
         piirra: function (juuri, ctx) { candlr(juuri, ctx, { loppu: true }); },
         tick: kaavioTick },
 
-      { id: 7, nimi: 'Kameratesti', piirra: M.testikortti() }
+      { id: 6, nimi: 'Kameratesti', piirra: M.testikortti() }
 
     ]; }
   }).then(function () {

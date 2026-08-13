@@ -1,11 +1,15 @@
-/* GRUMBL — keskustelupalsta, iPad pysty 820 pt.
+/* GRUMBL — keskustelupalsta. iPad pysty 820 pt.
  *
- * Rakenne on tarkistettu oikeasta foorumialustasta, ks. REFERENSSIT.md
- * kohta 3: suodatinrivi, rivillä otsikko + aihealue pienellä, äänestysnuolet
- * ja pistemäärä vasemmassa laidassa, suhteellinen aika.
+ * GRUMBL EI ole sovellus vaan selaimessa auki oleva sivusto, ja siksi sen
+ * asettelu on kolmipalstainen työpöytäasettelu: vasen navigaatiopalkki,
+ * keskellä sisältö, oikealla yhteisön tiedot ja säännöt.
  *
- * Kaikki mitat, tekstikoot ja varjot tulevat teema.json:ista. Älä kirjoita
- * pistekokoja tänne — koko ilme vaihdetaan sieltä.
+ * Se on myös se, minkä Alvina oikeasti näkisi: iPadin Safari pyytää
+ * työpöytäsivut oletuksena, joten palsta ei kutistu mobiiliasetteluun.
+ * Aiempi yksipalstainen sovellusasettelu oli väärä referenssi.
+ *
+ * Kaikki mitat, tekstikoot ja varjot tulevat teema.json:ista. Palstoilla on
+ * omat kiinteät leveytensä, koska 820 pt ei jousta — ne ovat tässä.
  *
  * Tunnusväri on roosa. EI oranssia eikä pyöreää maskottia, ks. brief kohta 8.
  */
@@ -18,214 +22,191 @@
   color: var(--teksti);
   font-family: var(--fontti);
   --grumbl: var(--tunnus, #C25A7A);
+  --linkki: #4A8FD8;
+  --palsta-vasen: 158px;
+  --palsta-oikea: 214px;
   padding:
     calc(var(--turva-yla) + var(--palkki-tila, 0px)) var(--turva-oikea)
     var(--turva-ala) var(--turva-vasen);
 }
 
-/* ── Aihealueen otsikko ─────────────────────────────────────────────────── */
-.grumbl-yla {
+/* ══ Yläpalkki ═══════════════════════════════════════════════════════════ */
+.grumbl-ylapalkki {
   display: flex; align-items: center; gap: var(--vali-m);
-  padding: var(--vali-m) var(--vali-xl);
+  padding: var(--vali-s) var(--vali-m);
+  border-bottom: var(--reuna) solid var(--viiva);
+  flex: none;
 }
-.grumbl-alue-merkki {
-  width: 42px; height: 42px; border-radius: 50%;
+.grumbl-logo {
+  display: flex; align-items: center; gap: 7px;
+  font-size: var(--teksti-otsikko); font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--grumbl);
+  flex: none;
+}
+.grumbl-logo-merkki {
+  width: 26px; height: 26px; border-radius: 50%;
   background: var(--grumbl);
   display: grid; place-items: center;
-  flex: none;
   color: #0B0F13;
   font-family: var(--fontti-mono);
-  font-size: var(--teksti-vali); font-weight: 600;
-}
-.grumbl-alue { font-size: var(--teksti-otsikko); font-weight: 600; }
-.grumbl-jasenet {
-  font-family: var(--fontti-mono);
-  font-size: var(--teksti-pieni); color: var(--himmea);
-  margin-top: 2px;
-}
-.grumbl-liity {
-  margin-left: auto;
-  background: transparent;
-  border: var(--reuna) solid var(--grumbl);
-  color: var(--grumbl);
-  border-radius: var(--kaarre-pilleri);
-  padding: 9px 22px;
-  font-family: var(--fontti);
-  font-size: var(--teksti-leipa); font-weight: 600;
+  font-size: 12px; font-weight: 600;
 }
 
-/* ── Suodatinrivi ───────────────────────────────────────────────────────── */
-.grumbl-suodattimet {
-  display: flex; gap: var(--vali-xs);
-  padding: 0 var(--vali-xl) var(--vali-m);
-  border-bottom: var(--reuna) solid var(--viiva);
-}
-.grumbl-suodatin {
-  background: transparent; border: none;
-  color: var(--himmea);
-  font-family: var(--fontti);
-  font-size: var(--teksti-leipa); font-weight: 600;
-  padding: 9px 17px;
-  border-radius: var(--kaarre-pilleri);
-}
-.grumbl-suodatin.valittu { background: var(--paneeli-3); color: var(--teksti); }
-
-/* ── Postauslista ────────────────────────────────────────────────────────
-   Ensimmäinen versio näytti sähköpostilta: tasapaksuja rivejä, pystysuora
-   äänestyssarake ja ei väriä. Foorumi tunnistetaan kolmesta asiasta, jotka
-   sähköpostilistassa ei ole:
-
-     1. VAAKASUORA TOIMINTOPILLERI otsikon alla — ⬆ pisteet ⬇ omassa
-        pillerissään, kommentit omassaan. Tämä on tunnistettavin yksittäinen
-        elementti koko genressä.
-     2. AIHEMERKINNÄT värillisinä sirpaleina.
-     3. PIKKUKUVAT osassa riveistä. Rivit eivät saa olla samanpainoisia. */
-.grumbl-lista { flex: 1; overflow: hidden; padding-top: var(--vali-xs); }
-.grumbl-postaus {
-  display: flex; gap: var(--vali-m);
-  padding: var(--vali-m) var(--vali-xl);
-  border-bottom: var(--reuna) solid var(--viiva);
-}
-.grumbl-postaus:active { background: var(--paneeli); }
-
-.grumbl-sisus { flex: 1; min-width: 0; }
-
-/* Metarivi: kuvake, käyttäjä, aika, aihemerkintä. */
-.grumbl-meta {
+/* Hakukenttä, jonka sisällä on yhteisösiru. */
+.grumbl-haku {
+  flex: 1; min-width: 0;
   display: flex; align-items: center; gap: var(--vali-s);
-  margin-bottom: 7px;
+  background: var(--paneeli-2);
+  border: var(--reuna) solid var(--grumbl);
+  border-radius: var(--kaarre-pilleri);
+  padding: 5px 14px 5px 10px;
 }
-.grumbl-kuva {
-  width: 26px; height: 26px; border-radius: 50%;
+.grumbl-haku svg { width: 17px; height: 17px; fill: var(--himmea); flex: none; }
+.grumbl-haku-siru {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--paneeli-3);
+  border-radius: var(--kaarre-pilleri);
+  padding: 4px 9px 4px 5px;
+  font-size: 12.5px; font-weight: 600;
+  flex: none;
+}
+.grumbl-haku-siru b {
+  width: 17px; height: 17px; border-radius: 50%;
+  background: var(--varoitus);
+  display: grid; place-items: center;
+  color: #0B0F13; font-size: 9px;
+}
+.grumbl-haku-siru span { color: var(--himmea); font-weight: 400; margin-left: 2px; }
+.grumbl-haku-vihje {
+  font-size: 12.5px; color: var(--himmea-2);
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+
+.grumbl-ylatoiminnot { display: flex; align-items: center; gap: var(--vali-s); flex: none; }
+.grumbl-ylakuvake { width: 20px; height: 20px; fill: var(--himmea); }
+.grumbl-luo {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12.5px; font-weight: 600;
+  color: var(--teksti);
+  padding: 0 var(--vali-xs);
+}
+.grumbl-kello { position: relative; display: flex; }
+.grumbl-merkkiluku {
+  position: absolute; top: -5px; right: -5px;
+  min-width: 15px; height: 15px;
+  border-radius: var(--kaarre-pilleri);
+  background: var(--virhe);
+  color: #fff;
+  font-family: var(--fontti-mono);
+  font-size: 9px; font-weight: 600;
+  display: grid; place-items: center;
+}
+.grumbl-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--ok);
+  display: grid; place-items: center;
+  color: #0B0F13;
+  font-family: var(--fontti-mono); font-size: 11px; font-weight: 600;
+}
+
+/* ══ Kolme palstaa ═══════════════════════════════════════════════════════ */
+.grumbl-runko {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Vasen navigaatio ──────────────────────────────────────────────────── */
+.grumbl-vasen {
+  width: var(--palsta-vasen);
+  flex: none;
+  border-right: var(--reuna) solid var(--viiva);
+  padding: var(--vali-s) var(--vali-xs);
+  overflow: hidden;
+  font-size: 12.5px;
+}
+.grumbl-navi-rivi {
+  display: flex; align-items: center; gap: var(--vali-s);
+  padding: 8px 10px;
+  border-radius: var(--kaarre-s);
+  color: var(--teksti);
+}
+.grumbl-navi-rivi svg { width: 17px; height: 17px; fill: currentColor; flex: none; }
+.grumbl-navi-rivi.valittu { background: var(--paneeli-2); }
+.grumbl-osasto {
+  display: flex; align-items: center;
+  margin: var(--vali-m) 10px var(--vali-xs);
+  padding-top: var(--vali-s);
+  border-top: var(--reuna) solid var(--viiva);
+  font-family: var(--fontti-mono);
+  font-size: 9.5px; letter-spacing: .1em;
+  color: var(--himmea-2);
+}
+.grumbl-osasto span { margin-left: auto; }
+.grumbl-pikkurivi {
+  display: flex; align-items: center; gap: var(--vali-s);
+  padding: 6px 10px;
+  color: var(--himmea);
+  font-size: 12px;
+}
+.grumbl-pikkumerkki {
+  width: 20px; height: 20px; border-radius: 50%;
   flex: none;
   display: grid; place-items: center;
-  font-family: var(--fontti-mono);
-  font-size: 11px; font-weight: 600;
-  color: #0B0F13;
-}
-.grumbl-kayttaja {
-  font-family: var(--fontti-mono);
-  font-size: var(--teksti-pieni);
-  color: var(--himmea);
-}
-.grumbl-aika {
-  font-family: var(--fontti-mono);
-  font-size: var(--teksti-pieni);
-  color: var(--himmea-2);
-}
-.grumbl-merkinta {
-  font-family: var(--fontti-mono);
-  font-size: 10px; font-weight: 600; letter-spacing: .1em;
-  padding: 3px 9px;
-  border-radius: var(--kaarre-pilleri);
-}
-.grumbl-merkinta.tappio  { background: rgba(196,64,47,.16);  color: var(--virhe); }
-.grumbl-merkinta.apua    { background: rgba(199,154,58,.16); color: var(--varoitus); }
-.grumbl-merkinta.puhetta { background: rgba(194,90,122,.16); color: var(--grumbl); }
-
-.grumbl-otsikko {
-  font-size: var(--teksti-otsikko); font-weight: 600;
-  line-height: 1.3;
+  font-size: 9px; font-weight: 600; color: #0B0F13;
 }
 
-/* Vaakasuora toimintopilleri. Tämä on se, mikä lukee foorumina. */
-.grumbl-toiminnot {
-  display: flex; align-items: center; gap: var(--vali-s);
-  margin-top: var(--vali-m);
-}
-.grumbl-pilleri {
-  display: flex; align-items: center; gap: var(--vali-s);
-  background: var(--paneeli-2);
-  border-radius: var(--kaarre-pilleri);
-  padding: 7px 13px;
-  color: var(--himmea);
-  font-size: var(--teksti-pieni); font-weight: 600;
-}
-.grumbl-pilleri.aanestetty { background: rgba(194,90,122,.14); color: var(--grumbl); }
-.grumbl-pilleri svg { width: 18px; height: 18px; fill: currentColor; display: block; }
-.grumbl-pisteet {
-  font-family: var(--fontti-mono);
-  font-variant-numeric: tabular-nums;
-  min-width: 3.2em; text-align: center;
-}
-
-/* Pikkukuva. Vain osassa riveistä — tasapaksu lista lukee sähköpostina. */
-.grumbl-pikkukuva {
-  width: 96px; height: 72px;
-  flex: none;
-  border-radius: var(--kaarre-s);
+/* ── Keskipalsta ───────────────────────────────────────────────────────── */
+.grumbl-keski {
+  flex: 1; min-width: 0;
   overflow: hidden;
-  background: var(--paneeli-2);
-  border: var(--reuna) solid var(--viiva);
-}
-.grumbl-pikkukuva svg { width: 100%; height: 100%; display: block; }
-
-/* ── Kirjoituspainike ───────────────────────────────────────────────────── */
-.grumbl-kirjoita {
-  margin: var(--vali-m) var(--vali-xl);
-  display: flex; align-items: center; gap: var(--vali-m);
-  background: var(--paneeli);
-  border: var(--reuna) solid var(--viiva-2);
-  border-radius: var(--kaarre-pilleri);
-  padding: 15px 22px;
-  color: var(--himmea);
-  font-size: var(--teksti-leipa);
-}
-
-/* ══ Kirjoitusnäkymä ══════════════════════════════════════════════════════
-   Peittää palstan. Ylhäällä otsikkokenttä, alhaalla sovelluksen oma
-   näppäimistö — ei iOS:n omaa, koska automaattikorjaus ja ennakoiva
-   tekstipalkki pilaisivat oton. */
-.grumbl-kirjoitus {
-  position: absolute; inset: 0;
+  padding: var(--vali-m) var(--vali-m) 0;
   display: flex; flex-direction: column;
-  background: var(--pohja);
-  z-index: 5;
-  padding:
-    calc(var(--turva-yla) + var(--palkki-tila, 0px)) var(--turva-oikea)
-    var(--turva-ala) var(--turva-vasen);
 }
-.grumbl-kirjoitus-yla {
-  display: flex; align-items: center; gap: var(--vali-m);
-  padding: var(--vali-m) var(--vali-xl);
+
+/* Kirjoituslomake. Tämä on cue 1: Alvina kirjoittaa otsikon. */
+.grumbl-lomake-otsikko {
+  display: flex; align-items: baseline;
+  font-size: var(--teksti-otsikko); font-weight: 600;
+  padding-bottom: var(--vali-s);
   border-bottom: var(--reuna) solid var(--viiva);
+  margin-bottom: var(--vali-m);
 }
-.grumbl-peruuta {
-  background: none; border: none;
-  color: var(--himmea);
-  font-family: var(--fontti);
-  font-size: var(--teksti-leipa);
-}
-.grumbl-kirjoitus-otsikko {
-  font-size: var(--teksti-leipa); font-weight: 600;
-  position: absolute; left: 50%; transform: translateX(-50%);
-}
-.grumbl-julkaise {
+.grumbl-lomake-otsikko span {
   margin-left: auto;
-  background: var(--paneeli-3);
-  border: none; border-radius: var(--kaarre-pilleri);
-  color: var(--himmea-2);
-  padding: 10px 24px;
-  font-family: var(--fontti);
-  font-size: var(--teksti-leipa); font-weight: 600;
+  font-size: 12px; font-weight: 400; color: var(--himmea);
 }
-.grumbl-julkaise.aktiivinen { background: var(--grumbl); color: #0B0F13; }
+.grumbl-valilehdet {
+  display: flex; gap: var(--vali-xs);
+  margin-bottom: var(--vali-m);
+}
+.grumbl-valilehti {
+  padding: 7px 15px;
+  border-radius: var(--kaarre-pilleri);
+  font-size: 12.5px; font-weight: 600;
+  color: var(--himmea);
+}
+.grumbl-valilehti.valittu { background: var(--paneeli-3); color: var(--teksti); }
 
 .grumbl-kentta {
-  flex: 1;
-  padding: var(--vali-xl);
-  overflow: hidden;
-  display: flex; flex-direction: column;
+  background: var(--paneeli);
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-m);
+  padding: var(--vali-m);
+  margin-bottom: var(--vali-s);
 }
-.grumbl-kentta-alue {
+.grumbl-kentta.aktiivinen { border-color: var(--grumbl); }
+.grumbl-kentta-nimi {
   font-family: var(--fontti-mono);
-  font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  font-size: 9.5px; letter-spacing: .12em;
   color: var(--himmea-2);
-  margin-bottom: var(--vali-m);
+  margin-bottom: 7px;
 }
 /* Otsikko on se, mitä kameralla luetaan. Iso ja väljä. */
 .grumbl-teksti {
-  font-size: 30px; font-weight: 600;
+  font-size: 25px; font-weight: 600;
   line-height: 1.3;
   min-height: 1.3em;
   word-break: break-word;
@@ -237,7 +218,7 @@
 }
 .grumbl-kohdistin {
   display: inline-block;
-  width: 3px; height: 1em;
+  width: 2px; height: 1em;
   background: var(--grumbl);
   vertical-align: text-bottom;
   margin-left: 2px;
@@ -245,47 +226,188 @@
 }
 @keyframes grumbl-kohdistin { 0%, 50% { opacity: 1 } 50.01%, 100% { opacity: 0 } }
 
-/* Leipätekstikenttä. Jää tyhjäksi — Alvina kirjoittaa vain otsikon —
-   mutta ilman sitä lomakkeen ja näppäimistön väliin jäisi tyhjä alue,
-   joka lukee heti keskeneräisenä. */
-.grumbl-runko {
-  margin-top: var(--vali-l);
-  padding-top: var(--vali-l);
+.grumbl-runkokentta {
+  min-height: 78px;
+  font-size: 13.5px;
+  color: var(--himmea-2);
+}
+.grumbl-tyokalut {
+  display: flex; align-items: center; gap: var(--vali-m);
+  margin-top: var(--vali-s);
+  padding-top: var(--vali-s);
   border-top: var(--reuna) solid var(--viiva);
-  font-size: var(--teksti-vali);
-  color: var(--himmea-2);
-  flex: 1;
 }
-
+.grumbl-tyokalut svg { width: 17px; height: 17px; fill: var(--himmea-2); }
 .grumbl-laskuri {
-  margin-top: var(--vali-l);
+  margin-left: auto;
   font-family: var(--fontti-mono);
-  font-size: var(--teksti-pieni);
+  font-size: 11px; color: var(--himmea-2);
+}
+.grumbl-lomake-napit {
+  display: flex; gap: var(--vali-s); justify-content: flex-end;
+  margin-top: var(--vali-s);
+}
+.grumbl-peruuta {
+  background: var(--paneeli-2); border: none;
+  border-radius: var(--kaarre-pilleri);
+  color: var(--himmea);
+  padding: 9px 20px;
+  font-family: var(--fontti);
+  font-size: 12.5px; font-weight: 600;
+}
+.grumbl-julkaise {
+  background: var(--paneeli-3); border: none;
+  border-radius: var(--kaarre-pilleri);
   color: var(--himmea-2);
+  padding: 9px 24px;
+  font-family: var(--fontti);
+  font-size: 12.5px; font-weight: 600;
+}
+.grumbl-julkaise.aktiivinen { background: var(--grumbl); color: #0B0F13; }
+
+/* Julkaisumuistutus lomakkeen alla. Täyttää keskipalstan ja on aitoa:
+   palstat näyttävät säännöt juuri kirjoitettaessa. */
+.grumbl-muistutus {
+  margin-top: var(--vali-m);
+  background: var(--paneeli);
+  border: var(--reuna) solid var(--viiva);
+  border-radius: var(--kaarre-m);
+  padding: var(--vali-m);
+}
+.grumbl-muistutus-otsikko {
+  font-size: 12.5px; font-weight: 600;
+  margin-bottom: var(--vali-s);
+}
+.grumbl-muistutus-rivi {
+  display: flex; gap: var(--vali-s);
+  padding: 6px 0;
+  font-size: 12px; line-height: 1.4;
+  color: var(--himmea);
+}
+.grumbl-muistutus-rivi i {
+  font-style: normal; color: var(--grumbl); flex: none;
 }
 
-/* ── Näppäimistö ────────────────────────────────────────────────────────
-   Piirretty, ei iOS:n oma. iPadin näppäimistö on leveämpi ja siinä on
-   enemmän näppäimiä kuin puhelimessa — ks. brief kohta 6. */
+/* ── Oikea palsta: yhteisön tiedot ─────────────────────────────────────── */
+.grumbl-oikea {
+  width: var(--palsta-oikea);
+  flex: none;
+  border-left: var(--reuna) solid var(--viiva);
+  padding: var(--vali-m) var(--vali-s);
+  overflow: hidden;
+  font-size: 12px;
+}
+.grumbl-opas {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  background: var(--linkki);
+  border-radius: var(--kaarre-pilleri);
+  padding: 9px;
+  color: #0B0F13;
+  font-size: 12px; font-weight: 600;
+  margin-bottom: var(--vali-m);
+}
+.grumbl-tilastot { display: flex; gap: var(--vali-m); padding: 0 var(--vali-xs) var(--vali-m); }
+.grumbl-tilasto b {
+  display: block;
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--teksti-vali); font-weight: 600;
+}
+.grumbl-tilasto span { color: var(--linkki); font-size: 11px; }
+
+.grumbl-lohko {
+  border-top: var(--reuna) solid var(--viiva);
+  padding: var(--vali-m) var(--vali-xs);
+}
+.grumbl-lohko-otsikko {
+  font-family: var(--fontti-mono);
+  font-size: 9.5px; letter-spacing: .12em;
+  color: var(--linkki);
+  margin-bottom: var(--vali-s);
+}
+.grumbl-liputus { display: flex; align-items: center; gap: var(--vali-s); }
+.grumbl-liputus-merkki {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--ok);
+  display: grid; place-items: center;
+  color: #0B0F13; font-family: var(--fontti-mono); font-size: 10px; font-weight: 600;
+}
+.grumbl-liputus span { color: var(--linkki); font-size: 12px; }
+
+/* Numeroidut säännöt haitareina — tunnistettava osa yhteisösivupalkkia. */
+.grumbl-saanto {
+  display: flex; align-items: flex-start; gap: var(--vali-s);
+  padding: 9px 0;
+  border-bottom: var(--reuna) solid var(--viiva);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.grumbl-saanto:last-child { border-bottom: none; }
+.grumbl-saanto i {
+  font-style: normal;
+  color: var(--linkki);
+  font-family: var(--fontti-mono);
+  flex: none;
+}
+.grumbl-saanto svg { width: 14px; height: 14px; fill: var(--himmea-2); margin-left: auto; flex: none; }
+
+.grumbl-mode-nappi {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  background: var(--linkki);
+  border-radius: var(--kaarre-pilleri);
+  padding: 9px;
+  color: #0B0F13;
+  font-size: 12px; font-weight: 600;
+  margin-bottom: var(--vali-s);
+}
+.grumbl-mode {
+  display: flex; align-items: center; gap: var(--vali-s);
+  padding: var(--vali-s) 0;
+}
+.grumbl-mode-kuva {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--paneeli-3);
+  flex: none;
+}
+.grumbl-mode-nimi { color: var(--linkki); font-size: 12px; }
+.grumbl-mode-merkki {
+  background: rgba(94,158,107,.2); color: var(--ok);
+  border-radius: var(--kaarre-s);
+  padding: 2px 7px;
+  font-family: var(--fontti-mono); font-size: 9.5px; font-weight: 600;
+}
+.grumbl-alatunniste {
+  margin-top: var(--vali-m);
+  padding-top: var(--vali-s);
+  border-top: var(--reuna) solid var(--viiva);
+  color: var(--himmea-2);
+  font-size: 10.5px;
+  line-height: 1.7;
+}
+
+/* ══ Näppäimistö ═════════════════════════════════════════════════════════
+   Piirretty, ei iOS:n oma. Nousee sivun päälle kuten oikea näppäimistö —
+   sivu jää näkyviin sen yläpuolelle. */
 .grumbl-nappaimisto {
+  flex: none;
   background: var(--paneeli-2);
   border-top: var(--reuna) solid var(--viiva-2);
   padding: var(--vali-s) var(--vali-s) var(--vali-m);
-  display: flex; flex-direction: column; gap: var(--vali-s);
+  display: flex; flex-direction: column; gap: 7px;
   user-select: none;
 }
-.grumbl-rivi { display: flex; gap: 7px; justify-content: center; }
+.grumbl-rivi { display: flex; gap: 6px; justify-content: center; }
 .grumbl-nappain {
   flex: 1;
   min-width: 0;
   min-height: var(--kosketus);
-  height: 52px;
+  height: 46px;
   background: var(--paneeli-3);
   border: none;
   border-radius: var(--kaarre-s);
   color: var(--teksti);
   font-family: var(--fontti);
-  font-size: var(--teksti-vali);
+  font-size: var(--teksti-leipa);
   box-shadow: 0 1px 0 rgba(0,0,0,.5);
   -webkit-tap-highlight-color: transparent;
 }
@@ -295,5 +417,5 @@
 .grumbl-nappain.toiminto {
   background: var(--paneeli);
   color: var(--himmea);
-  font-size: var(--teksti-pieni);
+  font-size: 12px;
 }

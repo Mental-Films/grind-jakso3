@@ -106,7 +106,21 @@ Se on ainoa kohta, jossa CANDLR tarvitsee piirrettyä grafiikkaa.
 
 ## 3. GRUMBL — keskustelupalsta
 
-Katsottu suoraan yhdeltä isolta avoimen lähdekoodin foorumialustalta
+> **Tarkennus tuotannolta 13.8.:** GRUMBL ei ole sovellus vaan **selaimessa
+> auki oleva sivusto**, ja sen asettelu on kolmipalstainen: vasen
+> navigaatiopalkki, keskellä sisältö, oikealla yhteisön tiedot ja säännöt.
+>
+> Se on myös oikein: **iPadin Safari pyytää työpöytäsivut oletuksena**, joten
+> palsta ei kutistu mobiiliasetteluun. Yksipalstainen sovellusasettelu oli
+> väärä referenssi.
+>
+> Kolmipalstaisen asettelun osat, jotka propissa on:
+> yläpalkki hakukenttineen ja yhteisösiruineen · vasen navigaatio ja
+> yhteisölistat · keskellä kirjoituslomake · oikealla yhteisön kävijäluvut,
+> käyttäjän liputus, **numeroidut säännöt haitareina** ja moderaattorit ·
+> alatunnisteen linkit.
+
+Katsottu lisäksi yhdeltä isolta avoimen lähdekoodin foorumialustalta
 tummassa teemassa. Rakenne:
 
 | Osa | Mitä siinä on |

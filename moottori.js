@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  var VERSIO = '0.8.0';
+  var VERSIO = '0.9.0';
 
   /* ══ Siemennetty satunnaisluku ══════════════════════════════════════════
      Jatkuvuus vaatii, että sama cue piirtää saman kuvan joka otossa.

@@ -304,143 +304,183 @@
   }
 
   /* ══ GRUMBL — keskustelupalsta ══════════════════════════════════════════
-     Rakenne oikeasta foorumialustasta: suodatinrivi, äänestysnuolet ja
-     pisteet vasemmalla, otsikko, aihealue pienellä, suhteellinen aika.
-     Ks. REFERENSSIT.md kohta 3. */
+     GRUMBL ei ole sovellus vaan selaimessa auki oleva sivusto: vasen
+     navigaatio, keskellä sisältö, oikealla yhteisön tiedot ja säännöt.
+     iPadin Safari pyytää työpöytäsivut oletuksena, joten juuri tämän Alvina
+     näkisi — mobiiliasettelu olisi väärä referenssi. */
 
-  var K_YLOS  = '<svg viewBox="0 0 24 24"><path d="M12 4 3 14h5v6h8v-6h5z"/></svg>';
-  var K_ALAS  = '<svg viewBox="0 0 24 24"><path d="M12 20 3 10h5V4h8v6h5z"/></svg>';
-  var K_PUHE  = '<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V6a2 2 0 0 1 0-2z"/></svg>';
-  var K_JAKO2 = '<svg viewBox="0 0 24 24"><path d="M18 16a3 3 0 0 0-2 .8l-7-4a3 3 0 0 0 0-1.6l7-4a3 3 0 1 0-1-2.2c0 .3 0 .5.1.8l-7 4a3 3 0 1 0 0 4.4l7 4a3 3 0 1 0 2.9-2.2z"/></svg>';
+  var K_HAKU   = '<svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 1 0 4.9 14.3l5.4 5.4 1.4-1.4-5.4-5.4A8 8 0 0 0 10 2zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/></svg>';
+  var K_KOTI   = '<svg viewBox="0 0 24 24"><path d="M12 3 3 11h2v9h5v-6h4v6h5v-9h2z"/></svg>';
+  var K_SUOSIO = '<svg viewBox="0 0 24 24"><path d="M4 20h4v-7H4zm6 0h4V7h-4zm6 0h4V10h-4z"/></svg>';
+  var K_UUTIS  = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zm2 3v3h7V7zm9 0v3h3V7zM6 12v2h12v-2zm0 4v2h12v-2z"/></svg>';
+  var K_TUTKI  = '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3.5 6.5-2 5-5 2 2-5z"/></svg>';
+  var K_PLUS   = '<svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>';
+  var K_LUO    = '<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zm7 3v4H7v2h4v4h2v-4h4v-2h-4V7z"/></svg>';
+  var K_PUHE   = '<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V6a2 2 0 0 1 0-2z"/></svg>';
+  var K_KELLO  = '<svg viewBox="0 0 24 24"><path d="M12 2a6 6 0 0 0-6 6v4l-2 3v2h16v-2l-2-3V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 0 3-3H9a3 3 0 0 0 3 3z"/></svg>';
+  var K_MAINOS = '<svg viewBox="0 0 24 24"><path d="M3 5h18v14H3zm3 3v8h3l4 3V5L9 8z"/></svg>';
+  var K_NUOLI  = '<svg viewBox="0 0 24 24"><path d="m8 10 4 4 4-4z"/></svg>';
+  var K_KIRJE  = '<svg viewBox="0 0 24 24"><path d="M3 5h18v14H3zm2 2v.5l7 4.5 7-4.5V7z"/></svg>';
+  var K_KUVA   = '<svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zm2 10 3-4 2 3 3-4 4 5z"/></svg>';
+  var K_VIDEO  = '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm-2 5 6 4-6 4z"/></svg>';
 
-  /* Pikkukuva: pieni kurssikäyrä. Piirretään koodilla, koska rivikohtainen
-     kuvatiedosto olisi turha — tässä riittää siluetti. Siemennetty, joten
-     sama rivi näyttää samalta joka otossa. */
-  function pikkukuva(rnd, nouseva) {
-    var n = 26, kohdat = [], y = nouseva ? 0.8 : 0.25;
-    for (var i = 0; i < n; i++) {
-      y += (rnd() - (nouseva ? 0.62 : 0.36)) * 0.16;
-      y = Math.max(0.08, Math.min(0.92, y));
-      kohdat.push((i / (n - 1) * 96).toFixed(1) + ',' + (y * 72).toFixed(1));
-    }
-    var vari = nouseva ? 'var(--ok)' : 'var(--virhe)';
-    return '<svg viewBox="0 0 96 72" preserveAspectRatio="none">' +
-      '<polyline points="' + kohdat.join(' ') + '" fill="none" stroke="' + vari +
-      '" stroke-width="2"/></svg>';
-  }
-
-  function grumblSyote(ctx) {
+  function grumbl(juuri, ctx) {
     var G = ctx.S.grumbl;
     var d = el('grumbl');
 
-    var yla = el('grumbl-yla');
-    yla.appendChild(el('grumbl-alue-merkki', G.alueMerkki));
-    yla.appendChild(el('',
-      '<div class="grumbl-alue">' + G.alue + '</div>' +
-      '<div class="grumbl-jasenet">' + G.alueJasenet + '</div>'));
-    var liity = document.createElement('button');
-    liity.className = 'grumbl-liity';
-    liity.textContent = G.liityNappi;
-    yla.appendChild(liity);
+    /* ── Yläpalkki ─────────────────────────────────────────────────────── */
+    var yla = el('grumbl-ylapalkki');
+    yla.appendChild(el('grumbl-logo',
+      '<span class="grumbl-logo-merkki">' + G.alueMerkki.charAt(0) + '</span>' +
+      '<span>' + ctx.nimi('grumbl').toLowerCase() + '</span>'));
+
+    yla.appendChild(el('grumbl-haku',
+      K_HAKU +
+      '<span class="grumbl-haku-siru"><b>R</b>' + G.alue + '<span>×</span></span>' +
+      '<span class="grumbl-haku-vihje">' + G.hakuvihje + '</span>'));
+
+    var toiminnot = el('grumbl-ylatoiminnot');
+    toiminnot.innerHTML =
+      K_MAINOS.replace('<svg', '<svg class="grumbl-ylakuvake"') +
+      K_PUHE.replace('<svg', '<svg class="grumbl-ylakuvake"') +
+      '<span class="grumbl-luo">' + K_LUO.replace('<svg', '<svg class="grumbl-ylakuvake"') +
+        G.luoNappi + '</span>' +
+      '<span class="grumbl-kello">' + K_KELLO.replace('<svg', '<svg class="grumbl-ylakuvake"') +
+        '<span class="grumbl-merkkiluku">1</span></span>' +
+      '<span class="grumbl-avatar">A</span>';
+    yla.appendChild(toiminnot);
     d.appendChild(yla);
 
-    var suodattimet = el('grumbl-suodattimet');
-    G.suodattimet.forEach(function (nimi, i) {
-      var b = document.createElement('button');
-      b.className = 'grumbl-suodatin' + (i === G.suodatinValittu ? ' valittu' : '');
-      b.textContent = nimi;
-      suodattimet.appendChild(b);
+    var runko = el('grumbl-runko');
+
+    /* ── Vasen navigaatio ──────────────────────────────────────────────── */
+    var vasen = el('grumbl-vasen');
+    var naviKuvakkeet = [K_KOTI, K_SUOSIO, K_UUTIS, K_TUTKI, K_PLUS];
+    G.navi.forEach(function (nimi, i) {
+      vasen.appendChild(el('grumbl-navi-rivi' + (i === 0 ? ' valittu' : ''),
+        naviKuvakkeet[i] + '<span>' + nimi + '</span>'));
     });
-    d.appendChild(suodattimet);
 
-    var kirjoita = el('grumbl-kirjoita',
-      '<span style="font-size:20px">✎</span><span>' + G.kirjoitaVihje + '</span>');
-    kirjoita.addEventListener('click', function () { avaaKirjoitus(d, ctx); });
-    d.appendChild(kirjoita);
-
-    /* Käyttäjäkuvakkeiden värit kiertävät paletista — ei kuvatiedostoja. */
-    var kuvavarit = ['var(--grumbl)', 'var(--varoitus)', 'var(--ok)', 'var(--himmea)', 'var(--virhe)'];
-
-    var lista = el('grumbl-lista');
-    G.postaukset.forEach(function (p, i) {
-      var rivi = el('grumbl-postaus');
-      var sisus = el('grumbl-sisus');
-
-      var meta = el('grumbl-meta');
-      var kuvake = el('grumbl-kuva', p.kayttaja.replace('u/', '').charAt(0).toUpperCase());
-      kuvake.style.background = kuvavarit[i % kuvavarit.length];
-      meta.appendChild(kuvake);
-      meta.appendChild(el('grumbl-kayttaja', p.kayttaja));
-      meta.appendChild(el('grumbl-aika', '· ' + p.aika));
-      if (p.merkinta) {
-        meta.appendChild(el('grumbl-merkinta ' + p.merkinta,
-          (G.merkinnat && G.merkinnat[p.merkinta]) || p.merkinta.toUpperCase()));
-      }
-      sisus.appendChild(meta);
-      sisus.appendChild(el('grumbl-otsikko', p.otsikko));
-
-      /* Vaakasuora toimintopilleri — genren tunnistettavin elementti. */
-      var toiminnot = el('grumbl-toiminnot');
-      toiminnot.appendChild(el('grumbl-pilleri' + (i === 0 ? ' aanestetty' : ''),
-        K_YLOS + '<span class="grumbl-pisteet">' + ctx.e0(p.aanet) + '</span>' + K_ALAS));
-      toiminnot.appendChild(el('grumbl-pilleri',
-        K_PUHE + '<span>' + ctx.e0(p.kommentit) + (G.kommentitSana ? ' ' + G.kommentitSana : '') + '</span>'));
-      toiminnot.appendChild(el('grumbl-pilleri', K_JAKO2 + '<span>' + G.jakoSana + '</span>'));
-      sisus.appendChild(toiminnot);
-
-      rivi.appendChild(sisus);
-      if (p.kuva) rivi.appendChild(el('grumbl-pikkukuva', pikkukuva(ctx.rnd, i === 2)));
-      lista.appendChild(rivi);
+    var pelivarit = ['var(--linkki)', 'var(--varoitus)', 'var(--grumbl)', 'var(--virhe)'];
+    vasen.appendChild(el('grumbl-osasto', G.peliotsikko + K_NUOLI.replace('<svg', '<svg style="width:12px;height:12px;fill:currentColor;margin-left:auto"')));
+    G.pelit.forEach(function (peli, i) {
+      var r = el('grumbl-pikkurivi', '<span>' + peli + '</span>');
+      var m = el('grumbl-pikkumerkki', peli.charAt(0));
+      m.style.background = pelivarit[i % pelivarit.length];
+      r.insertBefore(m, r.firstChild);
+      vasen.appendChild(r);
     });
-    d.appendChild(lista);
-    return d;
-  }
 
-  /* Kirjoitusnäkymä. Näppäimistö on piirretty, ei iOS:n oma — muuten
-     automaattikorjaus ja ennakoiva tekstipalkki pilaisivat oton. Mikä
-     tahansa näppäin vie käsikirjoituksen tekstiä eteenpäin. */
-  function avaaKirjoitus(juuri, ctx) {
-    if (juuri.querySelector('.grumbl-kirjoitus')) return;
-    var G = ctx.S.grumbl;
+    vasen.appendChild(el('grumbl-osasto', G.syoteOtsikko));
+    vasen.appendChild(el('grumbl-pikkurivi',
+      K_PLUS.replace('<svg', '<svg style="width:16px;height:16px;fill:currentColor;flex:none"') +
+      '<span>' + G.syoteLuo + '</span>'));
+    vasen.appendChild(el('grumbl-osasto', G.yhteisoOtsikko));
+    runko.appendChild(vasen);
 
-    var k = el('grumbl-kirjoitus');
-    var yla = el('grumbl-kirjoitus-yla');
+    /* ── Keskipalsta: kirjoituslomake ──────────────────────────────────── */
+    var keski = el('grumbl-keski');
+    keski.appendChild(el('grumbl-lomake-otsikko',
+      '<span style="margin-left:0">' + G.kirjoitaOtsikko + '</span>' +
+      '<span>' + G.alue + '</span>'));
+
+    var valilehdet = el('grumbl-valilehdet');
+    ['Text', 'Images', 'Link', 'Poll'].forEach(function (v, i) {
+      valilehdet.appendChild(el('grumbl-valilehti' + (i === 0 ? ' valittu' : ''), v));
+    });
+    keski.appendChild(valilehdet);
+
+    var otsikkoKentta = el('grumbl-kentta aktiivinen');
+    otsikkoKentta.appendChild(el('grumbl-kentta-nimi', G.otsikkoKentta.toUpperCase()));
+    var teksti = el('grumbl-teksti');
+    teksti.setAttribute('data-vihje', G.otsikkoVihje);
+    otsikkoKentta.appendChild(teksti);
+    var tyokalut = el('grumbl-tyokalut', K_KUVA + K_VIDEO +
+      '<span style="font-family:var(--fontti-mono);font-size:11px;color:var(--himmea-2)">GIF</span>' +
+      '<span style="font-size:13px;color:var(--himmea-2)">Aa</span>');
+    var laskuri = el('grumbl-laskuri', '0 / 300');
+    tyokalut.appendChild(laskuri);
+    otsikkoKentta.appendChild(tyokalut);
+    keski.appendChild(otsikkoKentta);
+
+    var runkoKentta = el('grumbl-kentta');
+    runkoKentta.appendChild(el('grumbl-kentta-nimi', 'BODY'));
+    runkoKentta.appendChild(el('grumbl-runkokentta', G.runkoVihje));
+    keski.appendChild(runkoKentta);
+
+    var napit = el('grumbl-lomake-napit');
     var peruuta = document.createElement('button');
     peruuta.className = 'grumbl-peruuta';
     peruuta.textContent = G.peruutaNappi;
-    peruuta.addEventListener('click', function () { k.remove(); });
-    yla.appendChild(peruuta);
-    yla.appendChild(el('grumbl-kirjoitus-otsikko', G.alue));
     var julkaise = document.createElement('button');
     julkaise.className = 'grumbl-julkaise';
     julkaise.textContent = G.julkaisuNappi;
-    yla.appendChild(julkaise);
-    k.appendChild(yla);
+    napit.appendChild(peruuta);
+    napit.appendChild(julkaise);
+    keski.appendChild(napit);
 
-    var kentta = el('grumbl-kentta');
-    kentta.appendChild(el('grumbl-kentta-alue', G.otsikkoKentta));
-    var teksti = el('grumbl-teksti');
-    teksti.setAttribute('data-vihje', G.otsikkoVihje);
-    kentta.appendChild(teksti);
-    var laskuri = el('grumbl-laskuri', '0 / 300');
-    kentta.appendChild(laskuri);
-    kentta.appendChild(el('grumbl-runko', G.runkoVihje));
-    k.appendChild(kentta);
+    var muistutus = el('grumbl-muistutus');
+    muistutus.appendChild(el('grumbl-muistutus-otsikko', G.muistutusOtsikko));
+    G.muistutukset.forEach(function (rivi) {
+      muistutus.appendChild(el('grumbl-muistutus-rivi', '<i>•</i><span>' + rivi + '</span>'));
+    });
+    keski.appendChild(muistutus);
+    runko.appendChild(keski);
 
+    /* ── Oikea palsta: yhteisön tiedot ja säännöt ──────────────────────── */
+    var oikea = el('grumbl-oikea');
+    oikea.appendChild(el('grumbl-opas',
+      K_UUTIS.replace('<svg', '<svg style="width:14px;height:14px;fill:currentColor"') + G.oppaat));
+    oikea.appendChild(el('grumbl-tilastot',
+      '<div class="grumbl-tilasto"><b>' + G.kavijat + '</b><span>' + G.kavijatOtsikko + '</span></div>' +
+      '<div class="grumbl-tilasto"><b>' + G.osallistumiset + '</b><span>' + G.osallistumisetOtsikko + '</span></div>'));
+
+    var liputus = el('grumbl-lohko');
+    liputus.appendChild(el('grumbl-lohko-otsikko', G.kayttajaOtsikko));
+    liputus.appendChild(el('grumbl-liputus',
+      '<span class="grumbl-liputus-merkki">A</span><span>' + G.kayttajaNimi + '</span>'));
+    oikea.appendChild(liputus);
+
+    var saannot = el('grumbl-lohko');
+    saannot.appendChild(el('grumbl-lohko-otsikko', G.saannotOtsikko));
+    G.saannot.forEach(function (teksti2, i) {
+      saannot.appendChild(el('grumbl-saanto',
+        '<i>' + (i + 1) + '</i><span>' + teksti2 + '</span>' + K_NUOLI));
+    });
+    oikea.appendChild(saannot);
+
+    var modet = el('grumbl-lohko');
+    modet.appendChild(el('grumbl-lohko-otsikko', G.modeOtsikko));
+    modet.appendChild(el('grumbl-mode-nappi',
+      K_KIRJE.replace('<svg', '<svg style="width:14px;height:14px;fill:currentColor"') + G.viestiModeille));
+    modet.appendChild(el('grumbl-mode',
+      '<span class="grumbl-mode-kuva"></span>' +
+      '<span class="grumbl-mode-nimi">' + G.moderaattori + '</span>' +
+      '<span class="grumbl-mode-merkki">' + G.moderaattoriMerkki + '</span>'));
+    modet.appendChild(el('grumbl-mode-nappi', G.kaikkiModet));
+    oikea.appendChild(modet);
+
+    oikea.appendChild(el('grumbl-alatunniste', G.alatunniste.join(' &nbsp; ')));
+    runko.appendChild(oikea);
+    d.appendChild(runko);
+
+    /* ── Näppäimistö ───────────────────────────────────────────────────────
+       Mikä tahansa näppäin vie käsikirjoituksen tekstiä eteenpäin, joten
+       näyttelijän ei tarvitse osua oikeisiin näppäimiin. */
     nappaimisto = new GRIND.Nappaimisto({
       teksti: G.postausOtsikko,
       virhe: G.kirjoitusvirhe,
-      onMuutos: function (arvo, valmis) {
+      onMuutos: function (arvo) {
         teksti.innerHTML = arvo.replace(/&/g, '&amp;').replace(/</g, '&lt;') +
           '<span class="grumbl-kohdistin"></span>';
         laskuri.textContent = arvo.length + ' / 300';
         julkaise.classList.toggle('aktiivinen', arvo.length > 0);
       }
     });
-    k.appendChild(nappaimisto.el);
     teksti.innerHTML = '<span class="grumbl-kohdistin"></span>';
+    d.appendChild(nappaimisto.el);
 
-    juuri.appendChild(k);
+    juuri.appendChild(d);
   }
 
   /* ══ TABB — osta nyt, maksa myöhemmin ═══════════════════════════════════
@@ -555,11 +595,7 @@
       { id: 1, nimi: 'Postaus', sovellus: 'grumbl',
         kosketus: true,
         hohto: { vari: 'punainen', voima: 3 },
-        piirra: function (juuri, ctx) {
-          var d = grumblSyote(ctx);
-          juuri.appendChild(d);
-          avaaKirjoitus(d, ctx);
-        } },
+        piirra: function (juuri, ctx) { grumbl(juuri, ctx); } },
 
       /* 2 — TABB. Puhelin, takki ja neljä ruokatilausta, valtaosa
              erääntynyt. Luettava asia on ERÄÄNTYNYT-merkinnät, ei summat. */

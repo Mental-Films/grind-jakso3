@@ -133,6 +133,54 @@
     "runkoVihje":      "Body (optional)",
     "julkaisuNappi":   "Post",
     "peruutaNappi":    "Cancel",
+
+    // ── Selainkehys ja palstat ──────────────────────────────────────────
+    // GRUMBL on selaimessa auki oleva sivusto, ei sovellus. Siksi
+    // kolmipalstainen työpöytäasettelu: iPadin Safari pyytää työpöytäsivut
+    // oletuksena, joten juuri tämän Alvina näkisi.
+    "hakuvihje":       "Search in c/cryptolosses",
+    "luoNappi":        "Create",
+    "navi":            ["Home", "Popular", "News", "Explore", "Start a community"],
+    "peliotsikko":     "GAMES ON GRUMBL",
+    "pelit":           ["Letterset", "Cozy Spaces", "Hexa Stack", "Rock Bottom"],
+    "syoteOtsikko":    "CUSTOM FEEDS",
+    "syoteLuo":        "Create Custom Feed",
+    "yhteisoOtsikko":  "COMMUNITIES",
+
+    "oppaat":          "Community Guide",
+    "kavijat":         "7,2 t",
+    "kavijatOtsikko":  "Weekly visitors",
+    "osallistumiset":  "2 t",
+    "osallistumisetOtsikko": "Weekly contributions",
+
+    "kayttajaOtsikko": "USER FLAIR",
+    "kayttajaNimi":    "AstronautExtension21",
+
+    "saannotOtsikko":  "C/CRYPTOLOSSES RULES",
+    "saannot": [
+      "Respect others and be civil",
+      "No spam",
+      "Posts should be relevant to crypto and/or money",
+      "Misinformation"
+    ],
+
+    // Kirjoitusnäkymän muistutus. Täyttää keskipalstan lomakkeen alta ja
+    // on samalla aitoa: palstat näyttävät säännöt juuri kirjoitettaessa.
+    "muistutusOtsikko": "Posting to c/cryptolosses",
+    "muistutukset": [
+      "Remember the human — people here are losing real money",
+      "No financial advice, no referral links, no signal groups",
+      "Screenshots must not show account numbers or full names"
+    ],
+
+    "modeOtsikko":     "MODERATORS",
+    "viestiModeille":  "Message Mods",
+    "kaikkiModet":     "View all moderators",
+    "moderaattori":    "u/Ep0chalysis",
+    "moderaattoriMerkki": "RPR-110",
+
+    // Alatunnisteen linkit. Keksittyjä — ei oikean palvelun nimiä.
+    "alatunniste":     ["Grumbl Rules", "Privacy Policy", "User Agreement"],
     "kommentitSana":   "",
     "jakoSana":        "Share",
     "merkinnat":       { "tappio": "LOSS", "apua": "HELP", "puhetta": "DISCUSSION" },

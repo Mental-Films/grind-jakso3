@@ -324,9 +324,14 @@ Kolme rakenteellista asiaa, jotka tulevat suoraan oikeasta pörssistä:
 Aihealueita, postauslista, äänestysnuolet, kommenttimäärät. Päällä
 kirjoituskenttä ja **sovelluksen oma näppäimistö**.
 
-Rivillä on otsikko, sen alla aihealue pienellä, äänestysnuolet ja pistemäärä
-vasemmassa laidassa, kommenttimäärä ja **suhteellinen aika** (`3 t`, ei
-`03:31`). Suodatinrivi ylhäällä: `Uusimmat · Kuumat · Ylin`.
+**GRUMBL on selainsivu, ei sovellus.** Asettelu on kolmipalstainen
+työpöytäasettelu: vasen navigaatio (158 pt), keskellä sisältö, oikealla
+yhteisön tiedot ja numeroidut säännöt (214 pt). Näin siksi, että iPadin
+Safari pyytää työpöytäsivut oletuksena — juuri tämän Alvina näkisi.
+
+Palstat ovat kapeita, joten **chrome on pientä (9,5–12,5 pt) ja vain
+kirjoitettava otsikko on isoa (25 pt)**. Se on tarkoituksellista: sivun reunat
+ovat tekstuuria, otsikko on se, mikä kameralla luetaan.
 
 Näppäimistö on piirretty käyttöliittymä, ei iOS:n oma — muuten automaattikorjaus
 ja ennakoiva tekstipalkki pilaavat oton. Sen pitää näyttää oikealta lähikuvassa:

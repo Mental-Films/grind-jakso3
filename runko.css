@@ -5,7 +5,7 @@
 /* ── Kirjasimet ───────────────────────────────────────────────────────────
    Pudota IBM Plex -tiedostot kansioon assets/fontit/, niin ne otetaan
    käyttöön. Ilman niitä käytetään järjestelmän kirjasinta — se kelpaa
-   kameratestiin mutta ei lopulliseen proppiin. Ks. BRIEF_GRAAFIKKO.md 3. */
+   kameratestiin mutta ei lopulliseen proppiin. */
 @font-face {
   font-family: "Plex";
   src: url("assets/fontit/IBMPlexSans-Regular.woff2") format("woff2");

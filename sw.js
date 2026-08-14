@@ -8,7 +8,7 @@
  * Ajossa oleva versionumero näkyy propin ohjauspalkissa.
  */
 
-var VERSIO = 'grind3-v0.9.2';
+var VERSIO = 'grind3-v1.0.0';
 
 /* Pakolliset. Jos yksikin puuttuu, asennus epäonnistuu ja se on oikein —
    silloin proppi ei väitä olevansa offline-valmis. */
@@ -41,7 +41,6 @@ var VAPAAEHTOISET = [
   'KAYTTOONOTTO.md',
   'README.md',
   'SUUNNITELMA.md',
-  'BRIEF_GRAAFIKKO.md',
   'REFERENSSIT.md',
   'assets/ikoni_tabletti.png',
   'assets/ikoni_puhelin.png',
@@ -125,10 +124,16 @@ self.addEventListener('fetch', function (t) {
         var ajastin = setTimeout(function () { hylkaa(new Error('aikakatkaisu')); }, AIKAKATKAISU);
         fetch(haettava).then(function (vastaus) {
           clearTimeout(ajastin);
-          if (vastaus && vastaus.ok) {
-            var kopio = vastaus.clone();
-            caches.open(VERSIO).then(function (v) { v.put(pyynto, kopio); });
-          }
+
+          /* Vain kelvollinen vastaus kelpaa. Ilman tätä 404 palautuisi
+             sivulle "onnistuneena" ja proppi hajoaisi, vaikka koko sisältö
+             on välimuistissa — esimerkiksi jos osoite vaihtuu tai palvelin
+             vastaa virheellä. Virhe on syy mennä välimuistiin, ei syy
+             näyttää virhesivua. */
+          if (!vastaus || !vastaus.ok) { hylkaa(new Error('vastaus ' + (vastaus && vastaus.status))); return; }
+
+          var kopio = vastaus.clone();
+          caches.open(VERSIO).then(function (v) { v.put(pyynto, kopio); });
           valmis(vastaus);
         }).catch(function (e) { clearTimeout(ajastin); hylkaa(e); });
       });

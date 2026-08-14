@@ -1,8 +1,8 @@
 /* HOPP Partner — kuljettajanäkymä.
  *
  * Rakenne on kyytisovellusten genrekonventio: kartta täyttää ruudun, tieto
- * kelluu sen päällä ylä- ja alalaidassa. Ilme on oma — ks. BRIEF_GRAAFIKKO.md
- * kohta 8. Ei kenenkään tunnusväriä, kirjainmerkkiä eikä painikemuotoa.
+ * kelluu sen päällä ylä- ja alalaidassa. Ilme on oma: ei kenenkään
+ * tunnusväriä, kirjainmerkkiä eikä painikemuotoa.
  *
  * Värit tulevat teema.json:ista. Mitat ovat pisteitä (pt = CSS-px iOS:ssä).
  */

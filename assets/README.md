@@ -3,8 +3,8 @@
 Pudota grafiikka tähän kansioon oikealla nimellä — se korvaa paikkamerkin
 automaattisesti. Koodiin ei kosketa.
 
-Täysi lista nimineen ja mittoineen: **[../BRIEF_GRAAFIKKO.md](../BRIEF_GRAAFIKKO.md)**
-kohta 4.
+Nämä ovat valinnaisia: proppi toimii täysin ilman yhtään assettia, ja
+ilman tiedostoa kohta näkyy paikkamerkkinä oikean kokoisena.
 
 Tärkeimmät:
 

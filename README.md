@@ -150,7 +150,7 @@ Mitään ei tarvitse kääntää — tallennus riittää.
 Nimen vaihtaminen `nimet`-lohkosta muuttaa sen kaikkialle kerralla. Molemmissa
 JSON-tiedostoissa saa olla `//`-kommentteja.
 
-Täydet ohjeet: **[BRIEF_GRAAFIKKO.md](BRIEF_GRAAFIKKO.md)**
+Referenssit ja rakenteet: **[REFERENSSIT.md](REFERENSSIT.md)**
 
 ---
 

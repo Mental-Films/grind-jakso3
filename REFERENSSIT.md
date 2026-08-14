@@ -5,7 +5,7 @@ rakennetaan. Katsottu 12.8.2026.
 
 **Raja on sama kuin HOPP:ssa:** genrekonventiot kyllä, ilme ei. Ammattikäyttäjä
 saa tunnistaa sovelluksen *tyypin* sekunnissa, mutta ei tuotetta.
-Ks. [BRIEF_GRAAFIKKO.md](BRIEF_GRAAFIKKO.md) kohta 8.
+Ks. kohta 5, "Tavaramerkit".
 
 ---
 
@@ -63,7 +63,7 @@ kartan yli. Sama rakenne siirtyy tabletille.
 
 Apple mainitsee, että iPadia käytetään noin **90 cm:n etäisyydeltä**, ja että
 etäisyyden pitäisi ohjata sisällön kokoa ja tiheyttä. Meillä tulee lisäksi
-kameran etäisyys päälle — siksi briefin luettavuusportaat ovat olemassa.
+kameran etäisyys päälle — siksi luettavuusportaat ovat olemassa, ks. kohta 6.
 
 ---
 
@@ -179,7 +179,7 @@ käyttöön.
 
 Ylhäälle **kokonaissumma ja myöhästymismaksut** omana korttinaan, alas
 maksupainike. Kohtauksen kannalta luetaan **erääntymismerkinnät**, ei
-summat — ks. brief kohta 6.
+summat.
 
 ---
 

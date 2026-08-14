@@ -16,7 +16,7 @@
   'use strict';
 
   /* iPadin pystynäppäimistö. Leveämpi kuin puhelimessa ja return on
-     toisella rivillä — ks. BRIEF_GRAAFIKKO.md kohta 6. */
+     toisella rivillä. */
   var RIVIT = [
     ['q','w','e','r','t','y','u','i','o','p','⌫'],
     ['a','s','d','f','g','h','j','k','l','return'],

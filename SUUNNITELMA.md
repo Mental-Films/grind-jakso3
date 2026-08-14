@@ -313,7 +313,7 @@ manifest_tabletti.json  Kotivalikon nimi ja kuvake
 manifest_puhelin.json   "
 index.html              Aloitussivu, molemmat propit ja työkalut
 robots.txt              noindex
-SUUNNITELMA.md · BRIEF_GRAAFIKKO.md · README.md
+SUUNNITELMA.md · REFERENSSIT.md · KAYTTOONOTTO.md · README.md
 ```
 
 Kaksi proppia jakavat saman moottorin. Tuotannon aiempi proppi oli yksi tiedosto,
@@ -515,7 +515,7 @@ Seuraavaksi vaihe 2: asennus oikeille laitteille ja kameratesti.
 
 ## 12. Päätökset
 
-Ratkaistu 12.8.2026. Nämä on viety koodiin ja graafikon briefiin.
+Ratkaistu 12.8.2026. Nämä on viety koodiin.
 
 | # | Kysymys | Päätös | Mitä siitä seurasi |
 |:--:|---|---|---|

@@ -95,8 +95,8 @@
   },
 
   // ══ TYPOGRAFIA ════════════════════════════════════════════════════════
-  // Luettavuusportaat ovat BRIEF_GRAAFIKKO.md kohdassa 3. Nämä ovat ne
-  // portaat koodissa — älä kirjoita pistekokoja suoraan CSS:ään.
+  // Luettavuusportaat koodissa. Älä kirjoita pistekokoja suoraan CSS:ään —
+  // koko ilme vaihdetaan täältä.
   "typografia": {
     "jatti":   "58px",   // lähikuvan yksittäinen luku
     "iso":     "46px",   // kurssi

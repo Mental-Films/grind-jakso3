@@ -236,7 +236,7 @@
     }
 
     /* Täyttö käyrän alle. Pidetään vaimeana: laaja liukuväri raidoittuu
-       8-bittisessä videossa, ks. BRIEF_GRAAFIKKO kohta 3. */
+       8-bittisessä videossa. */
     var tayte = c.createLinearGradient(0, yla, 0, yla + kK);
     tayte.addColorStop(0, nousu ? 'rgba(94,158,107,.20)' : 'rgba(196,64,47,.20)');
     tayte.addColorStop(1, 'rgba(0,0,0,0)');

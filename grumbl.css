@@ -11,7 +11,8 @@
  * Kaikki mitat, tekstikoot ja varjot tulevat teema.json:ista. Palstoilla on
  * omat kiinteät leveytensä, koska 820 pt ei jousta — ne ovat tässä.
  *
- * Tunnusväri on roosa. EI oranssia eikä pyöreää maskottia, ks. brief kohta 8.
+ * Tunnusväri on roosa. EI oranssia eikä pyöreää maskottia — genren saa
+ * tunnistaa, tuotetta ei.
  */
 
 .grumbl {

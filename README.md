@@ -126,6 +126,7 @@ Klikkeri toimii silloinkin.
 
 | Osoite | Mitä |
 |---|---|
+| `graafikko.html` | **Graafikolle.** Molemmat propit tietokoneella oikeassa pistekoossa, laitekehyksissä turva-alueineen. Cue-, hohto- ja kirkkaussäädöt |
 | `laitetiedot.html` | Avaa **kuvauslaitteella**: artboardin mitat, turva-alueet, virkistystaajuus, kuvatiheys. Kopioi-nappi lopussa |
 | `proppi_tabletti.html?esikatselu` | Kaikki cuet vierekkäin laitteen oikeassa koossa |
 | `?cue=4` | Avaa suoraan tiettyyn cueen |

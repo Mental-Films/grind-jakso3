@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0E1116">
+<title>GRIND 3 — laitenäkymä graafikolle</title>
+<style>
+/* Esikatselusivu graafikolle. Ajetaan tietokoneella, ei laitteella.
+   Propit ajetaan oikeassa pistekoossa iframe-kehyksissä, joten mitä täällä
+   näkyy on sama kuin mitä iPadilla ja iPhonella näkyy. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0A0D11;
+  color: #C8D0D8;
+  font-family: "IBM Plex Sans", -apple-system, system-ui, sans-serif;
+  line-height: 1.55;
+  padding: 34px 30px 70px;
+}
+main { max-width: 1420px; margin: 0 auto; }
+
+.yla {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  color: #4E5866; margin-bottom: 7px;
+}
+h1 { font-size: 27px; font-weight: 600; letter-spacing: -.01em; margin-bottom: 8px; }
+.johdanto { color: #6C7885; font-size: 14.5px; max-width: 76ch; margin-bottom: 26px; }
+.johdanto b { color: #C8D0D8; font-weight: 600; }
+
+/* ── Ohjaimet ──────────────────────────────────────────────────────────── */
+.ohjaimet {
+  background: #12161C;
+  border: 1px solid #232B36;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 26px;
+  display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start;
+}
+.ryhma { display: flex; flex-direction: column; gap: 8px; }
+.ryhma > label {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: #4E5866;
+}
+.napit { display: flex; flex-wrap: wrap; gap: 5px; }
+button {
+  background: #1A2029; border: 1px solid #2E3846;
+  color: #C8D0D8;
+  font-family: inherit; font-size: 13px;
+  padding: 7px 13px; border-radius: 7px; cursor: pointer;
+}
+button:hover { border-color: #3D4757; background: #202834; }
+button.valittu { background: #C9A227; border-color: #C9A227; color: #0B0F13; font-weight: 600; }
+button.punainen.valittu { background: #C4402F; border-color: #C4402F; color: #fff; }
+button.vihrea.valittu  { background: #5E9E6B; border-color: #5E9E6B; color: #0B0F13; }
+.liuku { display: flex; align-items: center; gap: 10px; }
+input[type=range] { width: 140px; accent-color: #C9A227; }
+.arvo {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px; color: #6C7885; min-width: 4.5em;
+}
+.valinta { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #6C7885; }
+
+/* ── Laitteet ──────────────────────────────────────────────────────────── */
+.laitteet {
+  display: flex; gap: 46px; align-items: flex-start;
+  justify-content: center; flex-wrap: wrap;
+}
+.laite { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.laite-otsikko {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px; color: #6C7885; letter-spacing: .06em;
+}
+.laite-otsikko b { color: #C8D0D8; font-weight: 600; }
+
+/* Kehys skaalautuu zoomilla. transform ei kutista asettelua, joten kotelon
+   mitat asetetaan käsin — muuten pienennetyn kuvan alle jäisi ruudun
+   korkuinen tyhjä alue. */
+.kehys-kotelo { transform-origin: top left; }
+.kehys-kotelo > * { transition: transform .18s ease; }
+.kehys {
+  position: relative;
+  background: #05070A;
+  border: 1px solid #2E3846;
+  box-shadow: 0 24px 70px rgba(0,0,0,.7);
+}
+.kehys.tabletti { padding: 13px; border-radius: 30px; }
+.kehys.puhelin  { padding: 11px; border-radius: 44px; }
+
+.ruutu { position: relative; overflow: hidden; background: #000; }
+.kehys.tabletti .ruutu { border-radius: 19px; }
+.kehys.puhelin  .ruutu { border-radius: 34px; }
+.ruutu iframe { display: block; border: 0; }
+
+/* Tilapalkki. iOS piirtää tämän itse laitteella — tässä se on mukana,
+   jotta näkee mitä ylimpään turva-alueeseen oikeasti jää. */
+.tilapalkki {
+  position: absolute; left: 0; right: 0; top: 0;
+  display: flex; align-items: center;
+  color: #fff;
+  font-family: -apple-system, "IBM Plex Sans", system-ui, sans-serif;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 3;
+}
+.kehys.tabletti .tilapalkki { height: 24px; padding: 0 22px; font-size: 13px; }
+.kehys.puhelin  .tilapalkki { height: 59px; padding: 0 30px; font-size: 15px; align-items: flex-start; }
+.kehys.puhelin  .tilapalkki > * { margin-top: 15px; }
+.tilapalkki .oikea { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.akku {
+  width: 25px; height: 12px;
+  border: 1.5px solid rgba(255,255,255,.65);
+  border-radius: 3.5px;
+  position: relative;
+}
+.akku::after {
+  content: ""; position: absolute; right: -3.5px; top: 3.5px;
+  width: 2px; height: 4px; background: rgba(255,255,255,.65);
+  border-radius: 0 1px 1px 0;
+}
+.akku i { position: absolute; inset: 1.5px; background: #fff; border-radius: 1.5px; }
+
+/* Dynamic Island */
+.saari {
+  position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+  width: 122px; height: 35px; border-radius: 999px;
+  background: #000; z-index: 4; pointer-events: none;
+}
+
+/* Kotipalkki */
+.kotipalkki {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  height: 5px; border-radius: 3px;
+  background: rgba(255,255,255,.42);
+  z-index: 3; pointer-events: none;
+}
+.kehys.tabletti .kotipalkki { width: 250px; }
+.kehys.puhelin  .kotipalkki { width: 140px; }
+
+/* Turva-alueiden korostus */
+.turva {
+  position: absolute; left: 0; right: 0;
+  background: rgba(199,154,58,.13);
+  border-color: rgba(199,154,58,.45);
+  border-style: dashed; border-width: 0;
+  z-index: 2; pointer-events: none; display: none;
+}
+body.turvat .turva { display: block; }
+.turva.yla { top: 0; border-bottom-width: 1px; }
+.turva.ala { bottom: 0; border-top-width: 1px; }
+
+/* ── Muistilista ───────────────────────────────────────────────────────── */
+.muistio {
+  margin-top: 46px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+.kortti {
+  background: #12161C; border: 1px solid #232B36;
+  border-radius: 12px; padding: 17px 19px;
+}
+.kortti h2 {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: #4E5866; font-weight: 400; margin-bottom: 10px;
+}
+.kortti p, .kortti li { font-size: 13.5px; color: #8A94A2; }
+.kortti p + p { margin-top: 9px; }
+.kortti ul { margin: 0 0 0 17px; }
+.kortti li { margin-bottom: 5px; }
+.kortti b, .kortti code { color: #C8D0D8; }
+.kortti code {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12.5px; background: #1A2029; padding: 1px 5px; border-radius: 4px;
+}
+.kortti a { color: #C9A227; }
+.huomio { border-left: 3px solid #C79A3A; }
+</style>
+</head>
+<body class="turvat">
+<main>
+  <div class="yla">GRIND · jakso 3 · Pelkääjän paikka</div>
+  <h1>Laitenäkymä graafikolle</h1>
+  <p class="johdanto">
+    Molemmat propit ajossa <b>oikeassa pistekoossa</b>: iPad Air 820 × 1180 pt ja
+    iPhone 393 × 852 pt. Nämä eivät ole kuvakaappauksia vaan itse propit, joten
+    mitä tässä näkyy on sama kuin mitä laitteella näkyy. Tilapalkki, Dynamic
+    Island ja kotipalkki ovat mukana, koska ne vievät tilaa sommittelulta.
+  </p>
+
+  <div class="ohjaimet">
+    <div class="ryhma">
+      <label>iPad — cue</label>
+      <div class="napit" id="cuet-tabletti"></div>
+    </div>
+    <div class="ryhma">
+      <label>iPhone — cue</label>
+      <div class="napit" id="cuet-puhelin"></div>
+    </div>
+    <div class="ryhma">
+      <label>Hohto — kohtauksen valo kasvoille</label>
+      <div class="napit" id="hohto">
+        <button data-hohto="pois" class="valittu">pois</button>
+        <button data-hohto="punainen" class="punainen">punainen</button>
+        <button data-hohto="vihrea" class="vihrea">vihreä</button>
+      </div>
+      <div class="liuku">
+        <input type="range" id="hohtovoima" min="0" max="9" value="6">
+        <span class="arvo" id="hohtovoima-arvo">6</span>
+      </div>
+    </div>
+    <div class="ryhma">
+      <label>Kirkkaus</label>
+      <div class="liuku">
+        <input type="range" id="kirkkaus" min="50" max="140" value="100">
+        <span class="arvo" id="kirkkaus-arvo">100 %</span>
+      </div>
+    </div>
+    <div class="ryhma">
+      <label>Zoom — 100 % on 1:1 pisteinä</label>
+      <div class="napit" id="zoom">
+        <button data-zoom="1" class="valittu">100 %</button>
+        <button data-zoom="0.75">75 %</button>
+        <button data-zoom="0.5">50 %</button>
+      </div>
+    </div>
+    <div class="ryhma">
+      <label>Näytä</label>
+      <label class="valinta"><input type="checkbox" id="nayta-turvat" checked> turva-alueet</label>
+      <label class="valinta"><input type="checkbox" id="nayta-kromi" checked> tilapalkki ja kotipalkki</label>
+    </div>
+  </div>
+
+  <div class="laitteet">
+    <div class="laite">
+      <div class="laite-otsikko"><b>iPad Air</b> · 820 × 1180 pt · @2x → 1640 × 2360 px</div>
+      <div class="kehys-kotelo" data-kotelo>
+        <div class="kehys tabletti">
+          <div class="ruutu" style="width:820px;height:1180px">
+            <iframe id="kehys-tabletti" src="proppi_tabletti.html?cue=0"
+                    width="820" height="1180" title="iPad-proppi"></iframe>
+            <div class="turva yla" style="height:24px"></div>
+            <div class="turva ala" style="height:20px"></div>
+            <div class="tilapalkki" data-kromi>
+              <span data-kello>3:31</span>
+              <span class="oikea"><span style="font-size:.85em">WLAN</span><span class="akku"><i></i></span></span>
+            </div>
+            <div class="kotipalkki" data-kromi></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="laite">
+      <div class="laite-otsikko"><b>iPhone</b> · 393 × 852 pt · @3x → 1179 × 2556 px</div>
+      <div class="kehys-kotelo" data-kotelo>
+        <div class="kehys puhelin">
+          <div class="ruutu" style="width:393px;height:852px">
+            <iframe id="kehys-puhelin" src="proppi_puhelin.html?cue=0"
+                    width="393" height="852" title="iPhone-proppi"></iframe>
+            <div class="turva yla" style="height:59px"></div>
+            <div class="turva ala" style="height:34px"></div>
+            <div class="saari" data-kromi></div>
+            <div class="tilapalkki" data-kromi>
+              <span data-kello>3:31</span>
+              <span class="oikea"><span class="akku"><i></i></span></span>
+            </div>
+            <div class="kotipalkki" data-kromi></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="muistio">
+    <div class="kortti">
+      <h2>Mitä muutat ja mistä</h2>
+      <ul>
+        <li><b>Värit, pyöristykset, välit, tekstikoot, varjot</b> → <code>teema.json</code></li>
+        <li><b>Kaikki teksti ja numerot</b> → <code>sisalto.json</code></li>
+        <li><b>Sovellusten nimet</b> → <code>sisalto.json</code>, lohko <code>nimet</code></li>
+        <li><b>Kuvat ja logot</b> → <code>assets/</code>, tiedostonimi ratkaisee</li>
+      </ul>
+      <p>Mitään ei tarvitse kääntää. Tallenna tiedosto ja päivitä tämä sivu.</p>
+    </div>
+
+    <div class="kortti">
+      <h2>Kamerasäännöt</h2>
+      <ul>
+        <li>Kirkkain sallittu <code>#C8D0D8</code> — puhdas valkoinen palaa puhki</li>
+        <li>Tummin <code>#0E1116</code> — täysmusta ei valaise kasvoja</li>
+        <li>Ohuin viiva 2 pt, pienin teksti 13 pt</li>
+        <li>Vältä laajoja hienovaraisia liukuvärejä — 8-bit-video raidoittuu</li>
+        <li>Ei täyskylläisiä värejä; punainen <code>#FF0000</code> leviää</li>
+      </ul>
+    </div>
+
+    <div class="kortti">
+      <h2>Hohto on osa sommittelua</h2>
+      <p>
+        Ruutu on kohtauksen valonlähde: punainen alussa ja lopussa, vihreä
+        välissä. Hohto nostaa kokonaiskirkkautta ja vetää sävyt yhteen suuntaan.
+      </p>
+      <p>
+        <b>Suunnittele perustila hieman himmeämmäksi</b> kuin lopputuloksen pitää
+        olla — kokeile yllä olevalla säätimellä miltä se näyttää hohdon kanssa.
+      </p>
+    </div>
+
+    <div class="kortti huomio">
+      <h2>Kaksi asiaa jotka näkyvät täällä väärin</h2>
+      <p>
+        <b>Kirjasin.</b> <code>assets/fontit/</code> on tyhjä, joten selain
+        käyttää järjestelmän kirjasinta. Oikea on IBM Plex Sans ja Mono. Numerot
+        näyttävät siksi tällä hetkellä väärältä.
+      </p>
+      <p>
+        <b>Kirkkaus ja väri.</b> Tabletin ruutu on kirkkaampi ja kylläisempi kuin
+        työpöytämonitori. Tarkista värit oikealla laitteella heti kun ensimmäiset
+        arvot ovat paikallaan — älä vasta lopuksi.
+      </p>
+    </div>
+
+    <div class="kortti">
+      <h2>Muut näkymät</h2>
+      <ul>
+        <li><a href="proppi_tabletti.html?esikatselu">Tabletin kaikki cuet vierekkäin</a></li>
+        <li><a href="proppi_puhelin.html?esikatselu">Puhelimen kaikki cuet vierekkäin</a></li>
+        <li><a href="REFERENSSIT.md">Referenssit</a> — mitä oikeista sovelluksista otettiin</li>
+        <li><a href="SUUNNITELMA.md">Suunnitelma</a> — ajolista ja kuvausasetukset</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<script>
+/* Propit ajetaan iframe-kehyksissä samasta lähteestä kuin oikealla laitteella,
+   joten esikatselu ei voi ajautua eri asentoon kuin itse proppi. */
+(function () {
+  var laitteet = {
+    tabletti: { kehys: document.getElementById('kehys-tabletti'), turvaYla: 24, turvaAla: 20, G: null },
+    puhelin:  { kehys: document.getElementById('kehys-puhelin'),  turvaYla: 59, turvaAla: 34, G: null }
+  };
+  var hohto = { vari: null, voima: 6 };
+
+  /* Odota että proppi on ladannut sisältönsä — GRIND.kaynnista on
+     asynkroninen, koska se hakee teema.json:in ja sisalto.json:in. */
+  function odotaValmista(nimi, valmis) {
+    var L = laitteet[nimi];
+    var yritykset = 0;
+    (function katso() {
+      var G = L.kehys.contentWindow && L.kehys.contentWindow.GRIND;
+      if (G && G.cuet && G.cuet.length) { L.G = G; valmis(G); return; }
+      if (++yritykset > 200) return;
+      setTimeout(katso, 60);
+    })();
+  }
+
+  function alusta(nimi) {
+    odotaValmista(nimi, function (G) {
+      var L = laitteet[nimi];
+
+      /* Ohjauspalkki pois: graafikon pitää nähdä sommittelu sellaisena kuin
+         se on otossa, ei operaattorin työkalujen kanssa. */
+      G.palkki(false);
+
+      /* Turva-alueet käsin: selaimessa env(safe-area-inset-*) on nolla, joten
+         ilman tätä sisältö nousisi tilapalkin alle eikä sommittelu vastaisi
+         laitetta. */
+      var juuri = L.kehys.contentDocument.documentElement;
+      juuri.style.setProperty('--turva-yla', L.turvaYla + 'px');
+      juuri.style.setProperty('--turva-ala', L.turvaAla + 'px');
+
+      teeCuenapit(nimi, G);
+      asetaHohto();
+      asetaKirkkaus(document.getElementById('kirkkaus').value);
+    });
+  }
+
+  function teeCuenapit(nimi, G) {
+    var kotelo = document.getElementById('cuet-' + nimi);
+    kotelo.innerHTML = '';
+    G.cuet.forEach(function (c, i) {
+      var b = document.createElement('button');
+      b.textContent = i + ' · ' + c.nimi;
+      if (i === G.cue) b.className = 'valittu';
+      b.addEventListener('click', function () {
+        G.aja(i);
+        G.palkki(false);
+        asetaHohto();
+        [].forEach.call(kotelo.children, function (x) { x.className = ''; });
+        b.className = 'valittu';
+      });
+      kotelo.appendChild(b);
+    });
+  }
+
+  /* Hohto asetetaan molempiin laitteisiin samalla kertaa: kohtauksessa ne
+     ovat samassa valossa. */
+  function asetaHohto() {
+    Object.keys(laitteet).forEach(function (nimi) {
+      var G = laitteet[nimi].G;
+      if (!G) return;
+      if (hohto.vari) G.asetaHohto(hohto.vari, hohto.voima, false);
+      else G.asetaHohto(null, 0, false);
+    });
+  }
+
+  function asetaKirkkaus(prosentti) {
+    Object.keys(laitteet).forEach(function (nimi) {
+      var G = laitteet[nimi].G;
+      if (G) G.asetaKirkkaus(prosentti / 100);
+    });
+    document.getElementById('kirkkaus-arvo').textContent = prosentti + ' %';
+  }
+
+  document.getElementById('hohto').addEventListener('click', function (t) {
+    var b = t.target.closest('button');
+    if (!b) return;
+    [].forEach.call(this.children, function (x) { x.classList.remove('valittu'); });
+    b.classList.add('valittu');
+    hohto.vari = b.dataset.hohto === 'pois' ? null : b.dataset.hohto;
+    asetaHohto();
+  });
+
+  document.getElementById('hohtovoima').addEventListener('input', function () {
+    hohto.voima = +this.value;
+    document.getElementById('hohtovoima-arvo').textContent = this.value;
+    asetaHohto();
+  });
+
+  document.getElementById('kirkkaus').addEventListener('input', function () {
+    asetaKirkkaus(+this.value);
+  });
+
+  /* transform: scale() ei kutista asettelua vaan piirtää pienemmäksi, joten
+     kotelon mitat asetetaan käsin skaalatun kuvan mukaisiksi. Ilman tätä
+     pienennetyn laitteen alle jää sen alkuperäisen korkuinen tyhjä alue. */
+  function asetaZoom(kerroin) {
+    [].forEach.call(document.querySelectorAll('[data-kotelo]'), function (k) {
+      var kehys = k.firstElementChild;
+      kehys.style.transform = 'scale(' + kerroin + ')';
+      kehys.style.transformOrigin = 'top left';
+      k.style.width = Math.round(kehys.offsetWidth * kerroin) + 'px';
+      k.style.height = Math.round(kehys.offsetHeight * kerroin) + 'px';
+    });
+  }
+
+  document.getElementById('zoom').addEventListener('click', function (t) {
+    var b = t.target.closest('button');
+    if (!b) return;
+    [].forEach.call(this.children, function (x) { x.classList.remove('valittu'); });
+    b.classList.add('valittu');
+    asetaZoom(+b.dataset.zoom);
+  });
+
+  /* Alkutila. 100 % on oletus, koska se on 1:1 pisteinä — juuri se koko,
+     jossa typografiaa ja välejä arvioidaan. Pienempään mennään vasta jos
+     ikkuna on niin matala, ettei laitteesta näkyisi mitään järkevää. */
+  (function alkuZoom() {
+    var tila = window.innerHeight - 420;
+    var kerroin = tila >= 620 ? 1 : (tila >= 440 ? 0.75 : 0.5);
+    var nappi = document.querySelector('#zoom button[data-zoom="' + kerroin + '"]');
+    if (nappi) {
+      [].forEach.call(nappi.parentNode.children, function (x) { x.classList.remove('valittu'); });
+      nappi.classList.add('valittu');
+    }
+    asetaZoom(kerroin);
+  })();
+
+  document.getElementById('nayta-turvat').addEventListener('change', function () {
+    document.body.classList.toggle('turvat', this.checked);
+  });
+  document.getElementById('nayta-kromi').addEventListener('change', function () {
+    var nakyy = this.checked;
+    [].forEach.call(document.querySelectorAll('[data-kromi]'), function (e) {
+      e.style.display = nakyy ? '' : 'none';
+    });
+  });
+
+  Object.keys(laitteet).forEach(function (nimi) {
+    laitteet[nimi].kehys.addEventListener('load', function () { alusta(nimi); });
+    if (laitteet[nimi].kehys.contentDocument &&
+        laitteet[nimi].kehys.contentDocument.readyState === 'complete') alusta(nimi);
+  });
+})();
+</script>
+</body>
+</html>

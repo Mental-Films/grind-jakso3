@@ -3,7 +3,7 @@
 ## Kuvausproppi: Alvinan iPad ja iPhone
 
 Runko ja HOPP Partner toteutettu — ks. kohta 11 "Tila".
-Julkaistu: <https://antsub.github.io/grind-jakso3/>
+Julkaistu: <https://mental-films.github.io/grind-jakso3/>
 
 Alvinan kohtaus tarvitsee neljä keksittyä sovellusta kahdella laitteella:
 tabletilla kryptopörssi, keskustelupalsta ja osamaksupalvelu, puhelimessa

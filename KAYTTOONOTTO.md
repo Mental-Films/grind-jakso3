@@ -23,13 +23,18 @@ laitteessa, ja **`EI OFFLINE — avattu ilman HTTPS:ää`** jos ei ole.
 **Proppi on julkaistu. Tämä on osoite, joka avataan jokaisella laitteella:**
 
 ```
-https://antsub.github.io/grind-jakso3/
+https://mental-films.github.io/grind-jakso3/
 ```
 
-Repo: <https://github.com/antsub/grind-jakso3> — julkinen, koska GitHub Pages ei
-ole ilmaisella tilillä käytettävissä yksityisille repoille. `robots.txt` ja
-`noindex` pitävät sivun poissa hakukoneista, ja sovellukset ovat keksittyjä.
-Sama ratkaisu kuin tuotannon aiemmassa propissa.
+Repo: <https://github.com/Mental-Films/grind-jakso3> — Mental Filmsin
+organisaation alla, julkinen, koska GitHub Pages ei ole ilmaisella tilillä
+käytettävissä yksityisille repoille. `robots.txt` ja `noindex` pitävät sivun
+poissa hakukoneista, ja sovellukset ovat keksittyjä.
+
+> **Osoite vaihtui 13.8.** Aiempi `antsub.github.io/grind-jakso3` ei enää
+> toimi. Jos proppi on ehditty asentaa jollekin laitteelle vanhasta
+> osoitteesta, **poista se kotivalikosta ja asenna uudelleen** — vanha
+> asennus on eri origossa eikä saa päivityksiä.
 
 ### Päivitykset
 
@@ -49,7 +54,7 @@ versionumerosta näkee, mikä build on koneessa.
 
 Tee tämä **kotona tai toimistossa, missä on wifi.** Ei kuvauspaikalla.
 
-1. Avaa **`antsub.github.io/grind-jakso3`** laitteen **Safarissa** (ei
+1. Avaa **`mental-films.github.io/grind-jakso3`** laitteen **Safarissa** (ei
    Chromessa — Koti-valikkoon lisääminen ja offline-tuki toimivat iOS:ssä
    vain Safarissa)
 2. Valitse proppi:

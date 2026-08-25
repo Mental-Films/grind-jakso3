@@ -1,0 +1,261 @@
+/* RYDEZ — kyytisovelluksen kuljettajanäkymä, iPhone pysty.
+ *
+ * Ilme tulee graafikon liikevideosta (Rydez-app-motion.mp4):
+ *   · tumma neutraali kartta, ei ylä-appbaria — vain kartta ja kortit
+ *   · kortit VAALEITA (#F4F2ED) mustalla lihavalla tekstillä
+ *   · aksentit keltainen #FFD60A ja oranssi #FF5400
+ *   · kortissa keltainen pystypilleri ajan vieressä
+ *
+ * Tämä poikkeaa tarkoituksella tabletin sovelluksista, jotka ovat tummia:
+ * Rydez on graafikon määrittelemä ilme ja kartta antaa tumman pohjan, jota
+ * vasten vaalea kortti lukee kirkkaana.
+ *
+ * Väriarvot tulevat teema.json:ista (rydez-*), mitat mitat-lohkosta.
+ */
+
+.rydez {
+  position: absolute; inset: 0;
+  overflow: hidden;
+  color: var(--rydez-musta, #141414);
+  font-family: var(--fontti);
+}
+
+.rydez-kartta { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* Kevyt alahimmenä kartan päälle, jotta vaalea kortti irtoaa pohjasta. */
+.rydez-himmennys {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(0,0,0,.32) 0%, rgba(0,0,0,0) 30%);
+}
+
+/* ── Alakortti — videon "Current ride" ──────────────────────────────────── */
+.rydez-ala {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--turva-ala) + var(--vali-m));
+  padding: 0 var(--vali-m);
+  display: flex; flex-direction: column; gap: var(--vali-s);
+}
+.rydez-kortti {
+  background: var(--rydez-kortti, #F4F2ED);
+  border-radius: var(--kaarre-l);
+  padding: var(--vali-l);
+  box-shadow: var(--varjo-kelluva);
+}
+.rydez-otsikko {
+  font-size: 24px; font-weight: 700; letter-spacing: -.01em;
+  line-height: 1.15;
+}
+.rydez-alaotsikko {
+  font-size: var(--teksti-pieni);
+  color: var(--rydez-harmaa, #6A675F);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* Aika keltaisen pystypillerin kanssa — suoraan videosta. */
+.rydez-aikarivi {
+  display: flex; align-items: center; gap: var(--vali-s);
+  margin-top: var(--vali-s);
+}
+.rydez-pilleri {
+  width: 8px; height: 34px; border-radius: 4px;
+  background: var(--rydez-keltainen, #FFD60A);
+  position: relative; flex: none;
+}
+.rydez-pilleri::before, .rydez-pilleri::after {
+  content: ""; position: absolute; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%;
+  background: rgba(0,0,0,.35);
+}
+.rydez-pilleri::before { top: 4px; }
+.rydez-pilleri::after { bottom: 4px; }
+.rydez-aika {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 30px; font-weight: 700; letter-spacing: -.01em;
+}
+
+/* Työaikaloki (purku 5): hh:mm:ss isolla, sekunnit juoksevat. */
+.rydez-loki {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 38px; font-weight: 700; line-height: 1;
+  letter-spacing: -.01em;
+}
+.rydez-loki small {
+  font-size: 22px; font-weight: 700;
+  color: var(--rydez-oranssi, #FF5400);
+}
+.rydez-rivi {
+  display: flex; gap: var(--vali-s);
+  margin-top: var(--vali-m);
+  padding-top: var(--vali-m);
+  border-top: var(--reuna) solid rgba(0,0,0,.1);
+}
+.rydez-solu { flex: 1; min-width: 0; }
+.rydez-solu span {
+  display: block; font-size: 11px; font-weight: 600;
+  color: var(--rydez-harmaa, #6A675F);
+  margin-bottom: 3px;
+}
+.rydez-solu b {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 16px; font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Sanamerkki kortin kulmassa. */
+.rydez-merkki {
+  display: flex; align-items: center; gap: 7px;
+  font-size: var(--teksti-pieni); font-weight: 700;
+  color: var(--rydez-oranssi, #FF5400);
+  letter-spacing: .02em;
+}
+.rydez-merkki i {
+  width: 18px; height: 18px; border-radius: 6px;
+  background: var(--rydez-oranssi, #FF5400);
+  display: grid; place-items: center;
+  color: #fff; font-style: normal; font-size: 11px; font-weight: 800;
+}
+.rydez-ylarivi { display: flex; align-items: baseline; justify-content: space-between; }
+
+/* ── Kyytitarjous (purku 5A) ─────────────────────────────────────────────
+   Hyppää kartalle, ajastin antaa vain pari sekuntia. Keltainen palkki
+   valuu tyhjiin ja tarjous vaihtuu seuraavaan. */
+.rydez-tarjous {
+  background: var(--rydez-kortti, #F4F2ED);
+  border-radius: var(--kaarre-l);
+  box-shadow: var(--varjo-kelluva);
+  overflow: hidden;
+  animation: rydez-sisaan .22s ease-out;
+}
+@keyframes rydez-sisaan {
+  from { transform: translateY(26px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+.rydez-ajastinpalkki {
+  height: 6px;
+  background: rgba(0,0,0,.1);
+  position: relative;
+}
+.rydez-ajastinpalkki i {
+  position: absolute; inset: 0;
+  transform-origin: left center;
+  background: var(--rydez-keltainen, #FFD60A);
+}
+.rydez-ajastinpalkki.kiire i { background: var(--rydez-oranssi, #FF5400); }
+.rydez-tarjous-sisus { padding: var(--vali-m) var(--vali-l) var(--vali-l); }
+.rydez-tarjous-yla { display: flex; align-items: baseline; gap: var(--vali-s); }
+.rydez-summa {
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 40px; font-weight: 700; line-height: 1;
+  letter-spacing: -.02em;
+}
+.rydez-sekunnit {
+  margin-left: auto;
+  font-family: var(--fontti-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 19px; font-weight: 700;
+  color: var(--rydez-harmaa, #6A675F);
+}
+.rydez-ajastinpalkki.kiire + .rydez-tarjous-sisus .rydez-sekunnit,
+.rydez-sekunnit.kiire { color: var(--rydez-oranssi, #FF5400); }
+
+/* ── Napit ──────────────────────────────────────────────────────────────── */
+.rydez-nappi {
+  display: block; width: 100%;
+  min-height: var(--kosketus);
+  padding: 17px;
+  border: none; border-radius: var(--kaarre-m);
+  background: var(--rydez-keltainen, #FFD60A);
+  color: var(--rydez-musta, #141414);
+  font-family: var(--fontti);
+  font-size: 18px; font-weight: 800; letter-spacing: .05em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.rydez-nappi:active { filter: brightness(.88); transform: translateY(1px); }
+.rydez-nappi.iso { padding: 21px; font-size: 21px; }
+.rydez-nappi.haamu {
+  background: transparent;
+  border: var(--reuna-paksu) solid rgba(0,0,0,.16);
+  color: var(--rydez-harmaa, #6A675F);
+  font-size: var(--teksti-leipa); letter-spacing: 0;
+  padding: 12px;
+}
+.rydez-nappi.painettu { filter: brightness(.8); }
+.rydez-napit { display: flex; flex-direction: column; gap: var(--vali-s); margin-top: var(--vali-m); }
+
+/* Osoiterivi hyväksytyssä tilauksessa. */
+.rydez-osoite {
+  display: flex; align-items: center; gap: var(--vali-s);
+  margin-top: var(--vali-s);
+  font-size: var(--teksti-leipa); font-weight: 600;
+}
+.rydez-osoite i {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--rydez-oranssi, #FF5400);
+  flex: none; font-style: normal;
+}
+
+/* Vahvistus HYVÄKSY-painalluksen jälkeen. */
+.rydez-kuittaus {
+  display: flex; align-items: center; gap: var(--vali-m);
+}
+.rydez-kuittaus-merkki {
+  width: 44px; height: 44px; border-radius: 50%; flex: none;
+  background: var(--rydez-keltainen, #FFD60A);
+  display: grid; place-items: center;
+  animation: rydez-kuittaus .4s ease-out;
+}
+.rydez-kuittaus-merkki svg { width: 24px; height: 24px; fill: var(--rydez-musta, #141414); }
+@keyframes rydez-kuittaus {
+  0% { transform: scale(.5); opacity: 0; }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── KÄÄNNY YMPÄRI (purku 6b) ───────────────────────────────────────────
+   Musta palkki ruudun ylälaidassa, ohje punaisella. Purku: "Sovelluksessa
+   on vain punaisella ohje" — palkki on ainoa käyttöliittymäelementti. */
+.rydez-yla {
+  position: absolute; left: 0; right: 0; top: 0;
+  padding:
+    calc(var(--turva-yla) + var(--palkki-tila, 0px) + var(--vali-s))
+    var(--vali-m) var(--vali-m);
+  background: rgba(10, 10, 10, .96);
+  display: flex; align-items: center; gap: var(--vali-m);
+  box-shadow: 0 8px 30px rgba(0,0,0,.6);
+}
+.rydez-kaanny {
+  font-size: 27px; font-weight: 800; letter-spacing: .04em;
+  color: var(--rydez-punainen, #E5342A);
+}
+.rydez-kaanny-selite {
+  font-size: var(--teksti-pieni); font-weight: 600;
+  color: rgba(244, 242, 237, .55);
+  margin-top: 2px;
+}
+.rydez-yla .rydez-merkki i { width: 26px; height: 26px; border-radius: 8px; font-size: 15px; }
+
+/* ── Operaattorin karttatyökalu ─────────────────────────────────────────
+   Näkyy vain kun ohjauspalkki on esillä. */
+.rydez-tyokalu {
+  position: absolute; right: 10px;
+  top: calc(var(--turva-yla) + var(--palkki-tila, 0px) + 10px);
+  display: none;
+  flex-direction: column; gap: 6px;
+  background: rgba(8, 10, 14, .92);
+  border: var(--reuna) solid var(--viiva-2);
+  border-radius: var(--kaarre-s);
+  padding: 9px;
+  font-family: var(--fontti-mono); font-size: var(--teksti-mikro);
+  color: var(--himmea);
+  z-index: 5;
+  max-width: 176px;
+}
+body.ko-palkki-esilla .rydez-tyokalu { display: flex; }
+.rydez-tyokalu b { color: var(--teksti); }
+.rydez-tyokalu .rivi { display: flex; justify-content: space-between; gap: 8px; }

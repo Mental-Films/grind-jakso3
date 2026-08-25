@@ -22,7 +22,7 @@
     "candlr":     { "nimi": "CANDLR",     "tunnusvari": "#C9A227" },  // vaihtoehdot: Spindl, Wickr, Bullpen
     "grumbl":     { "nimi": "GRUMBL",     "tunnusvari": "#C25A7A" },  // Warren, Threadle
     "tabb":       { "nimi": "TABB",       "tunnusvari": "#A8746A" },  // Laterr, Owed
-    "hopp":       { "nimi": "HOPP",       "tunnusvari": "#3E9E92" },  // Vectr, Haul
+    "hopp":       { "nimi": "Rydez",      "tunnusvari": "#FF5400" },  // graafikon videosta; avain pysyy "hopp"
     "reapercoin": { "nimi": "Reapercoin", "tunnusvari": "#C4402F" },  // käsikirjoituksesta
     "novex":      { "nimi": "NOVEX",      "tunnusvari": "#6C7885" },  // puhelinvalmistaja
     "nibbl":      { "nimi": "NIBBL",      "tunnusvari": "#C79A3A" },  // ruokalähetti
@@ -243,100 +243,78 @@
 
   // ══ HOPP Partner — kyytipalvelu (suomi) ════════════════════════════════
   "hopp": {
+    // Sovellus on RYDEZ (graafikon liikevideosta). Sisäinen avain on yhä
+    // "hopp", jotta tiedostonimet ja koodi eivät muutu — näkyvä nimi ja
+    // värit tulevat nimet-lohkosta ja teemasta.
     "otsikko":         "Kuljettaja",
     "tilaVapaana":     "Vapaana · tolpalla",
     "tilaKyydissa":    "Kyyti käynnissä",
     "taksitolppa":     "Kivihaanväylä",
-    "vuoroOtsikko":    "Työvuoro käynnissä",
+
+    // ── Työaikaloki (purku 5) ────────────────────────────────────────────
+    // Laskee hh:mm:ss ja sekunnit juoksevat oikeasti. Tunnit ja minuutit
+    // tulevat luvut-lohkosta (vuoroTunnit, vuoroMinuutit) — sama luku kuin
+    // vuoron pituus, ei omaa kopiota.
+    "lokiOtsikko":     "Työaikaa tänään",
     "ansiotOtsikko":   "Vuoron ansiot",
     "kyyditOtsikko":   "Kyytejä",
     "hyvaksyntaOtsikko": "Hyväksymisaste",
-    "taukoVaroitus":   "Suositeltu tauko ylitetty",
 
-    "pyyntoOtsikko":   "Uusi kyyti",
+    // ── Kyytitarjoukset (purku 5A) ───────────────────────────────────────
+    // Näytölle hyppii tarjouksia. Jokaisessa ajastin, joka antaa vain pari
+    // sekuntia aikaa hyväksyä ennen kuin tarjous häviää ja tilalle tulee
+    // toinen. Kesto sekunneissa; kierto on siemennetty järjestys, joten
+    // sama otto toistuu samanlaisena.
+    "tarjousKesto":    3.31,
+    "tarjoukset": [
+      { "summa": 4.20, "nouto": "1,2 km", "matka": "6,8 km" },
+      { "summa": 2.85, "nouto": "3,4 km", "matka": "4,1 km" },
+      { "summa": 5.15, "nouto": "0,8 km", "matka": "11,3 km" },
+      { "summa": 3.31, "nouto": "2,1 km", "matka": "3,31 km" },
+      { "summa": 2.10, "nouto": "4,7 km", "matka": "2,9 km" }
+    ],
+    "tarjousOtsikko":  "Uusi kyyti",
     "hyvaksyNappi":    "HYVÄKSY",
     "hylkaaNappi":     "HYLKÄÄ",
-    "ennusteOtsikko":  "Arvioitu tuotto",
-    "etaisyysOtsikko": "Nouto",
+    "noutoOtsikko":    "Nouto",
+    "matkaOtsikko":    "Matka",
 
-    "aloitaNappi":     "START RIDE",
-    "lopetaNappi":     "PÄÄTÄ KYYTI",
-    "matkustaja":      "Matkustaja kyydissä",
-    "saapuminen":      "Perillä",
-    "kaannyNappi":     "KÄÄNNY YMPÄRI",
-
-    // Räpsähtely cuessa 1. Käynnistyy itsestään, koska kuvauspaikalla
-    // operaattorilla on vain klikkeri eikä näppäimistöä. Väli millisekunteja.
-    // Tyypit: tear (repeytyminen), block (blokkiintuminen),
-    //         flip (kuva väärinpäin), comb (sahalaita).
-    "rapsy": {
-      "tyypit":  ["tear", "comb", "block"],
-      "valiMin": 1600,
-      "valiMax": 4600
-    },
-
-    // Navigaattorin ohjeet ajon aikana, järjestyksessä.
-    "ohjeet": [
-      { "matka": "400 m",  "teksti": "Käänny oikealle" },
-      { "matka": "1,2 km", "teksti": "Jatka suoraan" },
-      { "matka": "3,1 km", "teksti": "Käänny vasemmalle" },
-      { "matka": "800 m",  "teksti": "Jatka suoraan" },
-      { "matka": "—",      "teksti": "Reitti ei ole käytettävissä" }
-    ],
-
-    // Kadunnimet piirretään kartan päälle. Keksittyjä, eivät viittaa
-    // oikeaan paikkaan.
-    "kadut": ["Ruovaarantie", "Kivihaanväylä", "Louhoskaari", "Pyörretie", "Sammalpolku"],
-    "maaranpaa": "Sammalpolku 31",
-    "noutopaikka": "Louhoskaari 12",
-    // Matkan pituus kilometreinä. Ruudulla näkyvä jäljellä oleva matka
-    // lasketaan tästä, ei generoidun reitin todellisesta pituudesta —
-    // muuten lukema hyppäisi heti kun kartta lähtee liikkeelle.
-    "matkanPituusKm": 3.31,
-
-    // Noutoetäisyys. Sama luku kuin matka — 331-sarjaa, ei sattumaa.
-    "noutoEtaisyysKm": 3.31,
-    "matkanKesto": "9 min",
-
-    // Saapumisaika on sama kuin jäädytetty kello: matkustaja nousee kyytiin
-    // 3:31 ja on perillä 3:31. Tarkoituksellista — älä "korjaa" sitä.
-    "saapumisaika": "3:31",
-
-    // Kyyti hyväksytty -vahvistus, joka jää ruudulle HYVÄKSY-painalluksen
-    // jälkeen. Cue vaihdetaan klikkerillä, ei tästä.
+    // ── Hyväksytty tilaus ja START RIDE (purku 5B) ───────────────────────
     "hyvaksyttyOtsikko": "KYYTI HYVÄKSYTTY",
     "hyvaksyttyTeksti":  "Matkalla noutopaikkaan",
-    "saavuOtsikko":      "Saavu paikalle",
+    "noutopaikka":     "Louhoskaari 12",
+    "aloitaNappi":     "START RIDE",
+    "matkustaja":      "Matkustaja kyydissä",
 
+    // ── Ajonäkymä (purku 6) ──────────────────────────────────────────────
+    // "Seuraillaan reittiä. Määränpäätä ei näy." — kortissa on vain
+    // kyydin nimi ja kulunut aika, kuten graafikon videossa.
+    "ajoOtsikko":      "Current ride",
+    "ajoAlku":         "12:13",
 
-    // ── KARTTA ───────────────────────────────────────────────────────────
-    // Tiestö generoidaan siemenluvusta, ei kuvatiedostosta. Siemenen
-    // vaihtaminen antaa uuden kaupungin samalla tyylillä — sama luku antaa
-    // aina saman kartan, joten jatkuvuus säilyy ottojen välillä.
-    //
-    // Operaattori voi siirtää ja zoomata karttaa propissa (näppäimet W A S D,
-    // + ja −) ja tallentaa löytämänsä näkymän painamalla M. Tallennettu
-    // näkymä ilmestyy alle listaan "nakymat" — kopioi se tähän tiedostoon,
-    // niin se on mukana seuraavallakin kerralla.
+    // ── Signaali katoaa (purku 6b) ───────────────────────────────────────
+    "kaannyTeksti":    "KÄÄNNY YMPÄRI",
+    "eiSignaalia":     "GPS-signaali katosi",
+
+    // Kyytiin liittyvät luvut. 3,31-sarja jatkuu.
+    "matkanPituusKm":  3.31,
+    "noutoEtaisyysKm": 3.31,
+    "matkanKesto":     "9 min",
+    "saapumisaika":    "3:31",
+
+    // Kadunnimiä EI piirretä kartalle — graafikon videossa niitä ei ole.
+    // Tyhjä lista sammuttaa ne. Osoitteet korteissa säilyvät.
+    "kadut": [],
+
     "kartta": {
       "siemen": 3310,
-      "zoom": 0.7,            // px/m. 0,7 → ruudulla ~560 m (ajozoom)
+      "zoom": 0.7,
       "nopeusKmh": 42,
-      "kaanny": true,         // kartta kääntyy ajosuuntaan, kuten navigaattorissa
-
-      // Missä kohtaa reittiä ollaan kussakin cuessa, 0–1.
-      // 0 = kaupunki, 0,5 = maantie, 0,9+ = metsätie
-      // Missä kohtaa MATKAREITTIÄ ollaan kussakin cuessa, 0–1.
-      // 0 = noutopaikka, 0,5 = maantie, 0,9+ = metsätie.
-      //
-      // Cuet 0 ja 1 eivät käytä näitä: Alvina on taksitolpalla eikä
-      // reitillä. Reitti ilmestyy vasta kun kyyti hyväksytään.
+      "kaanny": true,
       "osuudet": {
         "ajossa": 0.42,
         "metsatie": 0.93
       },
-
-      // Tallennetut näkymät. Tyhjä lista = käytetään yllä olevia oletuksia.
       "nakymat": []
     }
   }

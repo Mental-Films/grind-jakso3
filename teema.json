@@ -24,7 +24,17 @@
     "himmea-2":  "#4E5866",
     "virhe":     "#C4402F",   // erääntynyt, lasku, reittiviiva
     "varoitus":  "#C79A3A",
-    "ok":        "#5E9E6B"    // nousu
+    "ok":        "#5E9E6B",   // nousu
+
+    // Rydez (puhelin) — graafikon liikevideon ilme. Poikkeaa tabletin
+    // sovelluksista: kortit ovat VAALEITA mustalla tekstillä, aksentit
+    // keltainen ja oranssi.
+    "rydez-kortti":   "#F4F2ED",
+    "rydez-musta":    "#141414",
+    "rydez-harmaa":   "#6A675F",
+    "rydez-keltainen":"#FFD60A",
+    "rydez-oranssi":  "#FF5400",
+    "rydez-punainen": "#E5342A"
   },
 
   // Hohtokerros — kohtauksen käytännön valo Alvinan kasvoille.
@@ -53,22 +63,37 @@
   // Nämä eivät ole CSS-muuttujia vaan menevät suoraan canvakselle, joten
   // rgba() käy mutta var() ei.
   "kartta": {
-    "maa":           "#12161C",   // pohja, kaupungin ulkopuoli
-    "kortteli":      "#171C24",   // rakennuskorttelit
-    "metsa":         "#131A18",
-    "vesi":          "#16202B",
-    "tie-kuori":     "#0D1116",   // tumma reunus tien alla
-    "tie-paa":       "#39424F",   // valtaväylä ja pääkatu
-    "tie":           "#2A323D",   // katu ja maantie
-    "tie-pieni":     "#222932",   // metsätie
-    "kadunnimi":     "#7A8694",
-    "tolppa":        "#C79A3A",   // taksitolpan merkki kartalla
-    "reitti":        "#C4402F",
-    "reitti-kuori":  "#7A1E14",
-    "reitti-ajettu": "#4A241D",   // jo ajettu osuus, himmeä
-    "auto":          "#3E9E92",
-    "auto-hehku":    "rgba(62,158,146,.45)"
+    // Rydez-kartta graafikon liikevideosta (Rydez-app-motion.mp4):
+    // tumma neutraali pohja, vaaleanharmaat tiet ilman reunuksia,
+    // kelta-oranssi paksu reitti ja oranssi autosprite.
+    "maa":           "#2E2E2E",
+    "kortteli":      "#3E3E3E",
+    "metsa":         "#2A2E2A",
+    "vesi":          "#26292E",
+    "tie-kuori":     "#2E2E2E",   // ei erottuvaa reunusta — videon tiet ovat tasaisia
+    "tie-paa":       "#8F8F8F",
+    "tie":           "#6E6E6E",
+    "tie-pieni":     "#4A4A4A",
+    "kadunnimi":     "#A5A5A5",
+    "tolppa":        "#FFD60A",   // taksitolpan merkki — Rydezin keltainen
+
+    // Reitti kahtena kerroksena: keltainen ydin oranssin reunuksen päällä.
+    // kartta.js piirtää kuoren leveämpänä ytimen alle, joten tämä vastaa
+    // suoraan videon ilmettä.
+    "reitti":        "#FFD60A",
+    "reitti-kuori":  "#FF5400",
+    "reitti-ajettu": "#7A5A08",
+    "reitti-leveys": 15,
+
+    "auto":          "#FF5000",
+    "auto-hehku":    "rgba(255,84,0,.35)",
+
+    // Signaali kadonnut: kartta himmenee lähes tyhjäksi ja jäljelle jää
+    // sykkivä sijaintipiste (purku 6b).
+    "signaali-himmennys": 0.1,
+    "signaali-piste":     "#4A8FD8"
   },
+
 
   // ══ MITAT ═════════════════════════════════════════════════════════════
   // Nämä ovat ulkoasun rakennuspalikat. Jos graafikko toimittaa uuden

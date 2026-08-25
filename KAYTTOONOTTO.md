@@ -71,6 +71,18 @@ ruutuun ilman selainpalkkia, ja vasta silloin turva-alueet ovat oikein.
 Kuvakkeet ovat paikkamerkkejä, jotta oikean propin löytää: **kulta = tabletti,
 turkoosi = puhelin.**
 
+### Android-puhelin
+
+Sama proppi toimii Androidilla — purku sallii kummankin. Erot asennuksessa:
+
+1. Avaa osoite **Chromessa**
+2. Valikko (⋮) → **Lisää aloitusnäyttöön** (tai "Asenna sovellus")
+3. Avaa aloitusnäytön kuvakkeesta ja testaa lentotilassa kuten iPhonella
+
+Ohjattua käyttöä vastaava toiminto Androidissa on **sovelluksen kiinnitys**
+(Asetukset → Suojaus → Kiinnitä sovellus). Kello väärennetään samalla
+tavalla asetuksista, ja Bluetooth-klikkeri pariutuu samoin.
+
 ---
 
 ## 3. Varmista offline — älä ohita tätä

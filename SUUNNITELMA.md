@@ -153,20 +153,24 @@ Cue 3 on tila, ei siirtymä: Alvina *herää* vihreään ruutuun.
 ajolistassa — ja väliporras, joka pitää muistaa ohittaa klikkerillä kesken
 kohtauksen.
 
-### Puhelin — `proppi_puhelin.html`
+### Puhelin — `proppi_puhelin.html` — RYDEZ
 
-| Cue | Ruudulla |
-|:---:|---|
-| **0** | **Vuoroloki.** Alvina on parkissa **taksitolpalla**. Kartalla tolpan merkki, ei reittiä. Työvuoro **18 tuntia**, ansiot, hyväksymisprosentti |
-| **1** | **Räpsy + ajastin.** Yhä tolpalla. Ruutu häiriöityy, hyväksymisajastin sykkii. **HYVÄKSY** irrottaa auton tolpalta: noutoreitti ilmestyy ja Alvina lähtee hakemaan kyytiläisen |
-| **2** | **Matkustaja kyydissä.** Ollaan noutopaikassa, matkareitti näkyy. **START RIDE** piilottaa paneelin ja aloittaa navigoinnin. Alvina painaa itse |
-| **3** | **Ajossa.** GPS-näkymä, punainen reittiviiva etenee kartalla |
-| **4** | **Metsätie.** Näytölle: **KÄÄNNY YMPÄRI** |
-| **5** | **Uusi kyytipyyntö.** Lähellä oleva asiakas, hyvä provikkaennuste, laskeva ajastin. Alvina painaa **HYVÄKSY** |
+Sovellus on **Rydez** ja sen ilme tulee graafikon liikevideosta
+(`Rydez-app-motion.mp4`): tumma neutraali kartta, kelta-oranssi paksu
+reitti, oranssi autosprite ja **vaaleat kortit** mustalla tekstillä.
+Sisältö on grafiikkapurusta (kohdat 5, 5A, 5B, 6, 6b).
 
-Kartta ei ole karttapalvelu eikä piirretty kuva, vaan generoitu siemenluvusta.
-Se toimii lentotilassa, ei vaadi lisenssiä, on siirrettävissä mihin tahansa ja
-piirtyy joka otossa samanlaisena. Ks. kohta 13.
+| Cue | Purku | Ruudulla |
+|:---:|:---:|---|
+| **0** | 5 | **Tilausnäkymä.** Tolpalla. Työaikaloki laskee **hh:mm:ss** ja sekunnit juoksevat — 18:31:ss |
+| **1** | 5A | **Tarjoukset.** Kyytitarjouksia hyppii näytölle, jokaisessa ajastin joka antaa vain pari sekuntia (3,31 s). Tarjous häviää ja tilalle tulee toinen. Räpsy päällä. HYVÄKSY → vahvistus ja noutoreitti käyntiin |
+| **2** | 5B | **Hyväksytty tilaus** ja suuri **START RIDE**. Painallus piilottaa kortin ja aloittaa ajon |
+| **3** | 6 | **Ajossa.** Reittiä seuraillaan. **Määränpäätä ei näy** — kortissa vain "Current ride" ja kulunut aika (12:13 →) |
+| **4** | 6b | **Signaali katoaa.** Kartta tyhjenee, jäljelle jää sykkivä sijaintipiste. Musta palkki, punaisella: **KÄÄNNY YMPÄRI** |
+| **5** | — | **Uusi kyyti.** Yksittäinen tarjous 3,31 €, ajastin 31 s. Alvina painaa HYVÄKSY |
+
+Tarjousten kierto on deterministinen cue-ajasta, joten sama otto toistuu
+samanlaisena. Kaikki tarjoukset ja tekstit ovat `sisalto.json`:issa.
 
 > Jakson nimi kannattaa pitää mielessä telineen paikkaa valittaessa. Jos puhelin
 > on kiinnitetty kojelaudan oikeaan laitaan, sovellus istuu kirjaimellisesti

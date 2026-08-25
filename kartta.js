@@ -250,6 +250,13 @@
     this.naytaReitti = true;
     this.pysakoity = false;
 
+    /* Signaali kadonnut (purku 6b): kartta himmenee lähes tyhjäksi, reitti
+       ja auto katoavat, jäljelle jää sykkivä sijaintipiste. Pulssin vaihe
+       tulee cue-suhteellisesta ajasta (signaaliAika), joten se toistuu
+       otosta toiseen. */
+    this.signaaliKadonnut = false;
+    this.signaaliAika = 0;
+
     this.matka = 0;                                   // metriä reitin alusta
     this.nopeus = (this.asetukset.nopeusKmh || 42) / 3.6;
     this.zoom = this.asetukset.zoom || 0.7;           // pikseliä per metri
@@ -438,6 +445,12 @@
     c.fillStyle = this.vari('maa', '#12161C');
     c.fillRect(0, 0, L, K);
 
+    /* Signaali kadonnut: maasto piirretään himmeänä, reitti ja auto eivät
+       lainkaan. Lopuksi vain sykkivä piste. */
+    if (this.signaaliKadonnut) {
+      c.globalAlpha = Number(this.vari('signaali-himmennys', 0.1)) || 0.1;
+    }
+
     /* Ajoneuvon paikka ruudulla, ks. autoY. */
     var ax = L / 2, ay = K * this.autoY;
     c.save();
@@ -482,15 +495,15 @@
     }, this);
 
     /* Reitti: ajettu osuus himmeänä, edessä oleva kirkkaana. */
-    if (this.naytaReitti && !this.pysakoity && this.reitti.length > 1) {
+    if (this.naytaReitti && !this.pysakoity && !this.signaaliKadonnut && this.reitti.length > 1) {
       var jaettu = this.jaaReitti();
-      var reittiLev = Math.max(10, 5 / this.zoom);
+      var reittiLev = Math.max(Number(this.vari('reitti-leveys', 10)) || 10, 5 / this.zoom);
       c.strokeStyle = this.vari('reitti-ajettu', '#5A2A22');
       c.lineWidth = reittiLev;
       if (jaettu.takana.length > 1) { this.polku(c, jaettu.takana); c.stroke(); }
 
       c.strokeStyle = this.vari('reitti-kuori', '#7A1E14');
-      c.lineWidth = reittiLev + 4.5;
+      c.lineWidth = reittiLev + Math.max(6, reittiLev * 0.55);
       if (jaettu.edessa.length > 1) { this.polku(c, jaettu.edessa); c.stroke(); }
       c.strokeStyle = this.vari('reitti', '#C4402F');
       c.lineWidth = reittiLev;
@@ -499,9 +512,39 @@
 
     c.restore();
 
+    if (this.signaaliKadonnut) {
+      c.globalAlpha = 1;
+      this.piirraSignaalipiste(c, L / 2, K * 0.5);
+      return;
+    }
+
     this.piirraTolppa(c, ax, ay);
     this.piirraKadunnimet(c, ax, ay);
     this.piirraAuto(c, ax, ay);
+  };
+
+  /* Yksinäinen sijaintipiste, kun signaali on kadonnut. Sykkivä rengas
+     kertoo että laite etsii — kuten karttasovelluksissa. */
+  Kartta.prototype.piirraSignaalipiste = function (c, x, y) {
+    var vari = this.vari('signaali-piste', '#4A8FD8');
+    var vaihe = (this.signaaliAika % 2.2) / 2.2;
+
+    c.save();
+    c.globalAlpha = Math.max(0, 0.4 * (1 - vaihe));
+    c.beginPath();
+    c.arc(x, y, 14 + vaihe * 34, 0, Math.PI * 2);
+    c.fillStyle = vari;
+    c.fill();
+    c.globalAlpha = 1;
+
+    c.beginPath();
+    c.arc(x, y, 10, 0, Math.PI * 2);
+    c.fillStyle = vari;
+    c.fill();
+    c.lineWidth = 3;
+    c.strokeStyle = 'rgba(255,255,255,.85)';
+    c.stroke();
+    c.restore();
   };
 
   Kartta.prototype.jaaReitti = function () {
@@ -620,20 +663,47 @@
     c.translate(s.x, s.y);
     if (!this.kaanny) c.rotate(this.suunta + Math.PI / 2);
 
-    var hehku = c.createRadialGradient(0, 0, 2, 0, 0, 30);
-    hehku.addColorStop(0, this.vari('auto-hehku', 'rgba(62,158,146,.45)'));
+    /* Autosprite graafikon liikevideosta: oranssi kori ylhäältä, mustat
+       ikkunat, kevyt hehku alla. Nokka osoittaa ylös (ajosuuntaan, koska
+       kartta kääntyy ajosuunnan mukaan). Mitat pisteinä ruudulla — sprite
+       ei skaalaudu zoomin mukana, kuten ei navigaattoreissakaan. */
+    var hehku = c.createRadialGradient(0, 0, 4, 0, 0, 34);
+    hehku.addColorStop(0, this.vari('auto-hehku', 'rgba(255,84,0,.35)'));
     hehku.addColorStop(1, 'rgba(0,0,0,0)');
     c.fillStyle = hehku;
-    c.beginPath(); c.arc(0, 0, 30, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(0, 0, 34, 0, Math.PI * 2); c.fill();
 
+    var runko = this.vari('auto', '#FF5000');
+    var lasi = '#1A1A1A';
+
+    /* Kori */
     c.beginPath();
-    c.moveTo(0, -13); c.lineTo(9.5, 10); c.lineTo(0, 5.5); c.lineTo(-9.5, 10);
-    c.closePath();
-    c.fillStyle = this.vari('auto', '#3E9E92');
+    if (c.roundRect) c.roundRect(-9, -19, 18, 38, 7);
+    else c.rect(-9, -19, 18, 38);
+    c.fillStyle = runko;
     c.fill();
-    c.lineWidth = 2;
-    c.strokeStyle = this.vari('maa', '#12161C');
+    c.lineWidth = 1.5;
+    c.strokeStyle = 'rgba(0,0,0,.45)';
     c.stroke();
+
+    /* Tuulilasi (edessä, ylhäällä) ja takalasi */
+    c.fillStyle = lasi;
+    c.beginPath();
+    if (c.roundRect) c.roundRect(-6.5, -12, 13, 7, 2.5);
+    else c.rect(-6.5, -12, 13, 7);
+    c.fill();
+    c.beginPath();
+    if (c.roundRect) c.roundRect(-6.5, 7, 13, 6, 2.5);
+    else c.rect(-6.5, 7, 13, 6);
+    c.fill();
+
+    /* Katto */
+    c.fillStyle = runko;
+    c.beginPath();
+    if (c.roundRect) c.roundRect(-6.5, -4, 13, 10, 2);
+    else c.rect(-6.5, -4, 13, 10);
+    c.fill();
+
     c.restore();
   };
 

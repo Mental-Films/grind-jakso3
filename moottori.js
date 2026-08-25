@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  var VERSIO = '1.1.0';
+  var VERSIO = '1.2.0';
 
   /* ══ Siemennetty satunnaisluku ══════════════════════════════════════════
      Jatkuvuus vaatii, että sama cue piirtää saman kuvan joka otossa.
@@ -264,7 +264,11 @@
     var c = M.cuet[M.cue];
     if (c && typeof c.tick === 'function' && M._ctx) {
       M._ctx.t = (nyt - M.alkuAika) / 1000;
-      c.tick(M._el.sovellus, M._ctx);
+      /* Yksi kaatuva tick ei saa tappaa silmukkaa: rAF:n uudelleentilaus on
+         tämän kutsun JÄLKEEN, joten ilman suojaa poikkeus pysäyttäisi koko
+         propin pysyvästi — kesken kuvauspäivän. Virhe menee konsoliin. */
+      try { c.tick(M._el.sovellus, M._ctx); }
+      catch (virhe) { if (global.console) console.error('tick:', virhe); }
     }
     requestAnimationFrame(silmukka);
   }
